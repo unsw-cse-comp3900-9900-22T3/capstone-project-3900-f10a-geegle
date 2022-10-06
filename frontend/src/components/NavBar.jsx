@@ -12,7 +12,7 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
-import { Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Link, Routes } from 'react-router-dom';
 const pages = ['Products', 'Pricing', 'Blog'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
@@ -37,42 +37,46 @@ const NavBar = () => {
   const styles = {
     appBar: {
       padding: '0',
-      backgroundColor: '#cfabed'
+      backgroundColor: '#9662f0'
     }
   }
   return (
-    <AppBar position="static" sx={{bgcolor: '#cfabed'}}>
-      <Container maxWidth="xl" style={{backgroundColor: '#cfabed'}}>
-        <Toolbar style={{backgroundColor: '#cfabed'}}>
-          <Typography
-            variant="h6"
-            sx={{
-              mr: 2,
-              display: { xs: 'none', md: 'flex' },
-              fontFamily: 'monospace',
-              fontWeight: 700,
-              letterSpacing: '.3rem',
-              color: 'inherit',
-              textDecoration: 'none',
-            }}
-          >
-            EVENTFUL
-          </Typography>
-          <div>
+    <>
+    <Router>
+      <AppBar position="static" sx={{bgcolor: '#9662f0'}}>
+        <Container maxWidth="xl" style={{backgroundColor: '#9662f0'}}>
+          <Toolbar style={{backgroundColor: '#9662f0'}}>
+            <Typography
+              variant="h6"
+              sx={{
+                mr: 2,
+                display: { xs: 'none', md: 'flex' },
+                fontFamily: 'monospace',
+                fontWeight: 700,
+                letterSpacing: '.3rem',
+                color: 'inherit',
+                textDecoration: 'none',
+              }}
+            >
+              EVENTFUL
+            </Typography>
             <div>
-              <Link to = '/'>
-                Home
-              </Link>
+              <Link to = '/'><div style={{display:'inline-block'}}>Home&nbsp;|</div></Link>
+                {/* <div>Home</div> */}
+              <Link to ='/login'><div style={{display:'inline-block'}}>&nbsp;Login&nbsp;|</div></Link>
+              <Link to ='/register'><div style={{display:'inline-block'}}>&nbsp;Register&nbsp;</div></Link>
+              {/* <div>Login</div> */}
             </div>
-            <div >
-              <Link to ='/login'>
-                Login
-              </Link>
-            </div>
-          </div>
-        </Toolbar>
-      </Container>
-    </AppBar>
+          </Toolbar>
+        </Container>
+      </AppBar>
+        <Routes>
+          <Route path={`/`} element={<div>Home Page</div>}></Route>
+          <Route path={`/login`} element={<div>Login Page</div>}></Route>
+          <Route path={`/register`} element={<div>Register Page</div>}></Route>
+        </Routes>
+      </Router>
+    </>
   );
 };
 export default NavBar;
