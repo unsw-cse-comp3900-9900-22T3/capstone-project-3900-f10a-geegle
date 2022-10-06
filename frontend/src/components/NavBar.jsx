@@ -13,6 +13,8 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import { BrowserRouter as Router, Route, Link, Routes } from 'react-router-dom';
+import LoginPage from '../pages/login';
+import RegisterPage from '../pages/register';
 const pages = ['Products', 'Pricing', 'Blog'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
@@ -22,7 +24,6 @@ const NavBar = () => {
 
   //const handleOpenNavMenu = (event) => {
     //setAnchorElNav(event.currentTarget);
-  //};
   // const handleOpenUserMenu = (event) => {
   //   setAnchorElUser(event.currentTarget);
   // };
@@ -72,8 +73,8 @@ const NavBar = () => {
       </AppBar>
         <Routes>
           <Route path={`/`} element={<div>Home Page</div>}></Route>
-          <Route path={`/login`} element={<div>Login Page</div>}></Route>
-          <Route path={`/register`} element={<div>Register Page</div>}></Route>
+          <Route path={`/login`} element={<LoginPage></LoginPage>}></Route>
+          <Route path={`/register`} element={<RegisterPage></RegisterPage>}></Route>
         </Routes>
       </Router>
     </>
