@@ -1,6 +1,6 @@
 import express from 'express';
 import morgan from 'morgan';
-import eventRouter from './routes/event.route';
+import eventRouter from './routes/event.route.js';
 
 const app = express();
 const PORT = 3000;
