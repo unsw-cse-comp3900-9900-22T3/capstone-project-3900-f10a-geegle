@@ -59,8 +59,16 @@ const NavBar = () => {
             EVENTFUL
           </Typography>
           <div>
-            <div >Home</div>
-            <div >Login</div>
+            <div>
+              <Link to = '/'>
+                Home
+              </Link>
+            </div>
+            <div >
+              <Link to ='/login'>
+                Login
+              </Link>
+            </div>
           </div>
         </Toolbar>
       </Container>
