@@ -42,7 +42,6 @@ const NavBar = () => {
   }
   return (
     <>
-    <Router>
       <AppBar position="static" sx={{bgcolor: '#9662f0'}}>
         <Container maxWidth="xl" style={{backgroundColor: '#9662f0'}}>
           <Toolbar style={{backgroundColor: '#9662f0'}}>
@@ -60,22 +59,26 @@ const NavBar = () => {
             >
               EVENTFUL
             </Typography>
-            <div>
-              <Link to = '/'><div style={{display:'inline-block'}}>Home&nbsp;|</div></Link>
-                {/* <div>Home</div> */}
-              <Link to ='/login'><div style={{display:'inline-block'}}>&nbsp;Login&nbsp;|</div></Link>
-              <Link to ='/register'><div style={{display:'inline-block'}}>&nbsp;Register&nbsp;</div></Link>
-              {/* <div>Login</div> */}
+            <div style={{display:'flex', gap:'1rem'}}>
+              <div style={{display:'inline-block'}}>
+                <Link to = '/' style={{color:'white'}}>
+                  Home
+                </Link>
+              </div>
+              <div style={{display:'inline-block'}}>
+                <Link to ='/login' style={{color:'white'}}>
+                  Login
+                </Link>
+              </div>
+              <div style={{display:'inline-block'}}>
+                <Link to ='/register' style={{color:'white'}}>
+                  Register
+                </Link>
+              </div>
             </div>
           </Toolbar>
         </Container>
       </AppBar>
-        <Routes>
-          <Route path={`/`} element={<div>Home Page</div>}></Route>
-          <Route path={`/login`} element={<div>Login Page</div>}></Route>
-          <Route path={`/register`} element={<div>Register Page</div>}></Route>
-        </Routes>
-      </Router>
     </>
   );
 };
