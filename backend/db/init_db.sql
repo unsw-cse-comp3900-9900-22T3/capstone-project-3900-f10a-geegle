@@ -43,14 +43,14 @@ CREATE TABLE creditCardDetails(
     userID integer NOT NULL,
     foreign key (userID)
         references users(userID)
-)
+);
 
 CREATE TABLE paypalDetails (
     accountID integer PRIMARY KEY
     userID integer NOT NULL,
     foreign key(userID)
         references users(userID)
-)
+);
 
 CREATE TABLE ticketPurchase (
     userID integer NOT NULL,
@@ -61,7 +61,7 @@ CREATE TABLE ticketPurchase (
         references users(userID),
     foreign key (ticketID)
         references tickets(ticketID)
-)
+);
 
 
 INSERT INTO USERS (userID, firstName, lastName, email, userPassword) VALUES (DEFAULT, 'John', 'SMITH', 'jsmith@email.com', 'password123');
