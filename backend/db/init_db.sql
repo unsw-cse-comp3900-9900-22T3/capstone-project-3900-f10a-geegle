@@ -10,12 +10,6 @@ CREATE TABLE users(
     userPassword text NOT NULL
 );
 
-CREATE TABLE userSession(
-    token text PRIMARY KEY,
-    startTime timestamp,
-    endTime timestamp
-);
-
 CREATE TABLE events(
     eventID SERIAL PRIMARY KEY,
     eventDate date NOT NULL,
@@ -32,12 +26,12 @@ CREATE TABLE tickets(
     price integer NOT NULL,
     eventID integer NOT NULL,
     foreign key (eventID)
-        references events(eventID),
+        references events(eventID)
 );
 
 CREATE TABLE creditCardDetails(
-    creditCardNum integer (creditCardNum between 0000000000000000 and 9999999999999999)  PRIMARY KEY,
-    ccv integer NOT NULL (ccv between 000 and 999),
+    creditCardNum integer check (creditCardNum between 0000000000000000 and 9999999999999999)  PRIMARY KEY,
+    ccv integer NOT NULL check (ccv between 000 and 999),
     expiryMonth char(2) check (expiryMonth ~ '[0-9]{2}') NOT NULL,
     expiryYear char(2) check (expiryYear ~ '[0-9]{2}') NOT NULL,
     userID integer NOT NULL,
@@ -46,7 +40,7 @@ CREATE TABLE creditCardDetails(
 );
 
 CREATE TABLE paypalDetails (
-    accountID integer PRIMARY KEY
+    accountID integer PRIMARY KEY,
     userID integer NOT NULL,
     foreign key(userID)
         references users(userID)

@@ -22,6 +22,7 @@ app.get("/", (req, res) => {
 app.use('/auth', authRouter);
 app.use('/events', eventRouter);
 
+
 app.listen(PORT, () => {
     console.log(`Server started on port ${PORT}`);
 });
