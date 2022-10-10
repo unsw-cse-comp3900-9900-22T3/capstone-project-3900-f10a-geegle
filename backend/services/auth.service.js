@@ -16,21 +16,24 @@ const validPassword = (password) => {
 const registerUserService = async(req, res) => {
     const {firstName, lastName, email, password} = req.body
     if (!validEmail(email)) {
-        return res.status(401).json({error: 'Invalid Email'})
+        return {user: null, token: null, statusCode : 401, err: 'Invalid Email'}
     }
+
     if (!validPassword(password)) {
-        return res.status(401).json({error: 'Invalid Password'})
+        return {user: null, token: null, statusCode : 401, err: 'Invalid Password'}
     }
+
     const userByEmail = await getUserByEmailDb(email)
     if (userByEmail) {
-        return res.status(401).json({error: 'User Already Exists'})
+        return {user: null, token: null, statusCode : 401, err: 'User Already Exists'}
     }
+
     const salt = await bcrypt.genSalt()
     const encryptPassword = await bcrypt.hash(password, salt)
 
     const newUser = await addUserDb(firstName, lastName, email, encryptPassword)
-    console.log(newUser)
-    return {user: newUser, token: "122313"}
+    
+    return {user: newUser, token: "122313", statusCode : 201, err: null}
 }
 
 
