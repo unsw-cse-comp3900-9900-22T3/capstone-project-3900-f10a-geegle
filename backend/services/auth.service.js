@@ -23,12 +23,12 @@ const registerUserService = async(req, res) => {
         if (!validPassword(password)) {
             return res.status(401).json({error: 'Invalid Password'}).end()
         }
+        
         // This does not work apparently
-        const userByEmail = await getUserByEmailDb(email)
-        if (userByEmail) {
+        const usersWithEmail = await getUserByEmailDb(email)
+        if (usersWithEmail > 0) {
             return res.status(401).json({error: 'User Already Exists'}).end()
         }
-        console.log("2" + userByEmail)
         const salt = await bcrypt.genSalt()
         const encryptPassword = await bcrypt.hash(password, salt)
 
