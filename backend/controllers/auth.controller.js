@@ -1,11 +1,14 @@
 import {registerUserService} from '../services/auth.service.js'
 
 const registerUserController = async(req, res) => {
-    const {user, token} = await registerUserService(req, res);
-    res.status(201).json({
-        user,
-        token    
-    })
+    try {
+        const userResponse = await registerUserService(req, res)
+        res.status(201).json(userResponse)
+    } catch (e) {
+        return res.status(500).end()
+    }
+    
+    
 }
 
 export {
