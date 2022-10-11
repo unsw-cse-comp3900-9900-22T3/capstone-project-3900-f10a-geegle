@@ -15,38 +15,76 @@ const validPassword = (password) => {
 }
 
 const registerUserService = async(req, res) => {
-    try {    
-        const {firstName, lastName, email, password} = req.body
-        if (!validEmail(email)) {
-            return res.status(401).json({error: 'Invalid Email'}).end()
+    const {firstName, lastName, email, password} = req.body
+    if (!validEmail(email)) {
+        return {user: null, token: null, statusCode : 401, msg: 'Invalid Email'}
+    }
+
+    if (!validPassword(password)) {
+        return {user: null, token: null, statusCode : 401, msg: 'Invalid Password'}
+    }
+
+    try {
+        const userByEmail = await getUserByEmailDb(email)
+        if (userByEmail.length > 0) {
+            return {user: null, token: null, statusCode : 401, msg: 'User Already Exists'}
         }
-        if (!validPassword(password)) {
-            return res.status(401).json({error: 'Invalid Password'}).end()
-        }
-        
-        // This does not work apparently
-        const usersWithEmail = await getUserByEmailDb(email)
-        if (usersWithEmail > 0) {
-            return res.status(401).json({error: 'User Already Exists'}).end()
-        }
+
         const salt = await bcrypt.genSalt()
         const encryptPassword = await bcrypt.hash(password, salt)
 
         const newUser = await addUserDb(firstName, lastName, email, encryptPassword)
-        const newToken = generateNewToken(newUser.userID, res)
+        delete newUser.userpassword
+        
+        // Getting query result from database turns all object keys to lowercase
+        const newToken = generateNewToken({ userID : newUser.userid })
 
-        return {
-            firstName: newUser.firstName,
-            lastName: newUser.lastName,
-            email: newUser.email,
-            token: newToken
+        return {user: { userID : newUser.userid,
+                        firstName: newUser.firstname,
+                        lastName: newUser.lastname,
+                        email: newUser.email }, 
+                token: newToken, 
+                statusCode : 201, 
+                msg: "Register success!"}
+    } catch (error) {
+        throw error
+    }
+    
+}
+
+const loginUserService = async(req, res) => {
+    const { email, password } = req.body
+    if (!validEmail(email)) {
+        return {user: null, token: null, statusCode : 401, msg: 'Invalid Email'}
+    }
+
+    try {
+        const userByEmail = await getUserByEmailDb(email)
+        if (userByEmail.length == 0) {
+            return {user: null, token: null, statusCode : 401, msg: 'Email Does Not Exist'}
         }
-    } catch (e) {
-        loggger.err(e)
+        
+        const match = await bcrypt.compare(password, userByEmail[0].userpassword)
+        if (!validPassword(password) || !match) {
+            return {user: null, token: null, statusCode : 401, msg: 'Invalid Password'}
+        }
+    
+        const newToken = generateNewToken({ userID : userByEmail[0].userid })
+    
+        return {user: { userID : userByEmail[0].userid,
+                        firstName: userByEmail[0].firstname,
+                        lastName: userByEmail[0].lastname,
+                        email: userByEmail[0].email }, 
+                token: newToken, 
+                statusCode : 200, 
+                msg: "Login success!"}
+    } catch (error) {
+        throw error
     }
 }
 
 
 export { 
-    registerUserService
+    registerUserService,
+    loginUserService
 }
