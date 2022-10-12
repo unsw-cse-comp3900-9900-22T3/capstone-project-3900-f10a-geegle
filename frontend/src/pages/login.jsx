@@ -3,6 +3,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import { FormControl } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 const style = {
     position: 'absolute',
@@ -15,9 +16,36 @@ const style = {
     p: 4,
   };
 
-const LoginPage = () => {
+const LoginPage = ({setLoggedIn}) => {
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
+    const navigate = useNavigate();
+
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+  
+      const response = await fetch('http://localhost:3000/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+  
+      const json = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem('token', json.token);
+        localStorage.setItem('email', email);
+        // setLogin(true);
+        alert('Success, you are now logged in!');
+        navigate('/');
+      } else if (response.status === 401) {
+        alert('Please ensure email and/or password is entered correctly');
+      } else {
+        alert('something went wrong please try again');
+      }
+    };
   
   return (
     <Box sx={style}>
@@ -33,7 +61,7 @@ const LoginPage = () => {
             required
             id="email"
             placeholder='jane@email.com'
-            onChange={e => setEmail(e)}
+            onChange={e => setEmail(e.target.value)}
             type='email'
             aria-label="title text input"
         />
@@ -44,7 +72,7 @@ const LoginPage = () => {
             required
             id="password"
             placeholder="your password"
-            onChange={e => setPassword(e)}
+            onChange={e => setPassword(e.target.value)}
             type='password'
             aria-label="title text input"
         />
@@ -52,6 +80,7 @@ const LoginPage = () => {
           type="submit"
           id="loginSubmit"
           aria-label="submit login form"
+          onClick = {handleSubmit}
           style = {{marginTop: "10%"}}
         >
           submit

@@ -13,12 +13,10 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import { BrowserRouter as Router, Route, Link, Routes } from 'react-router-dom';
-import LoginPage from '../pages/login';
-import RegisterPage from '../pages/register';
 const pages = ['Products', 'Pricing', 'Blog'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
-const NavBar = () => {
+const NavBar = ({setLoggedIn}) => {
   //const [anchorElNav, setAnchorElNav] = React.useState(null);
   //const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -42,8 +40,7 @@ const NavBar = () => {
     }
   }
   return (
-    <>
-    <Router>
+    <> 
       <AppBar position="static" sx={{bgcolor: '#9662f0'}}>
         <Container maxWidth="xl" style={{backgroundColor: '#9662f0'}}>
           <Toolbar style={{backgroundColor: '#9662f0'}}>
@@ -61,22 +58,32 @@ const NavBar = () => {
             >
               EVENTFUL
             </Typography>
-            <div>
-              <Link to = '/'><div style={{display:'inline-block'}}>Home&nbsp;|</div></Link>
-                {/* <div>Home</div> */}
-              <Link to ='/login'><div style={{display:'inline-block'}}>&nbsp;Login&nbsp;|</div></Link>
-              <Link to ='/register'><div style={{display:'inline-block'}}>&nbsp;Register&nbsp;</div></Link>
-              {/* <div>Login</div> */}
+            <div style={{display:'flex', gap:'1rem'}}>
+              <div style={{display:'inline-block'}}>
+                <Link to = '/' style={{color:'white'}}>
+                  Home
+                </Link>
+              </div>
+              <div style={{display:'inline-block'}}>
+                <Link to ='/login' style={{color:'white'}}>
+                  Login
+                </Link>
+              </div>
+              <div style={{display:'inline-block'}}>
+                <Link to ='/register' style={{color:'white'}}>
+                  Register
+                </Link>
+              </div>
+              <>
+                {setLoggedIn && <div style={{display:'inline-block'}}>
+                  <Link to ='/register' style={{color:'white'}}>
+                    Log Out
+                  </Link></div>}
+              </>
             </div>
           </Toolbar>
         </Container>
       </AppBar>
-        <Routes>
-          <Route path={`/`} element={<div>Home Page</div>}></Route>
-          <Route path={`/login`} element={<LoginPage></LoginPage>}></Route>
-          <Route path={`/register`} element={<RegisterPage></RegisterPage>}></Route>
-        </Routes>
-      </Router>
     </>
   );
 };
