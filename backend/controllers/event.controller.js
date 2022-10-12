@@ -9,7 +9,8 @@ const getUpcomingEventsController = (req, res) => {
                 startTime: new Date(2022, 10, 13, 12),
                 endTime: new Date(2022, 10, 13, 14),
                 eventDescription: "Eat CSE BBQ at UNSW",
-                eventLocation: "UNSW Library Lawn",
+                eventLocation: "The University of New South Wales High St Kensington NSW 2033",
+                eventVenue: "UNSW Library Lawn",
                 capacity: 500,
                 published: true
             },
@@ -20,7 +21,8 @@ const getUpcomingEventsController = (req, res) => {
                 startTime: new Date(2022, 10, 18, 18, 30),
                 endTime: new Date(2022, 10, 19),
                 eventDescription: "Dance at UNSW CSE Ball",
-                eventLocation: "Sydney Ballroom",
+                eventLocation: "The University of New South Wales High St Kensington NSW 2033",
+                eventVenue: "Sydney Ballroom",
                 capacity: 300,
                 published: true
             },
@@ -31,7 +33,8 @@ const getUpcomingEventsController = (req, res) => {
                 startTime: new Date(2022, 10, 20, 10),
                 endTime: new Date(2022, 10, 20, 16),
                 eventDescription: "Meet potential employers",
-                eventLocation: "UNSW Sir John Clancy Auditorium",
+                eventLocation: "The University of New South Wales High St Kensington NSW 2033",
+                eventVenue: "UNSW Sir John Clancy Auditorium",
                 capacity: 500,
                 published: true
             },
@@ -42,7 +45,8 @@ const getUpcomingEventsController = (req, res) => {
                 startTime: new Date(2022, 10, 28, 20),
                 endTime: new Date(2022, 10, 29, 4),
                 eventDescription: "Party at WAO",
-                eventLocation: "Ivy Sydney",
+                eventLocation: "330 George St, Sydney NSW 2000",
+                eventVenue: "Ivy Sydney",
                 capacity: 1000,
                 published: true
             },
@@ -53,7 +57,8 @@ const getUpcomingEventsController = (req, res) => {
                 startTime: new Date(2022, 10, 13, 18),
                 endTime: new Date(2022, 10, 31, 21, 30),
                 eventDescription: "Come see the musical Moulin Rogue",
-                eventLocation: "Sydney Lyric Theatre",
+                eventLocation: "55 Pirrama Rd, Pyrmont NSW 2009",
+                eventVenue: "Sydney Lyric Theatre",
                 capacity: 700,
                 published: true
             },
@@ -64,7 +69,8 @@ const getUpcomingEventsController = (req, res) => {
                 startTime: new Date(2022, 11, 1, 19),
                 endTime: new Date(2022, 11, 13, 23, 30),
                 eventDescription: "See lights at night around Sydney",
-                eventLocation: "Sydney CBD",
+                eventLocation: "George St, Sydney NSW 2000",
+                eventVenue: "Sydney CBD",
                 capacity: 10000,
                 published: true
             }
@@ -83,7 +89,8 @@ const getAllEventsController = (req, res) => {
                 startTime: new Date(2022, 10, 13, 12),
                 endTime: new Date(2022, 10, 13, 14),
                 eventDescription: "Eat CSE BBQ at UNSW",
-                eventLocation: "UNSW Library Lawn",
+                eventLocation: "The University of New South Wales High St Kensington NSW 2033",
+                eventVenue: "UNSW Library Lawn",
                 capacity: 500,
                 published: true
             },
@@ -94,7 +101,8 @@ const getAllEventsController = (req, res) => {
                 startTime: new Date(2022, 10, 18, 18, 30),
                 endTime: new Date(2022, 10, 19),
                 eventDescription: "Dance at UNSW CSE Ball",
-                eventLocation: "Sydney Ballroom",
+                eventLocation: "The University of New South Wales High St Kensington NSW 2033",
+                eventVenue: "Sydney Ballroom",
                 capacity: 300,
                 published: true
             },
@@ -105,7 +113,8 @@ const getAllEventsController = (req, res) => {
                 startTime: new Date(2022, 10, 20, 10),
                 endTime: new Date(2022, 10, 20, 16),
                 eventDescription: "Meet potential employers",
-                eventLocation: "UNSW Sir John Clancy Auditorium",
+                eventLocation: "The University of New South Wales High St Kensington NSW 2033",
+                eventVenue: "UNSW Sir John Clancy Auditorium",
                 capacity: 500,
                 published: true
             },
@@ -116,7 +125,8 @@ const getAllEventsController = (req, res) => {
                 startTime: new Date(2022, 10, 28, 20),
                 endTime: new Date(2022, 10, 29, 4),
                 eventDescription: "Party at WAO",
-                eventLocation: "Ivy Sydney",
+                eventLocation: "330 George St, Sydney NSW 2000",
+                eventVenue: "Ivy Sydney",
                 capacity: 1000,
                 published: true
             },
@@ -127,7 +137,8 @@ const getAllEventsController = (req, res) => {
                 startTime: new Date(2022, 10, 13, 18),
                 endTime: new Date(2022, 10, 31, 21, 30),
                 eventDescription: "Come see the musical Moulin Rogue",
-                eventLocation: "Sydney Lyric Theatre",
+                eventLocation: "55 Pirrama Rd, Pyrmont NSW 2009",
+                eventVenue: "Sydney Lyric Theatre",
                 capacity: 700,
                 published: true
             },
@@ -138,7 +149,8 @@ const getAllEventsController = (req, res) => {
                 startTime: new Date(2022, 11, 1, 19),
                 endTime: new Date(2022, 11, 13, 23, 30),
                 eventDescription: "See lights at night around Sydney",
-                eventLocation: "Sydney CBD",
+                eventLocation: "George St, Sydney NSW 2000",
+                eventVenue: "Sydney CBD",
                 capacity: 10000,
                 published: true
             },
@@ -149,7 +161,8 @@ const getAllEventsController = (req, res) => {
                 startTime: new Date(2022, 10, 13, 12),
                 endTime: new Date(2022, 10, 13, 14),
                 eventDescription: "Eat CSE BBQ at UNSW",
-                eventLocation: "UNSW Library Lawn",
+                eventLocation: "The University of New South Wales High St Kensington NSW 2033",
+                eventVenue: "UNSW Library Lawn",
                 capacity: 500,
                 published: true
             },
@@ -160,7 +173,8 @@ const getAllEventsController = (req, res) => {
                 startTime: new Date(2022, 10, 18, 18, 30),
                 endTime: new Date(2022, 10, 19),
                 eventDescription: "Dance at UNSW CSE Ball",
-                eventLocation: "Sydney Ballroom",
+                eventLocation: "The University of New South Wales High St Kensington NSW 2033",
+                eventVenue: "Sydney Ballroom",
                 capacity: 300,
                 published: true
             },
@@ -171,7 +185,8 @@ const getAllEventsController = (req, res) => {
                 startTime: new Date(2022, 10, 20, 10),
                 endTime: new Date(2022, 10, 20, 16),
                 eventDescription: "Meet potential employers",
-                eventLocation: "UNSW Sir John Clancy Auditorium",
+                eventLocation: "The University of New South Wales High St Kensington NSW 2033",
+                eventVenue: "UNSW Sir John Clancy Auditorium",
                 capacity: 500,
                 published: true
             },
@@ -182,7 +197,8 @@ const getAllEventsController = (req, res) => {
                 startTime: new Date(2022, 10, 28, 20),
                 endTime: new Date(2022, 10, 29, 4),
                 eventDescription: "Party at WAO",
-                eventLocation: "Ivy Sydney",
+                eventLocation: "330 George St, Sydney NSW 2000",
+                eventVenue: "Ivy Sydney",
                 capacity: 1000,
                 published: true
             },
@@ -193,7 +209,8 @@ const getAllEventsController = (req, res) => {
                 startTime: new Date(2022, 10, 13, 18),
                 endTime: new Date(2022, 10, 31, 21, 30),
                 eventDescription: "Come see the musical Moulin Rogue",
-                eventLocation: "Sydney Lyric Theatre",
+                eventLocation: "55 Pirrama Rd, Pyrmont NSW 2009",
+                eventVenue: "Sydney Lyric Theatre",
                 capacity: 700,
                 published: true
             },
@@ -204,7 +221,8 @@ const getAllEventsController = (req, res) => {
                 startTime: new Date(2022, 11, 1, 19),
                 endTime: new Date(2022, 11, 13, 23, 30),
                 eventDescription: "See lights at night around Sydney",
-                eventLocation: "Sydney CBD",
+                eventLocation: "George St, Sydney NSW 2000",
+                eventVenue: "Sydney CBD",
                 capacity: 10000,
                 published: true
             }
