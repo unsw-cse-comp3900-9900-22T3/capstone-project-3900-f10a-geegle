@@ -32,8 +32,8 @@ CREATE TABLE tickets(
 );
 
 CREATE TABLE creditCardDetails(
-    creditCardNum integer check (creditCardNum between 0000000000000000 and 9999999999999999)  PRIMARY KEY,
-    ccv integer NOT NULL check (ccv between 000 and 999),
+    creditCardNum char(16) check (creditCardNum ~ '[0-9]{16}')  PRIMARY KEY,
+    ccv char(3) NOT NULL check (ccv ~ '[0-9]{3}'),
     expiryMonth char(2) check (expiryMonth ~ '[0-9]{2}') NOT NULL,
     expiryYear char(2) check (expiryYear ~ '[0-9]{2}') NOT NULL,
     userID integer NOT NULL,
