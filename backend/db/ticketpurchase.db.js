@@ -10,7 +10,7 @@ const getTicketPurchaseByTicketIdDb = async(ticketId) => {
 // CREATE
 const addTicketPurchaseDb = async(userId, ticketId, ticketPurchaseTime) => {
     const result = await db.query (
-        "INSERT INTO ticketPurcahses (userID, ticketID, ticketPurchaseTime) VALUES ($1, $2, $3) RETURNING *",
+        "INSERT INTO ticketPurchases (userID, ticketID, ticketPurchaseTime) VALUES ($1, $2, $3) RETURNING *",
         [userId, ticketId, ticketPurchaseTime]
     )
     return result.rows[0]
