@@ -1,14 +1,15 @@
 import { Router } from 'express';
-import { getUpcomingEventsController, getAllEventsController } from '../controllers/event.controller.js'
+import { getUpcomingEventsController, getAllEventsController, createEventsController,
+publishEventsController, cancelEventsController } from '../controllers/event.controller.js'
 
 const eventRouter = Router();
 
-eventRouter.post('/create', (req, res) => {})
-eventRouter.post('/:eventId/publish', (req, res) => {})
-eventRouter.post('/:eventId/cancel', (req, res) => {})
+eventRouter.post('/create', verifyToken, createEventsController);
+eventRouter.put('/:eventID/publish', verifyToken, publishEventsController)
+eventRouter.delete('/:eventID/cancel', verifyToken, cancelEventsController)
 eventRouter.get('/upcoming', getUpcomingEventsController);
 eventRouter.get('/all', getAllEventsController);
-eventRouter.post('/:eventId/purchase', (req, res) => {})
-eventRouter.get('/guest/:eventId', (req, res) => {});
+eventRouter.post('/:eventID/purchase', (req, res) => {})
+eventRouter.get('/:eventID/guest', (req, res) => {});
 
 export default eventRouter;
