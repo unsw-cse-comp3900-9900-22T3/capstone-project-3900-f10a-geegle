@@ -12,12 +12,14 @@ CREATE TABLE users(
 
 CREATE TABLE events(
     eventID SERIAL PRIMARY KEY,
+    eventName text NOT NULL,
     eventDate date NOT NULL,
     startTime time NOT NULL,
     endTime time NOT NULL,
     eventDescription text,
     eventLocation text NOT NULL,
-    capacity integer NOT NULL
+    capacity integer NOT NULL,
+    published boolean DEFAULT TRUE
 );
 
 CREATE TABLE tickets(
