@@ -57,6 +57,11 @@ const NavBar = () => {
                   Register
                 </Link>
               </div>
+              <div style={{display:'inline-block'}}>
+                <Link to ='/event/create' style={{color:'white'}}>
+                  Create Event
+                </Link>
+              </div>
             </div>
           </Toolbar>
         </Container>
