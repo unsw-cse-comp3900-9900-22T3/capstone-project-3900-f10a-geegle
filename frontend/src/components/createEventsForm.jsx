@@ -23,7 +23,6 @@ export function fileToDataUrl (file) {
     reader.onload = () => resolve(reader.result);
     reader.onerror = reject; 
   });
-  
 }
 function CreateEventsForm () {
 
@@ -96,6 +95,7 @@ function CreateEventsForm () {
   const handleSubmit = async () => {
     // const resultStart = start.map(item => item.toLocaleDateString());
     // const resultEnd = end.map(item => item.toLocaleDateString());
+    console.log(thumbnail)
     const jsonString = JSON.stringify({
       events: {
         eventName: eventName,
@@ -117,7 +117,7 @@ function CreateEventsForm () {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + localStorage.getItem('token'),
+        'auth-token': localStorage.getItem('token'),
       },
       body: jsonString
     }
@@ -126,7 +126,7 @@ function CreateEventsForm () {
       navigate('/');
     } else {
       // alert the error code and the 
-     console.log(`error ${r.status}, ${r}`)
+     console.log(`error ${r.status}, ${r.text}`)
     } 
 
   }
