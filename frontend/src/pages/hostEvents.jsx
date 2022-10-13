@@ -9,7 +9,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import CardHeader from '@mui/material/CardHeader';
 import { FormControl } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 const style = {
     position: 'absolute',
@@ -24,7 +24,23 @@ const style = {
 
 const HostEventsPage = () => {
   const [myListings, setMyListings] = React.useState([]);
+  // const [publishedListings, setPublishedListings] = React.useState([]);
 
+  const handlePublish = async(obj, idx) => {
+    const response = await fetch(`http://localhost:3000/events/${obj.eachEvent.eventID}/publish`, {
+      method: 'PUT',
+      headers: {
+      'Content-Type': 'application/json',
+      'auth-token': localStorage.getItem('token'),
+      },
+    });
+    if (response.ok) {
+      console.log('published!')
+      fetchHostEvents();
+    };
+
+  }
+  
   const fetchHostEvents = async () => {
     if (localStorage.getItem('token')) {
       const response = await fetch(`http://localhost:3000/events/host`, {
@@ -96,7 +112,8 @@ const HostEventsPage = () => {
         </CardContent>
         <CardActions>
             <Button size="small">view</Button>
-            <Button size="small">publish</Button>
+            {obj.eachEvent.published && <Button size="small" onClick={e=>handlePublish(obj, idx)}>Cancel</Button>}
+            {!obj.eachEvent.published && <Button size="small" onClick={e=>handlePublish(obj, idx)}>publish</Button>}
         </CardActions>
       </Card> 
       )
