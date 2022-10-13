@@ -17,6 +17,7 @@ CREATE TABLE events(
     startDateTime timestamptz NOT NULL,
     endDateTime timestamptz NOT NULL,
     eventDescription text,
+    eventType text,
     eventLocation text NOT NULL,
     eventVenue text NOT NULL,
     capacity integer NOT NULL,
