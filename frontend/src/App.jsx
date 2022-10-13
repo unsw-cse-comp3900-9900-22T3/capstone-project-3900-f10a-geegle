@@ -4,7 +4,8 @@ import {useContext, React, useState} from 'react';
 import NavBar from './components/NavBar';
 import LoginPage from './pages/login';
 import RegisterPage from './pages/register';
-import MyEventsPage from './pages/myEvents';
+import HostEventsPage from './pages/hostEvents';
+import CreateEventsForm from './components/createEventsForm'
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   return (
@@ -17,7 +18,8 @@ function App() {
           <Route exact path={`/`} element={<div>Home Page</div>}></Route>
           <Route exact path={`/login`} element={<LoginPage setLoggedIn={setLoggedIn}/>}></Route>
           <Route exact path={`/register`} element={<RegisterPage/>}></Route>
-          <Route exact path={`/myEvents`} element={<MyEventsPage/>}></Route>
+          <Route exact path={`/events/host`} element={<HostEventsPage/>}></Route>
+          <Route exact path={`/event/create`} element={<CreateEventsForm/>}></Route>
         </Routes>
       </Router>
     </>

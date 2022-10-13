@@ -16,7 +16,7 @@ const style = {
     p: 4,
   };
 
-const MyEventsPage = () => {
+const HostEventsPage = () => {
     // const [myListings, setMyListings] = React.useState([]);
 
   //     // upon entering the page
@@ -121,4 +121,4 @@ const MyEventsPage = () => {
     </>
   );
 };
-export default MyEventsPage;
+export default HostEventsPage;

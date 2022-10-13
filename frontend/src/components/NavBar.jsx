@@ -13,6 +13,8 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import { BrowserRouter as Router, Route, Link, Routes } from 'react-router-dom';
+import LoginPage from '../pages/login';
+import RegisterPage from '../pages/register';
 import { useNavigate } from 'react-router-dom';
 const pages = ['Products', 'Pricing', 'Blog'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
@@ -29,13 +31,6 @@ const NavBar = ({setLoggedIn}) => {
   //   setAnchorElUser(event.currentTarget);
   // };
 
-  // const handleCloseNavMenu = () => {
-  //   setAnchorElNav(null);
-  // };
-
-  // const handleCloseUserMenu = () => {
-  //   setAnchorElUser(null);
-  // };
   const styles = {
     appBar: {
       padding: '0',
@@ -91,10 +86,17 @@ const NavBar = ({setLoggedIn}) => {
               </>
               <>
                 {localStorage.getItem('token') && <div style={{display:'inline-block'}}>
-                  <Link to ='/myEvents' style={{color:'white'}}>
-                    My Events
+                  <Link to ='/event/create' style={{color:'white'}}>
+                    Create Events
                   </Link>
-                  </div>}
+                </div>}
+              </>
+              <>
+                {localStorage.getItem('token') && <div style={{display:'inline-block'}}>
+                  <Link to ='/events/host' style={{color:'white'}}>
+                    Host Events
+                  </Link>
+                </div>}
               </>
               <>
                 {localStorage.getItem('token') && <button style={{display:'inline-block'}} onClick = {handleLogout}>

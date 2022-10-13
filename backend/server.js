@@ -4,6 +4,7 @@ import cors from 'cors';
 import db from './db/db.js';
 import authRouter from './routes/auth.route.js';
 import eventRouter from './routes/event.route.js';
+import userRouter from './routes/user.route.js';
 
 db.query('select * from users', (err, res) => {
     console.log(res.rows)
@@ -13,8 +14,8 @@ const app = express();
 const PORT = 3000;
 
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({limit:'10mb'}));
+app.use(express.urlencoded({ limit:'10mb', extended: true }));
 app.use(morgan('dev'));
 
 app.get("/", (req, res) => {
@@ -23,6 +24,7 @@ app.get("/", (req, res) => {
 
 app.use('/auth', authRouter);
 app.use('/events', eventRouter);
+app.use('/user', userRouter);
 
 
 app.listen(PORT, () => {
