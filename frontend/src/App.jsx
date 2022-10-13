@@ -6,6 +6,7 @@ import LoginPage from './pages/login';
 import RegisterPage from './pages/register';
 import HostEventsPage from './pages/hostEvents';
 import CreateEventsForm from './components/createEventsForm'
+import MyAccount from './pages/myAccount';
 import PublicLanding from './pages/publicLanding';
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -21,6 +22,7 @@ function App() {
           <Route exact path={`/register`} element={<RegisterPage/>}></Route>
           <Route exact path={`/events/host`} element={<HostEventsPage/>}></Route>
           <Route exact path={`/event/create`} element={<CreateEventsForm/>}></Route>
+          <Route exact path={`/user/profile`} element={<MyAccount/>}></Route>
         </Routes>
       </Router>
     </>

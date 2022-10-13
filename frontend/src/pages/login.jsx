@@ -37,6 +37,7 @@ const LoginPage = ({setLoggedIn}) => {
       if (response.ok) {
         localStorage.setItem('token', json.token);
         localStorage.setItem('email', email);
+        localStorage.setItem('userId', json.user.userID)
         // setLogin(true);
         alert('Success, you are now logged in!');
         navigate('/');
