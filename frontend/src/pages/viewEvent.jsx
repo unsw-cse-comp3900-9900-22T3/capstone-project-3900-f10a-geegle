@@ -44,18 +44,18 @@ const ViewEvent= () => {
     totalTicketAmount:'',
   });
   const [hostName, setHostName] = useState('');
-  const getHostInfo = async() => {
+  const getHostInfo = async(eventDetails) => {
     const requestOptions = {
       method: 'GET',
       headers: {
         'auth-token': localStorage.getItem('token'),
       },
     }
-    const response = await fetch(`http://localhost:3000/user/profile/${eventInfo.hostID}`, requestOptions
+    const response = await fetch(`http://localhost:3000/user/profile/${eventDetails.hostID}`, requestOptions
     )
     if (response.ok) {
       const json = (await response.json()).user;
-      //console.log(json);
+      console.log(json);
       const firstName = json.firstName;
       const lastName = json.lastname;
       setHostName(`${firstName} ${lastName}`);
@@ -89,11 +89,12 @@ const ViewEvent= () => {
     }
      //console.log(eventDetails);
      setEventInfo({...eventDetails});
-     getHostInfo();
+     getHostInfo(eventDetails);
       
   }
   useEffect(()=> {
     getEventInfo();
+    
     
   },[]);
 
