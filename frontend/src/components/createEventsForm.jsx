@@ -6,7 +6,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 //import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { width } from '@mui/system';
-
+import TicketTypeInput from './TicketTypeInput';
 /**
  * https://stackoverflow.com/questions/36280818/how-to-convert-file-to-base64-in-javascript
  *  
@@ -29,16 +29,27 @@ function CreateEventsForm () {
 
   const [eventName, setEventName] = useState('');
   const [eventType, setEventType] = useState('');
+  const [eventDescription, setEventDescription] = useState('');
   const [eventLocation, setEventLocation] = useState('');
+  const [venue, setVenue] = useState('');
+  const [capacity, setCapacity] = useState('');
   const [startDateTime, setStartDateTime] = useState(new Date());
   const [endDateTime, setEndDateTime] = useState(new Date());
   const [thumbnail, setThumbnail] = useState('');
   const [image2, setImage2] = useState('');
   const [image3, setImage3] = useState('');
-  const [ticketType, setTicketType] = useState('');
-  const [quantity, setQuantity] = useState('');
-  const [ticketPrice, setTicketPrice] = useState('');
+  const [ticketInfo, setTicketInfo] = useState({
+    ticketType: '',
+    ticketAmount: '',
+    price:''
+  });
+  const [allTicketTypes, setAllTicketTypes] = useState([ticketInfo]);
+
+  const navigate = useNavigate();
+  console.log(ticketInfo)
+ 
   
+  console.log(startDateTime);
   const handleImage2 = async (event) => {
     const image2Data = await fileToDataUrl(event.target.files[0]);
     setImage2(image2Data);
@@ -52,7 +63,72 @@ function CreateEventsForm () {
     setThumbnail(thumbnailData);
   }
   
-  
+  const handleAmount = (event) => {
+    const newTicketInfo = { ...ticketInfo };
+    newTicketInfo.ticketAmount= event.target.value;
+    setTicketInfo(newTicketInfo);
+  }
+  const handleTicketType = (event) => {
+    const newTicketInfo = { ...ticketInfo };
+    newTicketInfo.ticketType= event.target.value;
+    setTicketInfo(newTicketInfo);
+  }
+
+  const handleTicketPrice = (event) => {
+    const newTicketInfo = { ...ticketInfo };
+    newTicketInfo.price = event.target.value;
+    console.log(newTicketInfo.price);
+    setTicketInfo(newTicketInfo);
+  }
+  const handleAddTicket = () => {
+    //setAllTicketTypes(prev => [...prev, ticketInfo]);
+
+    // resetting the fields in ticketInfo
+    const newTicketInfo = { ...ticketInfo };
+    newTicketInfo.ticketType= '';
+    newTicketInfo.amount= '';
+    newTicketInfo.ticketPrice= '';
+    setTicketInfo(newTicketInfo);
+    setAllTicketTypes(prev => [...prev, ticketInfo]);
+
+  }
+
+  const handleSubmit = async () => {
+    // const resultStart = start.map(item => item.toLocaleDateString());
+    // const resultEnd = end.map(item => item.toLocaleDateString());
+    const jsonString = JSON.stringify({
+      events: {
+        eventName: eventName,
+        startDateTime: startDateTime,
+        endDateTime: endDateTime,
+        eventDescription: eventDescription,
+        eventLocation: eventLocation,
+        eventVenue: venue,
+        capacity: capacity,
+        image1: thumbnail,
+        image2: image2,
+        image3: image3
+     },
+      tickets: allTicketTypes
+
+    })
+    const requestOptions = {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + localStorage.getItem('token'),
+      },
+      body: jsonString
+    }
+    const r = await fetch(`http://localhost:3000/events/create`, requestOptions);
+    if (r.ok) {
+      navigate('/');
+    } else {
+     alert(`error ${r.status}, ${r}`)
+    } 
+
+  }
+
   const styles = {
     Paper: {
       display: 'flex',
@@ -103,24 +179,48 @@ function CreateEventsForm () {
             </FormControl>
           </Grid>
           <Grid item xs = {12}>
-          <FormControl fullWidth>
-              <InputLabel id="location label">Venue and Location</InputLabel>
-              <Select
-                labelId="location label"
-                id="location"
-                label="location"
-                aria-label="location"
-                value={eventLocation}
-                onChange={e=>setEventLocation(e.target.value)}
-              >
-                {/* do we need event types stored in the back end (maybe we need to when we filter?) */}
-                <MenuItem value={'Venue 1, Address'}>Venue 1, Address</MenuItem>
-                <MenuItem value={'Venue 2, Address'}>Venue 2, Address</MenuItem>
-                <MenuItem value={'Venue 3, Address'}>Venue 3, Address</MenuItem>
-                <MenuItem value={'Venue 4, Address'}>Venue 4, Address</MenuItem>
-                <MenuItem value={'Venue 5, Address'}>Venue 5, Address</MenuItem>
-              </Select>
-            </FormControl>
+          <TextField
+              id="Event Description"
+              label="Event Description"
+              aria-label="Event Description"
+              type="text"
+              variant="outlined"
+              onChange={e=>setEventDescription(e.target.value)}
+              fullWidth
+            />
+          </Grid>
+          <Grid item xs = {12}>
+          <TextField
+              id="Venue"
+              label="Venue"
+              aria-label="Venue"
+              type="text"
+              variant="outlined"
+              onChange={e=>setVenue(e.target.value)}
+              fullWidth
+            />
+          </Grid>
+          <Grid item xs = {12}>
+          <TextField
+              id="Event Location"
+              label="Event Location"
+              aria-label="Event Location"
+              type="text"
+              variant="outlined"
+              onChange={e=>setEventLocation(e.target.value)}
+              fullWidth
+            />
+          </Grid>
+          <Grid item xs = {12}>
+          <TextField
+              id="Capacity"
+              label="Capacity"
+              aria-label="Capacity"
+              type="text"
+              variant="outlined"
+              onChange={e=>setCapacity(e.target.value)}
+              fullWidth
+            />
           </Grid>
           <Grid item xs = {4}>
             <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -173,47 +273,29 @@ function CreateEventsForm () {
             />
           </Grid>
           <Grid item xs = {12}>
-            <Grid container spacing ={3}>
-              <Grid item xs = {6}>
-                <TextField
-                id="Ticket Type"
-                label="Ticket Type"
-                aria-label="Ticket Type"
-                type="text"
-                variant="outlined"
-                onChange={e=>setTicketType(e.target.value)}
-                fullWidth
-              />
-              </Grid>
-              <Grid item xs = {3}>
-                <TextField
-                id="Quantity"
-                label="Quantity"
-                aria-label="Quantity"
-                type="text"
-                variant="outlined"
-                onChange={e=>setQuantity(e.target.value)}
-                fullWidth
-              />
-              </Grid>
-              <Grid item xs = {3}>
-                <TextField
-                id="price"
-                label="price"
-                aria-label="price"
-                type="text"
-                variant="outlined"
-                onChange={e=>setTicketPrice(e.target.value)}
-                fullWidth
-              />
-              </Grid>
-            </Grid>
+            {allTicketTypes.map((item, index) => {
+              return (
+                <div key={index}>
+                  <TicketTypeInput handleAmount={handleAmount} handleTicketType={handleTicketType} handleTicketPrice={handleTicketPrice} index={index}/>
+                </div>
+              )
+            })}
           </Grid>
           <Grid item xs = {12}>
-            <button> Add Another Ticket Type</button>
+            <Button
+              variant ='outlined'
+              id = 'addButton'
+              onClick = {handleAddTicket}
+            > Add More Ticket Types
+            </Button>
           </Grid>
-          <Grid item xs = {6}>
-            <Button> Submit and Create</Button>
+          <Grid item xs = {12}>
+            <Button
+              variant ='outlined'
+              id = 'addButton'
+              onClick = {handleSubmit}
+            > Submit
+            </Button>
           </Grid>
         </Grid>
       </form>
