@@ -33,14 +33,14 @@ const getAllEventsDb = async() => {
 }
 
 // CREATE
-const addEventDb = async(eventName, hostID, startDateTime, endDateTime, eventDescription,
+const addEventDb = async(eventName, hostID, startDateTime, endDateTime, eventDescription, eventType,
     eventLocation, eventVenue, capacity, totalTicketAmount, image1, image2, image3) => {
     const result = await db.query (
         "INSERT INTO events (eventID, eventName, hostID, startDateTime, endDateTime, eventDescription, " +
-        "eventLocation, eventVenue, capacity, totalTicketAmount, image1, image2, image3) " +
-        "VALUES (default, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *",
-        [eventName, hostID, startDateTime, endDateTime, eventDescription, eventLocation, eventVenue, capacity, totalTicketAmount,
-         image1, image2, image3]
+        "eventType, eventLocation, eventVenue, capacity, totalTicketAmount, image1, image2, image3) " +
+        "VALUES (default, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *",
+        [eventName, hostID, startDateTime, endDateTime, eventDescription, eventType, eventLocation, eventVenue, capacity, 
+         totalTicketAmount, image1, image2, image3]
     )
     return result.rows[0]
 }

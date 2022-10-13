@@ -18,7 +18,7 @@ export const createEventsService = async(req, res) => {
         const {events, tickets} = req.body
 
         const {eventName, startDateTime, endDateTime, 
-            eventLocation, eventDescription, eventVenue, capacity,
+            eventLocation, eventDescription, eventType, eventVenue, capacity,
             image1, image2, image3} = events
         
         if (endDateTime <= startDateTime) {
@@ -43,7 +43,7 @@ export const createEventsService = async(req, res) => {
         }
 
         const newEvent = await addEventDb(eventName, req.userID, new Date(startDateTime), new Date(endDateTime), eventDescription,
-            eventLocation, eventVenue, capacity, totalTickets, image1, image2, image3)
+                eventType, eventLocation, eventVenue, capacity, totalTickets, image1, image2, image3)
     
 
         for (let i = 0; i < tickets.length; i++) {
@@ -60,6 +60,7 @@ export const createEventsService = async(req, res) => {
                             startDateTime: newEvent.startdatetime,
                             endDateTime: newEvent.enddatetime,
                             eventDescription: newEvent.eventdescription,
+                            eventType: newEvent.eventtype,
                             eventLocation: newEvent.eventlocation,
                             eventVenue: newEvent.eventvenue,
                             capacity: newEvent.capacity,
@@ -81,7 +82,6 @@ export const publishEventsService = async(req, res) => {
         const eventID = req.params.eventID;
         const event = await getEventByIdDb(eventID);
         if (event.length != 1) {
-            console.log(event, eventID, req.params.eventID)
             return {events: null, statusCode : 404, msg: 'Event does not exist'}
         }
         if (req.userID != event[0].hostid) {
@@ -99,6 +99,7 @@ export const publishEventsService = async(req, res) => {
                     startDateTime: publishedEvent.startdatetime,
                     endDateTime: publishedEvent.enddatetime,
                     eventDescription: publishedEvent.eventdescription,
+                    eventType: publishedEvent.eventtype,
                     eventLocation: publishedEvent.eventlocation,
                     eventVenue: publishedEvent.eventvenue,
                     capacity: publishedEvent.capacity,
@@ -149,6 +150,7 @@ export const getUpcomingEventsService = async(req, res) => {
                     startDateTime: eventList[i].startdatetime,
                     endDateTime: eventList[i].enddatetime,
                     eventDescription: eventList[i].eventdescription,
+                    eventType: eventList[i].eventtype,
                     eventLocation: eventList[i].eventlocation,
                     eventVenue: eventList[i].eventvenue,
                     capacity: eventList[i].capacity,
@@ -183,6 +185,7 @@ export const getAllEventsService = async(req, res) => {
                     startDateTime: eventList[i].startdatetime,
                     endDateTime: eventList[i].enddatetime,
                     eventDescription: eventList[i].eventdescription,
+                    eventType: eventList[i].eventtype,
                     eventLocation: eventList[i].eventlocation,
                     eventVenue: eventList[i].eventvenue,
                     capacity: eventList[i].capacity,
@@ -214,6 +217,7 @@ export const getHostEventsService = async(req, res) => {
                 startDateTime: eventList[i].startdatetime,
                 endDateTime: eventList[i].enddatetime,
                 eventDescription: eventList[i].eventdescription,
+                eventType: eventList[i].eventtype,
                 eventLocation: eventList[i].eventlocation,
                 eventVenue: eventList[i].eventvenue,
                 capacity: eventList[i].capacity,
