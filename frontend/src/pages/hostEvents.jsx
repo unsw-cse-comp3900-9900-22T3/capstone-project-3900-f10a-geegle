@@ -40,6 +40,21 @@ const HostEventsPage = () => {
     };
 
   }
+
+  const handleUnpublish = async(obj, idx) => {
+    const response = await fetch(`http://localhost:3000/events/${obj.eachEvent.eventID}/cancel`, {
+      method: 'PUT',
+      headers: {
+      'Content-Type': 'application/json',
+      'auth-token': localStorage.getItem('token'),
+      },
+    });
+    if (response.ok) {
+      console.log('unPublished!')
+      fetchHostEvents();
+    };
+
+  }
   
   const fetchHostEvents = async () => {
     if (localStorage.getItem('token')) {
@@ -112,7 +127,7 @@ const HostEventsPage = () => {
         </CardContent>
         <CardActions>
             <Button size="small">view</Button>
-            {obj.eachEvent.published && <Button size="small" onClick={e=>handlePublish(obj, idx)}>Cancel</Button>}
+            {obj.eachEvent.published && <Button size="small" onClick={e=>handleUnpublish(obj, idx)}>Cancel</Button>}
             {!obj.eachEvent.published && <Button size="small" onClick={e=>handlePublish(obj, idx)}>publish</Button>}
         </CardActions>
       </Card> 
