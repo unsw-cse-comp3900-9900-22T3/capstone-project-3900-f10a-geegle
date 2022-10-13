@@ -13,12 +13,22 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import { BrowserRouter as Router, Route, Link, Routes } from 'react-router-dom';
+<<<<<<< HEAD
 import LoginPage from '../pages/login';
 import RegisterPage from '../pages/register';
 const pages = ['Products', 'Pricing', 'Blog'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 const NavBar = () => {
+=======
+import { useNavigate } from 'react-router-dom';
+const pages = ['Products', 'Pricing', 'Blog'];
+const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+
+
+const NavBar = ({setLoggedIn}) => {
+  const navigate = useNavigate();
+>>>>>>> c5f669e (finished logout)
   //const [anchorElNav, setAnchorElNav] = React.useState(null);
   //const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -40,6 +50,14 @@ const NavBar = () => {
       padding: '0',
       backgroundColor: '#9662f0'
     }
+  }
+
+  const handleLogout = (e) => {
+    console.log('here')
+    localStorage.removeItem('token')
+    // localStorage.removeItem('email')
+    setLoggedIn(false)
+    navigate('/')
   }
   return (
     <>
@@ -66,6 +84,7 @@ const NavBar = () => {
                   Home
                 </Link>
               </div>
+<<<<<<< HEAD
               <div style={{display:'inline-block'}}>
                 <Link to ='/login' style={{color:'white'}}>
                   Login
@@ -76,6 +95,30 @@ const NavBar = () => {
                   Register
                 </Link>
               </div>
+=======
+              <>
+                {!localStorage.getItem('token') && <div style={{display:'inline-block'}}>
+                  <Link to ='/login' style={{color:'white'}}>
+                    Login
+                  </Link>
+                </div>}
+              </>
+              <>
+                {!localStorage.getItem('token') && <div style={{display:'inline-block'}}>
+                  <Link to ='/register' style={{color:'white'}}>
+                    Register
+                  </Link>
+                </div>}
+              </>
+              <>
+                {localStorage.getItem('token') && <button style={{display:'inline-block'}} onClick = {handleLogout}>
+                  {/* <Link to ='/' style={{color:'white'}}>
+                    Log Out
+                  </Link> */}
+                  Log Out
+                  </button>}
+              </>
+>>>>>>> c5f669e (finished logout)
             </div>
           </Toolbar>
         </Container>
