@@ -102,6 +102,7 @@ function CreateEventsForm () {
         startDateTime: startDateTime,
         endDateTime: endDateTime,
         eventDescription: eventDescription,
+        eventType: eventType,
         eventLocation: eventLocation,
         eventVenue: venue,
         capacity: capacity,
@@ -113,7 +114,7 @@ function CreateEventsForm () {
 
     })
     const requestOptions = {
-      method: 'PUT',
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: 'Bearer ' + localStorage.getItem('token'),
@@ -124,7 +125,8 @@ function CreateEventsForm () {
     if (r.ok) {
       navigate('/');
     } else {
-     alert(`error ${r.status}, ${r}`)
+      // alert the error code and the 
+     console.log(`error ${r.status}, ${r}`)
     } 
 
   }
