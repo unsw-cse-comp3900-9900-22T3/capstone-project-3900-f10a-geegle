@@ -1,5 +1,5 @@
 import { createEventsService, publishEventsService, cancelEventsService,
-getUpcomingEventsService } from "../services/event.service.js";
+         getUpcomingEventsService, getAllEventsService, getHostEventsService } from "../services/event.service.js";
 
 
 export const createEventsController = async(req, res) => {
@@ -57,6 +57,16 @@ export const getAllEventsController = async(req, res) => {
         res.status(500).send(e.message)
     }
 }
+
+export const getHostEventsController = async(req, res) => {
+    try {
+        const {events, statusCode, msg} = await getHostEventsService(req, res);
+        res.status(statusCode).json({events, msg})
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
+
 
 
 // const getUpcomingEventsController = (req, res) => {
@@ -272,8 +282,3 @@ export const getAllEventsController = async(req, res) => {
 //     }
 //     res.status(200).json(allEvents)
 // }
-
-export {
-    getUpcomingEventsController,
-    getAllEventsController
-}

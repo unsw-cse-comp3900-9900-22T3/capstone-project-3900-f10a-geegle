@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { getUpcomingEventsController, getAllEventsController, createEventsController,
-publishEventsController, cancelEventsController } from '../controllers/event.controller.js'
+         publishEventsController, cancelEventsController, getHostEventsController } from '../controllers/event.controller.js'
+import { verifyToken } from '../middleware/verifyToken.js';
 
 const eventRouter = Router();
 
@@ -9,6 +10,7 @@ eventRouter.put('/:eventID/publish', verifyToken, publishEventsController)
 eventRouter.delete('/:eventID/cancel', verifyToken, cancelEventsController)
 eventRouter.get('/upcoming', getUpcomingEventsController);
 eventRouter.get('/all', getAllEventsController);
+eventRouter.get('/host', verifyToken, getHostEventsController);
 eventRouter.post('/:eventID/purchase', (req, res) => {})
 eventRouter.get('/:eventID/guest', (req, res) => {});
 

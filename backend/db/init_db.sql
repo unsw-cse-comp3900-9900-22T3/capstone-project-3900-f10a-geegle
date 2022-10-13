@@ -21,7 +21,10 @@ CREATE TABLE events(
     eventVenue text NOT NULL,
     capacity integer NOT NULL,
     totalTicketAmount integer NOT NULL,
-    published boolean DEFAULT FALSE
+    published boolean DEFAULT FALSE,
+    image1 text,
+    image2 text,
+    image3 text,
     foreign key (hostID)
         references users(userID)
 );
@@ -45,10 +48,10 @@ CREATE TABLE events(
 CREATE TABLE tickets(
     ticketID SERIAL PRIMARY KEY,
     ticketType text NOT NULL,
-    price integer NOT NULL,
+    price decimal NOT NULL,
     eventID integer NOT NULL,
     foreign key (eventID)
-        references events(eventID)
+        references events(eventID) ON DELETE CASCADE
 );
 
 CREATE TABLE creditCardDetails(
@@ -76,7 +79,7 @@ CREATE TABLE ticketPurchases (
     foreign key (userID)
         references users(userID),
     foreign key (ticketID)
-        references tickets(ticketID)
+        references tickets(ticketID) ON DELETE CASCADE
 );
 
 

@@ -23,7 +23,6 @@ app.get("/", (req, res) => {
 
 app.use('/auth', authRouter);
 app.use('/events', eventRouter);
-app.use('/viewProfile', profileRouter);
 
 
 app.listen(PORT, () => {
