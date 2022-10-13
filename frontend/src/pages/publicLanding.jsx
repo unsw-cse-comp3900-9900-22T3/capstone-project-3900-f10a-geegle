@@ -9,7 +9,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import CardHeader from '@mui/material/CardHeader';
 import { FormControl } from '@mui/material';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate, Link } from 'react-router-dom';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 const style = {
@@ -145,7 +145,12 @@ const PublicLanding = () => {
             </Typography>
           </CardContent>
           <CardActions>
-              <Button size="small">view</Button>
+            <Button 
+              component={Link}
+              to= {{pathname: `/event/view/${obj.eachEvent.eventID}`}}
+              size="small">
+                view
+            </Button>
           </CardActions>
         </Card> 
         )
@@ -171,7 +176,12 @@ const PublicLanding = () => {
             </Typography>
           </CardContent>
           <CardActions>
-              <Button size="small">view</Button>
+              <Button 
+                component={Link}
+                to= {{pathname: `/event/view/${obj.eachEvent.eventID}`}}
+                size="small">
+                  view
+              </Button>
           </CardActions>
         </Card> 
         )
