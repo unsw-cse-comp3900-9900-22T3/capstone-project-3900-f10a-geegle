@@ -13,14 +13,8 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import { BrowserRouter as Router, Route, Link, Routes } from 'react-router-dom';
-<<<<<<< HEAD
 import LoginPage from '../pages/login';
 import RegisterPage from '../pages/register';
-const pages = ['Products', 'Pricing', 'Blog'];
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
-
-const NavBar = () => {
-=======
 import { useNavigate } from 'react-router-dom';
 const pages = ['Products', 'Pricing', 'Blog'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
@@ -28,7 +22,6 @@ const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 const NavBar = ({setLoggedIn}) => {
   const navigate = useNavigate();
->>>>>>> c5f669e (finished logout)
   //const [anchorElNav, setAnchorElNav] = React.useState(null);
   //const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -38,13 +31,6 @@ const NavBar = ({setLoggedIn}) => {
   //   setAnchorElUser(event.currentTarget);
   // };
 
-  // const handleCloseNavMenu = () => {
-  //   setAnchorElNav(null);
-  // };
-
-  // const handleCloseUserMenu = () => {
-  //   setAnchorElUser(null);
-  // };
   const styles = {
     appBar: {
       padding: '0',
@@ -60,7 +46,7 @@ const NavBar = ({setLoggedIn}) => {
     navigate('/')
   }
   return (
-    <>
+    <> 
       <AppBar position="static" sx={{bgcolor: '#9662f0'}}>
         <Container maxWidth="xl" style={{backgroundColor: '#9662f0'}}>
           <Toolbar style={{backgroundColor: '#9662f0'}}>
@@ -84,18 +70,6 @@ const NavBar = ({setLoggedIn}) => {
                   Home
                 </Link>
               </div>
-<<<<<<< HEAD
-              <div style={{display:'inline-block'}}>
-                <Link to ='/login' style={{color:'white'}}>
-                  Login
-                </Link>
-              </div>
-              <div style={{display:'inline-block'}}>
-                <Link to ='/register' style={{color:'white'}}>
-                  Register
-                </Link>
-              </div>
-=======
               <>
                 {!localStorage.getItem('token') && <div style={{display:'inline-block'}}>
                   <Link to ='/login' style={{color:'white'}}>
@@ -118,20 +92,10 @@ const NavBar = ({setLoggedIn}) => {
                   Log Out
                   </button>}
               </>
->>>>>>> c5f669e (finished logout)
             </div>
           </Toolbar>
         </Container>
       </AppBar>
-<<<<<<< HEAD
-=======
-        <Routes>
-          <Route path={`/`} element={<div>Home Page</div>}></Route>
-          <Route path={`/login`} element={<LoginPage></LoginPage>}></Route>
-          <Route path={`/register`} element={<RegisterPage></RegisterPage>}></Route>
-        </Routes>
-      </Router>
->>>>>>> 2dd8cbe (register and login page all setted up)
     </>
   );
 };
