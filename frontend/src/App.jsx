@@ -1,17 +1,21 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import {useContext, React} from 'react';
+import {useContext, React, useState} from 'react';
+// import React from 'react';
 import NavBar from './components/NavBar';
+import LoginPage from './pages/login';
+import RegisterPage from './pages/register';
 function App() {
+  const [loggedIn, setLoggedIn] = useState(false);
   return (
     <>
       <Router>
         <div>
-          <NavBar />
+          <NavBar setLoggedIn={setLoggedIn}/>
         </div>
         <Routes>
           <Route exact path={`/`} element={<div>Home Page</div>}></Route>
-          <Route exact path={`/login`} element={<div>Login Page</div>}></Route>
-          <Route exact path={`/register`} element={<div>Register Page</div>}></Route>
+          <Route exact path={`/login`} element={<LoginPage setLoggedIn={setLoggedIn}/>}></Route>
+          <Route exact path={`/register`} element={<RegisterPage/>}></Route>
         </Routes>
       </Router>
     </>

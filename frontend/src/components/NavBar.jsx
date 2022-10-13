@@ -22,6 +22,14 @@ const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 const NavBar = ({setLoggedIn}) => {
   const navigate = useNavigate();
+  //const [anchorElNav, setAnchorElNav] = React.useState(null);
+  //const [anchorElUser, setAnchorElUser] = React.useState(null);
+
+  //const handleOpenNavMenu = (event) => {
+    //setAnchorElNav(event.currentTarget);
+  // const handleOpenUserMenu = (event) => {
+  //   setAnchorElUser(event.currentTarget);
+  // };
 
   const styles = {
     appBar: {
@@ -38,7 +46,7 @@ const NavBar = ({setLoggedIn}) => {
     navigate('/')
   }
   return (
-    <>
+    <> 
       <AppBar position="static" sx={{bgcolor: '#9662f0'}}>
         <Container maxWidth="xl" style={{backgroundColor: '#9662f0'}}>
           <Toolbar style={{backgroundColor: '#9662f0'}}>
@@ -78,6 +86,9 @@ const NavBar = ({setLoggedIn}) => {
               </>
               <>
                 {localStorage.getItem('token') && <button style={{display:'inline-block'}} onClick = {handleLogout}>
+                  {/* <Link to ='/' style={{color:'white'}}>
+                    Log Out
+                  </Link> */}
                   Log Out
                   </button>}
               </>
