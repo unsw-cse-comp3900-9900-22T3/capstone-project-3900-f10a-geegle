@@ -4,6 +4,7 @@ import cors from 'cors';
 import db from './db/db.js';
 import authRouter from './routes/auth.route.js';
 import eventRouter from './routes/event.route.js';
+import userRouter from './routes/user.route.js';
 
 db.query('select * from users', (err, res) => {
     console.log(res.rows)
@@ -23,6 +24,7 @@ app.get("/", (req, res) => {
 
 app.use('/auth', authRouter);
 app.use('/events', eventRouter);
+app.use('/user', userRouter);
 
 
 app.listen(PORT, () => {
