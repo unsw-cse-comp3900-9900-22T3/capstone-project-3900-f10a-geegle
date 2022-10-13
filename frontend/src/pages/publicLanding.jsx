@@ -26,28 +26,12 @@ const style = {
 const PublicLanding = () => {
   const [allListings, setAllListings] = React.useState([]);
   const [upcomingListings, setUpcomingListings] = React.useState([]);
-  const [alignment, setAlignment] = React.useState('All Events');
+  const [toggleState, setToggleState] = React.useState('All Events');
 
   const handleChange = (event, newAlignment) => {
-    setAlignment(newAlignment);
-    console.log(newAlignment);
+    setToggleState(newAlignment);
+    //console.log(newAlignment);
   };
-  // const [publishedListings, setPublishedListings] = React.useState([]);
-
-  // const handlePublish = async(obj, idx) => {
-  //   const response = await fetch(`http://localhost:3000/events/${obj.eachEvent.eventID}/publish`, {
-  //     method: 'PUT',
-  //     headers: {
-  //     'Content-Type': 'application/json',
-  //     'auth-token': localStorage.getItem('token'),
-  //     },
-  //   });
-  //   if (response.ok) {
-  //     console.log('published!')
-  //     fetchHostEvents();
-  //   };
-
-  // }
   
   const fetchAllEvents = async () => {
     
@@ -79,7 +63,7 @@ const PublicLanding = () => {
         })
       }
       setAllListings(events)
-      console.log(allListings)
+      //console.log(allListings)
       // setMyListings(json);
   }
   
@@ -112,7 +96,7 @@ const PublicLanding = () => {
         })
       }
       setUpcomingListings(events)
-      // setMyListings(json);
+      //console.log(upcomingListings)
   }
 
   // upon entering the page
@@ -127,7 +111,7 @@ const PublicLanding = () => {
     <div>
       <ToggleButtonGroup
         color="primary"
-        value={alignment}
+        value={toggleState}
         exclusive
         onChange={handleChange}
         aria-label="Platform"
@@ -139,10 +123,10 @@ const PublicLanding = () => {
     {
     
     
-      alignment === 'All Events'?
+      toggleState === 'All Events'?
       allListings.map((obj, idx) => {
         return (
-        <Card sx={{ maxWidth: '100%' ,display: 'grid', gridTemplateColumns: '3fr 6fr'}}>
+        <Card key={idx} sx={{ maxWidth: '100%' ,display: 'grid', gridTemplateColumns: '3fr 6fr'}}>
           <CardMedia
               component="img"
               height="100%"
@@ -168,7 +152,7 @@ const PublicLanding = () => {
       }) : (
         upcomingListings.map((obj, idx) => {
         return (
-        <Card sx={{ maxWidth: '100%' ,display: 'grid', gridTemplateColumns: '3fr 6fr'}}>
+        <Card key = {idx} sx={{ maxWidth: '100%' ,display: 'grid', gridTemplateColumns: '3fr 6fr'}}>
           <CardMedia
               component="img"
               height="100%"
