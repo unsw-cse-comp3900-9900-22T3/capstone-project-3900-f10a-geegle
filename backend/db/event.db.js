@@ -60,6 +60,14 @@ const publishEventByIdDb = async(eventID) => {
     return result.rows[0]
 }
 
+// UPDATE
+const unpublishEventByIdDb = async(eventID) => {
+    const result = await db.query(
+        "UPDATE events SET published = FALSE WHERE eventID = $1 RETURNING *", [eventID]
+    )
+    return result.rows[0]
+}
+
 export {
     getEventByIdDb,
     getEventsByHostIdDb,
@@ -67,5 +75,6 @@ export {
     getAllEventsDb,
     addEventDb,
     removeEventByIdDb,
-    publishEventByIdDb
+    publishEventByIdDb,
+    unpublishEventByIdDb
 }

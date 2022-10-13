@@ -1,5 +1,5 @@
 import {addEventDb, getAllEventsNotSoldOutDb, getAllEventsDb, getEventByIdDb,
-        getEventsByHostIdDb, publishEventByIdDb, removeEventByIdDb} from '../db/event.db.js'
+        getEventsByHostIdDb, publishEventByIdDb, unpublishEventByIdDb, removeEventByIdDb} from '../db/event.db.js'
 import {addTicketDb} from '../db/ticket.db.js'
 
 /*  Request
@@ -114,7 +114,44 @@ export const publishEventsService = async(req, res) => {
     }
 }
 
-export const cancelEventsService = async(req, res) => {
+export const unpublishEventsService = async(req, res) => {
+    try {
+        const eventID = req.params.eventID;
+        const event = await getEventByIdDb(eventID);
+        if (event.length != 1) {
+            return {events: null, statusCode : 404, msg: 'Event does not exist'}
+        }
+        if (req.userID != event[0].hostid) {
+            return {events: null, statusCode : 403, msg: 'You are not the owner of this event'}
+        }
+        if (!event[0].published) {
+            return {events: null, statusCode : 400, msg: 'Event is already unpublished'}
+        }
+        const unpublishedEvent = await unpublishEventByIdDb(eventID);
+
+        return {events: {
+                    eventID: unpublishedEvent.eventid,
+                    eventName: unpublishedEvent.eventname,
+                    hostID: unpublishedEvent.hostid,
+                    startDateTime: unpublishedEvent.startdatetime,
+                    endDateTime: unpublishedEvent.enddatetime,
+                    eventDescription: unpublishedEvent.eventdescription,
+                    eventType: unpublishedEvent.eventtype,
+                    eventLocation: unpublishedEvent.eventlocation,
+                    eventVenue: unpublishedEvent.eventvenue,
+                    capacity: unpublishedEvent.capacity,
+                    totalTicketAmount: unpublishedEvent.totalticketamount,
+                    published: unpublishedEvent.published
+                },
+                statusCode : 200, 
+                msg: 'Event Unpublished'}
+
+    } catch(e) {
+        throw e
+    }
+}
+
+export const deleteEventsService = async(req, res) => {
     try {
         const eventID = req.params.eventID;
         const event = await getEventByIdDb(eventID)
@@ -128,6 +165,37 @@ export const cancelEventsService = async(req, res) => {
         await removeEventByIdDb(eventID);
         return {statusCode : 200, msg: 'Event deleted'}
 
+    } catch (e) {
+        throw e
+    }
+}
+
+export const getEventService = async(req, res) => {
+    try {
+        const event = await getEventByIdDb(req.params.eventID);
+        if (event.length === 0) {
+            return {events: null, statusCode: 404, msg: 'Event Id Not Found'}
+        } 
+
+        return {event: {
+                    eventID: event[0].eventid,
+                    eventName: event[0].eventname,
+                    hostID: event[0].hostid,
+                    startDateTime: event[0].startdatetime,
+                    endDateTime: event[0].enddatetime,
+                    eventDescription: event[0].eventdescription,
+                    eventType: event[0].eventtype,
+                    eventLocation: event[0].eventlocation,
+                    eventVenue: event[0].eventvenue,
+                    capacity: event[0].capacity,
+                    totalTicketAmount: event[0].totalticketamount,
+                    image1: event[0].image1,
+                    image2: event[0].image2,
+                    image3: event[0].image3,
+                    published: event[0].published
+                    }, 
+                statusCode: 200, 
+                msg: 'Event found'}
     } catch (e) {
         throw e
     }
