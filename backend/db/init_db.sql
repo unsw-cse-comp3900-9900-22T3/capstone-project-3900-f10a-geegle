@@ -13,22 +13,45 @@ CREATE TABLE users(
 CREATE TABLE events(
     eventID SERIAL PRIMARY KEY,
     eventName text NOT NULL,
-    eventDate date NOT NULL,
-    startTime time NOT NULL,
-    endTime time NOT NULL,
+    hostID integer NOT NULL,
+    startDateTime timestamptz NOT NULL,
+    endDateTime timestamptz NOT NULL,
     eventDescription text,
     eventLocation text NOT NULL,
+    eventVenue text NOT NULL,
     capacity integer NOT NULL,
-    published boolean DEFAULT TRUE
+    totalTicketAmount integer NOT NULL,
+    published boolean DEFAULT FALSE,
+    image1 text,
+    image2 text,
+    image3 text,
+    foreign key (hostID)
+        references users(userID)
 );
+
+-- CREATE TABLE venues (
+--     venueID SERIAL PRIMARY KEY,
+--     venueLocation text NOT NULL,
+
+-- )
+
+-- CREATE TABLE ticketType (
+--     ticketTypeID SERIAL PRIMARY KEY,
+--     amount integer,
+--     venueID integer,
+--     price integer NOT NULL,
+
+--     foreign key (venueID)
+--         references venues (venueID)
+-- )
 
 CREATE TABLE tickets(
     ticketID SERIAL PRIMARY KEY,
     ticketType text NOT NULL,
-    price integer NOT NULL,
+    price decimal NOT NULL,
     eventID integer NOT NULL,
     foreign key (eventID)
-        references events(eventID)
+        references events(eventID) ON DELETE CASCADE
 );
 
 CREATE TABLE creditCardDetails(
@@ -48,7 +71,7 @@ CREATE TABLE paypalDetails (
         references users(userID)
 );
 
-CREATE TABLE ticketPurchase (
+CREATE TABLE ticketPurchases (
     userID integer NOT NULL,
     ticketID integer NOT NULL,
     ticketPurchaseTime timestamp NOT NULL,
@@ -56,7 +79,7 @@ CREATE TABLE ticketPurchase (
     foreign key (userID)
         references users(userID),
     foreign key (ticketID)
-        references tickets(ticketID)
+        references tickets(ticketID) ON DELETE CASCADE
 );
 
 

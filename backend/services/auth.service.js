@@ -60,7 +60,7 @@ const loginUserService = async(req, res) => {
 
     try {
         const userByEmail = await getUserByEmailDb(email)
-        if (userByEmail.length == 0) {
+        if (userByEmail.length === 0) {
             return {user: null, token: null, statusCode : 401, msg: 'Email Does Not Exist'}
         }
         
