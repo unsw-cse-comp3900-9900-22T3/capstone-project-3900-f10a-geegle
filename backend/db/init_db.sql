@@ -19,11 +19,11 @@ CREATE TABLE venues (
 
 -- Location?
 CREATE TABLE seats (
-    seatID SERIAL,
+    seatID SERIAL PRIMARY KEY,
     seatSection text,
     seatRow text,
+    seatNo integer,
     venueID integer,
-    primary key (venueID, seatID),
     foreign key (venueID)
         references venues (venueID)
 );
@@ -54,7 +54,7 @@ CREATE TABLE eventMessages (
     messageID SERIAL,
     eventID integer NOT NULL,
     msg text NOT NULL,
-    msgTime timestamp NOT NULL,
+    msgTime timestamptz NOT NULL,
     primary key (eventID, messageID),
     foreign key (eventID)
         references events (eventID)
@@ -109,11 +109,14 @@ CREATE TABLE ticketPurchases (
     userID integer NOT NULL,
     ticketID integer NOT NULL,
     ticketPurchaseTime timestamptz NOT NULL,
+    seatID integer,
     primary key(ticketID),
     foreign key (userID)
         references users(userID),
     foreign key (ticketID)
-        references tickets(ticketID) ON DELETE CASCADE
+        references tickets(ticketID) ON DELETE CASCADE,
+    foreign key (seatID)
+        references seats (seatID)
 );
 
 
@@ -123,6 +126,7 @@ CREATE TABLE reviews (
     userID integer NOT NULL,
     rating integer NOT NULL,
     review text,
+    postedOn timestamptz NOT NULL,
     primary key (eventID, reviewID),
     foreign key (eventID)
         references events (eventID),
@@ -135,6 +139,7 @@ CREATE TABLE reviewReply (
     reviewID integer NOT NULL,
     userID integer NOT NULL,
     reply text NOT NULL,
+    repliedOn timestamptz NOT NULL,
     primary key (reviewID, replyID),
     foreign key (reviewID)
         references reviews (reviewID),
