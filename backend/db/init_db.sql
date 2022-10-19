@@ -10,6 +10,24 @@ CREATE TABLE users(
     userPassword text NOT NULL
 );
 
+CREATE TABLE venues (
+    venueID SERIAL PRIMARY KEY,
+    venueName text NOT NULL,
+    maxCapacity integer NOT NULL
+);
+
+
+-- Location?
+CREATE TABLE seats (
+    seatID SERIAL,
+    seatSection text,
+    seatRow text,
+    venueID integer,
+    primary key (venueID, seatID),
+    foreign key (venueID)
+        references venues (venueID)
+);
+
 CREATE TABLE events(
     eventID SERIAL PRIMARY KEY,
     eventName text NOT NULL,
@@ -19,7 +37,7 @@ CREATE TABLE events(
     eventDescription text,
     eventType text,
     eventLocation text NOT NULL,
-    eventVenue text NOT NULL,
+    eventVenue integer NOT NULL,
     capacity integer NOT NULL,
     totalTicketAmount integer NOT NULL,
     published boolean DEFAULT FALSE,
@@ -27,7 +45,19 @@ CREATE TABLE events(
     image2 text,
     image3 text,
     foreign key (hostID)
-        references users(userID)
+        references users(userID),
+    foreign key (eventVenue)
+        references venues (venueID)
+);
+
+CREATE TABLE eventMessages (
+    messageID SERIAL,
+    eventID integer NOT NULL,
+    msg text NOT NULL,
+    msgTime timestamp NOT NULL,
+    primary key (eventID, messageID),
+    foreign key (eventID)
+        references events (eventID)
 );
 
 -- CREATE TABLE venues (
@@ -51,8 +81,11 @@ CREATE TABLE tickets(
     ticketType text NOT NULL,
     price decimal NOT NULL,
     eventID integer NOT NULL,
+    seatID integer NOT NULL,
     foreign key (eventID)
-        references events(eventID) ON DELETE CASCADE
+        references events(eventID) ON DELETE CASCADE,
+    foreign key (seatID)
+        references seats(seatID)
 );
 
 CREATE TABLE creditCardDetails(
@@ -75,12 +108,38 @@ CREATE TABLE paypalDetails (
 CREATE TABLE ticketPurchases (
     userID integer NOT NULL,
     ticketID integer NOT NULL,
-    ticketPurchaseTime timestamp NOT NULL,
+    ticketPurchaseTime timestamptz NOT NULL,
     primary key(ticketID),
     foreign key (userID)
         references users(userID),
     foreign key (ticketID)
         references tickets(ticketID) ON DELETE CASCADE
+);
+
+
+CREATE TABLE reviews (
+    reviewID SERIAL,
+    eventID integer NOT NULL,
+    userID integer NOT NULL,
+    rating integer NOT NULL,
+    review text,
+    primary key (eventID, reviewID),
+    foreign key (eventID)
+        references events (eventID),
+    foreign key (userID)
+        references users (userID)
+);
+
+CREATE TABLE reviewReply (
+    replyID SERIAL,
+    reviewID integer NOT NULL,
+    userID integer NOT NULL,
+    reply text NOT NULL,
+    primary key (reviewID, replyID),
+    foreign key (reviewID)
+        references reviews (reviewID),
+    foreign key (userID)
+        references users (userID)
 );
 
 
