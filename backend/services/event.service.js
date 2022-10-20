@@ -1,5 +1,6 @@
-import {addEventDb, getAllEventsNotSoldOutDb, getAllEventsDb, getEventByIdDb,
-        getEventsByHostIdDb, publishEventByIdDb, unpublishEventByIdDb, removeEventByIdDb} from '../db/event.db.js'
+import {addEventDb, getAllEventsNotSoldOutDb, getAllEventsDb, getEventByIdDb, getEventByIdDisplayDb,
+        getEventsByHostIdDb, getEventVenueByNameDb, getEventVenueByIdDb, addEventVenueDb, publishEventByIdDb, 
+        unpublishEventByIdDb, removeEventByIdDb} from '../db/event.db.js'
 import {addTicketDb} from '../db/ticket.db.js'
 
 /*  Request
@@ -18,7 +19,7 @@ export const createEventsService = async(req, res) => {
         const {events, tickets} = req.body
 
         const {eventName, startDateTime, endDateTime, 
-            eventLocation, eventDescription, eventType, eventVenue, capacity,
+            eventDescription, eventType, eventVenue, capacity,
             image1, image2, image3} = events
         
         if (endDateTime <= startDateTime) {
@@ -28,7 +29,6 @@ export const createEventsService = async(req, res) => {
             return {events: null, statusCode : 400, msg: 'Invalid Capacity'}
         }
 
-        // Date comparison not working
         if (new Date(startDateTime) <= Date.now()) {
             return {events: null, statusCode : 400, msg: 'Invalid Event Date'}
         }
@@ -42,8 +42,16 @@ export const createEventsService = async(req, res) => {
             return {events: null, statusCode : 400, msg: 'Capacity not sufficient'}
         }
 
+        let venue = await getEventVenueByNameDb(eventVenue)
+        if (venue.length === 0) {
+            const { eventVenue, eventLocation, venueCapacity } = events
+            venue = await addEventVenueDb(eventVenue, eventLocation, venueCapacity)
+        } else {
+            venue = venue[0]
+        } 
+
         const newEvent = await addEventDb(eventName, req.userID, new Date(startDateTime), new Date(endDateTime), eventDescription,
-                eventType, eventLocation, eventVenue, capacity, totalTickets, image1, image2, image3)
+                eventType, venue.venueid, capacity, totalTickets, image1, image2, image3)
     
 
         for (let i = 0; i < tickets.length; i++) {
@@ -61,8 +69,8 @@ export const createEventsService = async(req, res) => {
                             endDateTime: newEvent.enddatetime,
                             eventDescription: newEvent.eventdescription,
                             eventType: newEvent.eventtype,
-                            eventLocation: newEvent.eventlocation,
-                            eventVenue: newEvent.eventvenue,
+                            eventVenue: venue.venuename,
+                            eventLocation: venue.venuelocation,
                             capacity: newEvent.capacity,
                             totalTicketAmount: newEvent.totalticketamount,
                             image1: newEvent.image1,
@@ -94,16 +102,6 @@ export const publishEventsService = async(req, res) => {
 
         return {events: {
                     eventID: publishedEvent.eventid,
-                    eventName: publishedEvent.eventname,
-                    hostID: publishedEvent.hostid,
-                    startDateTime: publishedEvent.startdatetime,
-                    endDateTime: publishedEvent.enddatetime,
-                    eventDescription: publishedEvent.eventdescription,
-                    eventType: publishedEvent.eventtype,
-                    eventLocation: publishedEvent.eventlocation,
-                    eventVenue: publishedEvent.eventvenue,
-                    capacity: publishedEvent.capacity,
-                    totalTicketAmount: publishedEvent.totalticketamount,
                     published: publishedEvent.published
                 },
                 statusCode : 201, 
@@ -131,16 +129,6 @@ export const unpublishEventsService = async(req, res) => {
 
         return {events: {
                     eventID: unpublishedEvent.eventid,
-                    eventName: unpublishedEvent.eventname,
-                    hostID: unpublishedEvent.hostid,
-                    startDateTime: unpublishedEvent.startdatetime,
-                    endDateTime: unpublishedEvent.enddatetime,
-                    eventDescription: unpublishedEvent.eventdescription,
-                    eventType: unpublishedEvent.eventtype,
-                    eventLocation: unpublishedEvent.eventlocation,
-                    eventVenue: unpublishedEvent.eventvenue,
-                    capacity: unpublishedEvent.capacity,
-                    totalTicketAmount: unpublishedEvent.totalticketamount,
                     published: unpublishedEvent.published
                 },
                 statusCode : 200, 
@@ -172,7 +160,7 @@ export const deleteEventsService = async(req, res) => {
 
 export const getEventService = async(req, res) => {
     try {
-        const event = await getEventByIdDb(req.params.eventID);
+        const event = await getEventByIdDisplayDb(req.params.eventID);
         if (event.length === 0) {
             return {events: null, statusCode: 404, msg: 'Event Id Not Found'}
         } 
@@ -181,12 +169,15 @@ export const getEventService = async(req, res) => {
                     eventID: event[0].eventid,
                     eventName: event[0].eventname,
                     hostID: event[0].hostid,
+                    hostName: event[0].firstname + ' ' + event[0].lastname,
+                    hostEmail: event[0].email,
                     startDateTime: event[0].startdatetime,
                     endDateTime: event[0].enddatetime,
                     eventDescription: event[0].eventdescription,
                     eventType: event[0].eventtype,
-                    eventLocation: event[0].eventlocation,
-                    eventVenue: event[0].eventvenue,
+                    eventVenue: event[0].venuename,
+                    eventLocation: event[0].venuelocation,
+                    venueCapacity: event[0].maxcapacity,
                     capacity: event[0].capacity,
                     totalTicketAmount: event[0].totalticketamount,
                     image1: event[0].image1,
@@ -215,12 +206,14 @@ export const getUpcomingEventsService = async(req, res) => {
                     eventID: eventList[i].eventid,
                     eventName: eventList[i].eventname,
                     hostID: eventList[i].hostid,
+                    hostName: eventList[0].firstname + ' ' + eventList[0].lastname,
                     startDateTime: eventList[i].startdatetime,
                     endDateTime: eventList[i].enddatetime,
                     eventDescription: eventList[i].eventdescription,
                     eventType: eventList[i].eventtype,
-                    eventLocation: eventList[i].eventlocation,
-                    eventVenue: eventList[i].eventvenue,
+                    eventVenue: eventList[i].venuename,
+                    eventLocation: eventList[i].venuelocation,
+                    venueCapacity: eventList[i].maxcapacity,
                     capacity: eventList[i].capacity,
                     totalTicketAmount: eventList[i].totalticketamount,
                     image1: eventList[i].image1,
@@ -250,12 +243,14 @@ export const getAllEventsService = async(req, res) => {
                     eventID: eventList[i].eventid,
                     eventName: eventList[i].eventname,
                     hostID: eventList[i].hostid,
+                    hostName: eventList[0].firstname + ' ' + eventList[0].lastname,
                     startDateTime: eventList[i].startdatetime,
                     endDateTime: eventList[i].enddatetime,
                     eventDescription: eventList[i].eventdescription,
                     eventType: eventList[i].eventtype,
-                    eventLocation: eventList[i].eventlocation,
-                    eventVenue: eventList[i].eventvenue,
+                    eventVenue: eventList[i].venuename,
+                    eventLocation: eventList[i].venuelocation,
+                    venueCapacity: eventList[i].maxcapacity,
                     capacity: eventList[i].capacity,
                     totalTicketAmount: eventList[i].totalticketamount,
                     image1: eventList[i].image1,
@@ -286,8 +281,9 @@ export const getHostEventsService = async(req, res) => {
                 endDateTime: eventList[i].enddatetime,
                 eventDescription: eventList[i].eventdescription,
                 eventType: eventList[i].eventtype,
-                eventLocation: eventList[i].eventlocation,
-                eventVenue: eventList[i].eventvenue,
+                eventVenue: eventList[i].venuename,
+                eventLocation: eventList[i].venuelocation,
+                venueCapacity: eventList[i].maxcapacity,
                 capacity: eventList[i].capacity,
                 totalTicketAmount: eventList[i].totalticketamount,
                 published: eventList[i].published,
