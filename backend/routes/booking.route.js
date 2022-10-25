@@ -9,5 +9,7 @@ bookingRouter.get('/:eventID/ticketTypes', verifyToken, bookingController.getEve
 bookingRouter.get('/:eventID/tickets', verifyToken, bookingController.getEventTicketsController);
 bookingRouter.get('/:eventID/availableTickets', verifyToken, bookingController.getEventAvailableTicketsController);
 bookingRouter.get('/:eventID/availableTicketGroup', verifyToken, bookingController.getEventAvailableTicketGroupController);
+bookingRouter.get('/:eventID/seats', verifyToken, bookingController.getEventSeatsController);
+bookingRouter.get('/:eventID/availableSeats', verifyToken, bookingController.getEventAvailableSeatsController);
 
 export default bookingRouter;

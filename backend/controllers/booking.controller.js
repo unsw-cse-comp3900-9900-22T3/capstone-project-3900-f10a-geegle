@@ -59,3 +59,33 @@ export const getEventAvailableTicketGroupController = async(req, res) => {
         res.status(500).send(error.message)
     }
 }
+
+export const getEventSeatsController = async(req, res) => {
+    try {
+        const {seats,statusCode, msg} = await bookingService.getEventSeatsService(req, res);
+
+        if (!seats) {
+            res.status(statusCode).json(msg)
+        } else {
+            res.status(statusCode).json({seats, msg})
+        }
+
+    } catch (error) {
+        res.status(500).send(error.message)
+    }
+}
+
+export const getEventAvailableSeatsController = async(req, res) => {
+    try {
+        const {seats,statusCode, msg} = await bookingService.getEventAvailableSeatsService(req, res);
+
+        if (!seats) {
+            res.status(statusCode).json(msg)
+        } else {
+            res.status(statusCode).json({seats, msg})
+        }
+
+    } catch (error) {
+        res.status(500).send(error.message)
+    }
+}

@@ -1,4 +1,5 @@
 import * as ticketdb from '../db/ticket.db.js'
+import * as venueSeatingdb from '../db/venueSeating.db.js'
 
 export const getEventTicketTypesService = async(req, res) => {
     try {
@@ -79,6 +80,56 @@ export const getEventAvailableTicketGroupService = async(req, res) => {
         return {tickets: tickets,
                 statusCode: 200,
                 msg: `Available tickets for Event ${eventID}`}
+
+    } catch (error) {
+        throw error
+    }
+}
+
+export const getEventSeatsService = async(req, res) => {
+    try {
+        const eventID = req.params.eventID;
+        const seats = await venueSeatingdb.getVenueSeatsByEventIdDb(eventID)
+        
+        for (let seat of seats) {
+            seat['seatID'] = seat['seatid']
+            delete seat['seatID']
+            seat['seatSection'] = seat['seatsection']
+            delete seat['seatsection']
+            seat['seatRow'] = seat['seatrow']
+            delete seat['seatrow']
+            seats['seatNo'] = seat['seatno']
+            delete seat['seatno']
+        }
+
+        return {seats: seats,
+                statusCode: 200,
+                msg: `All seats for Event ${eventID}`}
+
+    } catch (error) {
+        throw error
+    }
+}
+
+export const getEventAvailableSeatsService = async(req, res) => {
+    try {
+        const eventID = req.params.eventID;
+        const seats = await venueSeatingdb.getVenueAvailableSeatsByEventIdDb(eventID)
+        
+        for (let seat of seats) {
+            seat['seatID'] = seat['seatid']
+            delete seat['seatID']
+            seat['seatSection'] = seat['seatsection']
+            delete seat['seatsection']
+            seat['seatRow'] = seat['seatrow']
+            delete seat['seatrow']
+            seats['seatNo'] = seat['seatno']
+            delete seat['seatno']
+        }
+
+        return {seats: seats,
+                statusCode: 200,
+                msg: `Available seats for Event ${eventID}`}
 
     } catch (error) {
         throw error
