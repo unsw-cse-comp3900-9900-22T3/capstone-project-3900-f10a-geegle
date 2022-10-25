@@ -11,5 +11,7 @@ bookingRouter.get('/:eventID/availableTickets', verifyToken, bookingController.g
 bookingRouter.get('/:eventID/availableTicketGroup', verifyToken, bookingController.getEventAvailableTicketGroupController);
 bookingRouter.get('/:eventID/seats', verifyToken, bookingController.getEventSeatsController);
 bookingRouter.get('/:eventID/availableSeats', verifyToken, bookingController.getEventAvailableSeatsController);
+//bookingRouter.get('/:eventID/seatInfo/:seatID', verifyToken, bookingController.getEventSeatInfoController);
+// get seat info: seat name, ticket type for the seat, reserved or availabl --> means we have to assign every seat to a tickettype
 
 export default bookingRouter;

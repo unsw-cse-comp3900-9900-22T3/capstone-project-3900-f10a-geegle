@@ -98,7 +98,7 @@ export const getEventSeatsService = async(req, res) => {
             delete seat['seatsection']
             seat['seatRow'] = seat['seatrow']
             delete seat['seatrow']
-            seats['seatNo'] = seat['seatno']
+            seat['seatNo'] = seat['seatno']
             delete seat['seatno']
         }
 
@@ -123,13 +123,44 @@ export const getEventAvailableSeatsService = async(req, res) => {
             delete seat['seatsection']
             seat['seatRow'] = seat['seatrow']
             delete seat['seatrow']
-            seats['seatNo'] = seat['seatno']
+            seat['seatNo'] = seat['seatno']
             delete seat['seatno']
         }
 
         return {seats: seats,
                 statusCode: 200,
                 msg: `Available seats for Event ${eventID}`}
+
+    } catch (error) {
+        throw error
+    }
+}
+
+export const getEventSeatInfoService = async(req, res) => {
+    try {
+        const { eventID, seatID } = req.params;
+        const seat = await venueSeatingdb.getVenueSeatInfoByEventIdDb(eventID, seatID)
+
+        seat['seatID'] = seat['seatid']
+        delete seat['seatID']
+        seat['seatSection'] = seat['seatsection']
+        delete seat['seatsection']
+        seat['seatRow'] = seat['seatrow']
+        delete seat['seatrow']
+        seat['seatNo'] = seat['seatno']
+        delete seat['seatno']
+
+        const occupied = await venueSeatingdb.getSeatOccupantDb(eventID, seat.seatID)
+        console.log(occupied)
+        if (occupied.length == 1) {
+            seat['available'] = false
+        } else {
+            seat['available'] = true
+        }
+
+        return {seat: seat,
+                statusCode: 200,
+                msg: `Seat information for Seat ${seat.seatID} in Event ${eventID}`}
 
     } catch (error) {
         throw error
