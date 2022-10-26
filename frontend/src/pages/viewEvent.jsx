@@ -89,7 +89,7 @@ const ViewEvent= () => {
     }
      //console.log(eventDetails);
      setEventInfo({...eventDetails});
-     getHostInfo(eventDetails);
+     //getHostInfo(eventDetails);
       
   }
   useEffect(()=> {
@@ -136,7 +136,7 @@ const ViewEvent= () => {
               {eventInfo.eventName}
             </Typography>
             <Typography component = "div" variant="h5" color="text.secondary">
-              Host : {hostName}
+              Host : Host Name
             </Typography>
           </Box>
           <Box id="details section" sx={{marginTop: "2%"}}>

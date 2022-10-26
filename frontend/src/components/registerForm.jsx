@@ -64,9 +64,11 @@ const RegisterForm = () => {
         alert('Registered, please login');
       } else if (res === 401) {
         console.log(res);
-        alert('input error, check email or password');
+        console.log(out);
+        alert(`check email or password`);
       } else {
         console.log(res);
+        console.log(out);
         alert('authorization or connection error');
       }
     }
