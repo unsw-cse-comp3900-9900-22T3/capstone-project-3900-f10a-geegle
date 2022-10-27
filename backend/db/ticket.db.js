@@ -46,6 +46,16 @@ const addTicketDb = async(ticketType, price, eventID) => {
     return result.rows[0]
 }
 
+
+// CREATE
+const addTicketPurchaseDb = async(ticketID, userID, time) => {
+    const result = await db.query (
+        "INSERT INTO ticketPurchases (userID, ticketID, ticketPurchaseTime) VALUES ($1, $2, $3) RETURNING *",
+        [userID, ticketID, time]
+    )
+    return result.rows[0]
+}
+
 // DELETE
 const removeTicketByIdDb = async(ticketId) => {
     const result = await db.query (
@@ -54,6 +64,11 @@ const removeTicketByIdDb = async(ticketId) => {
 }
 
 // UPDATE
+const assignSeatToTicketDb = async(ticketID, seatID) => {
+    const result = await db.query(
+        "UPDATE tickets SET seatid = $1 where ticketid = $2 RETURNING *", [seatID, ticketID]
+    )
+}
 
 export {
     getTicketByEventIdDb,
@@ -62,5 +77,7 @@ export {
     getAvailableTicketsByEventIdDb,
     getAvailableTicketTypeGroupByEventIdDb,
     addTicketDb,
-    removeTicketByIdDb
+    removeTicketByIdDb,
+    assignSeatToTicketDb,
+    addTicketPurchaseDb
 }

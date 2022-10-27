@@ -104,3 +104,18 @@ export const getEventSeatInfoController = async(req, res) => {
         res.status(500).send(error.message)
     }
 }
+
+export const bookEventController = async(req, res) => {
+    try {
+        const {booking,statusCode, msg} = await bookingService.bookEventService(req, res);
+
+        if (!booking) {
+            res.status(statusCode).json(msg)
+        } else {
+            res.status(statusCode).json({booking, msg})
+        }
+
+    } catch (error) {
+        res.status(500).send(error.message)
+    }
+}

@@ -1,5 +1,6 @@
 import { createEventsService, publishEventsService, unpublishEventsService, deleteEventsService, getEventService,
-         getUpcomingEventsService, getAllEventsService, getHostEventsService } from "../services/event.service.js";
+         getUpcomingEventsService, getAllEventsService, getHostEventsService, getEventGuestListService } 
+         from "../services/event.service.js";
 
 
 export const createEventsController = async(req, res) => {
@@ -48,7 +49,12 @@ export const unpublishEventsController = async(req, res) => {
 export const deleteEventsController = async(req, res) => {
     try {
         const {statusCode, msg} = await deleteEventsService(req, res);
-        res.status(statusCode).json(msg)
+        
+        if (!events) {
+            res.status(statusCode).json(msg)
+        } else {
+            res.status(statusCode).json({events, msg})
+        }
     } catch (e) {
         res.status(500).send(e.message)
     }
@@ -90,7 +96,19 @@ export const getHostEventsController = async(req, res) => {
     }
 }
 
+export const getEventGuestListController = async(req, res) => {
+    try {
+        const {guests, statusCode, msg} = await getEventGuestListService(req, res);     
 
+        if (!guests) {
+            res.status(statusCode).json(msg)
+        } else {
+            res.status(statusCode).json({guests, msg})
+        }
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
 
 // const getUpcomingEventsController = (req, res) => {
 //     const upcomingEvents = {

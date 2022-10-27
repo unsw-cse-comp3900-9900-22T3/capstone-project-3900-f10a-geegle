@@ -48,7 +48,7 @@ export const getEventAvailableTicketService = async(req, res) => {
     try {
         const eventID = req.params.eventID;
         const tickets = await ticketdb.getAvailableTicketsByEventIdDb(eventID)
-        
+        console.log(tickets)
         for (let ticketInfo of tickets) {
             ticketInfo['ticketID'] = ticketInfo['ticketid']
             delete ticketInfo['ticketid']
@@ -149,6 +149,8 @@ export const getEventSeatInfoService = async(req, res) => {
         delete seat['seatrow']
         seat['seatNo'] = seat['seatno']
         delete seat['seatno']
+        seat['ticketType'] = seat['tickettype']
+        delete seat['tickettype']
 
         const occupied = await venueSeatingdb.getSeatOccupantDb(eventID, seat.seatID)
         console.log(occupied)
@@ -161,6 +163,41 @@ export const getEventSeatInfoService = async(req, res) => {
         return {seat: seat,
                 statusCode: 200,
                 msg: `Seat information for Seat ${seat.seatID} in Event ${eventID}`}
+
+    } catch (error) {
+        throw error
+    }
+}
+
+export const bookEventService = async(req, res) => {
+    try {
+        const { bookings } = req.body;
+
+        // Check credit card correct
+
+        // Check no. of tickets booked of each type are available
+        // In event create make sure total tickets for sale does not exceed venue capacity
+        for (let book of bookings) {
+
+        }
+        
+        // DB: get all available tickets at event
+        // https://stackoverflow.com/questions/3396088/how-do-i-remove-an-object-from-an-array-with-javascript
+        // - Use array.findIndex to find ticket matching the ticket type
+        // - Delete from available tickets
+
+        // Alternative: each iteration get from DB list of available tickets
+        /*
+            For each booking:
+                
+                - Get a ticketID based on ticketType
+                - Add seatID to the ticket
+                - Add to ticketPurchases table
+                
+        */
+
+
+        // Send email confirmation
 
     } catch (error) {
         throw error

@@ -12,6 +12,27 @@ bookingRouter.get('/:eventID/availableTicketGroup', verifyToken, bookingControll
 bookingRouter.get('/:eventID/seats', verifyToken, bookingController.getEventSeatsController);
 bookingRouter.get('/:eventID/availableSeats', verifyToken, bookingController.getEventAvailableSeatsController);
 //bookingRouter.get('/:eventID/seatInfo/:seatID', verifyToken, bookingController.getEventSeatInfoController);
-// get seat info: seat name, ticket type for the seat, reserved or availabl --> means we have to assign every seat to a tickettype
+// get seat info: seat name, ticket type for the seat, reserved or available, 
+// selecting which seat type belongs to which ticket type --> means we have to assign every seat to a tickettype? or let anyone choose any seat
+
+/*
+    bookings: [
+        {ticketType: '',
+         seatID: ''}, 
+        {
+
+        }
+    ],
+    creditCard: {useStored: true/false, creditCardNum: '', ccv: '', expiryMonth: '', expiryYear: ''},
+    email: {useStored: true/false, emailAddr: }
+
+    OR
+
+    tickets: [],
+    seats: []
+    creditCard: {}
+    email: {}
+*/
+bookingRouter.post('/:eventID/purchase', verifyToken, bookingController.bookEventController)
 
 export default bookingRouter;
