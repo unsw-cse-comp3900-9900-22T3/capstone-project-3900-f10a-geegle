@@ -1,6 +1,7 @@
 import { createEventsService, publishEventsService, unpublishEventsService, deleteEventsService, getEventService,
-         getUpcomingEventsService, getAllEventsService, getHostEventsService } from "../services/event.service.js";
+         getUpcomingEventsService, getAllEventsService, getHostEventsService, } from "../services/event.service.js";
 
+import { getEventReviewsService, createEventReviewService, editEventReviewService, deleteEventReviewService } from "../services/review.service.js"
 
 export const createEventsController = async(req, res) => {
     try {
@@ -85,6 +86,60 @@ export const getHostEventsController = async(req, res) => {
     try {
         const {events, statusCode, msg} = await getHostEventsService(req, res);
         res.status(statusCode).json({events, msg})
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
+
+export const createEventReviewController = async(req, res) => {
+    try {
+        const {reviews, statusCode, msg} = await createEventReviewService(req, res);
+        res.status(statusCode).json({reviews, msg})
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
+
+export const getEventReviewsController = async(req, res) => {
+    try {
+        const {reviews, statusCode, msg} = await getEventReviewsService(req, res);
+        res.status(statusCode).json({reviews, msg})
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
+
+export const editEventReviewController = async(req, res) => {
+    try {
+        const {reviews, statusCode, msg} = await editEventReviewService(req, res);
+        res.status(statusCode).json({reviews, msg})
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
+
+export const deleteEventReviewController = async(req, res) => {
+    try {
+        const {statusCode, msg} = await deleteEventReviewService(req, res);
+        res.status(statusCode).json({msg})
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
+
+export const createEventReviewReplyController = async(req, res) => {
+    try {
+        const {replies, statusCode, msg} = await createReviewReplyService(req, res);
+        res.status(statusCode).json({replies, msg})
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
+
+export const getEventReviewReplyController = async(req, res) => {
+    try {
+        const {replies, statusCode, msg} = await getReviewReplyService(req, res);
+        res.status(statusCode).json({replies, msg})
     } catch (e) {
         res.status(500).send(e.message)
     }
