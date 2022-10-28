@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
+import Carousel from "react-multi-carousel";
+import "react-multi-carousel/lib/styles.css";
 import TextField from '@mui/material/TextField';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -23,7 +25,26 @@ const style = {
     boxShadow: 24,
     p: 4,
   };
-
+// responsive prop for carousel 
+const responsive = {
+  superLargeDesktop: {
+    // the naming can be any, depends on you.
+    breakpoint: { max: 4000, min: 3000 },
+    items: 1
+  },
+  desktop: {
+    breakpoint: { max: 3000, min: 1024 },
+    items: 1
+  },
+  tablet: {
+    breakpoint: { max: 1024, min: 464 },
+    items: 1
+  },
+  mobile: {
+    breakpoint: { max: 464, min: 0 },
+    items: 1
+  }
+};
 const ViewEvent= () => {
   const { eventId} = useParams();
   const [eventInfo, setEventInfo] = useState({
@@ -44,6 +65,9 @@ const ViewEvent= () => {
     totalTicketAmount:'',
   });
   const [hostName, setHostName] = useState('');
+  const [imageArray, setImageArray] = useState([]);
+
+
   const getHostInfo = async(eventDetails) => {
     const requestOptions = {
       method: 'GET',
@@ -87,7 +111,14 @@ const ViewEvent= () => {
       startDateTime: eventJson.startDateTime,
       totalTicketAmount:eventJson.totalTicketAmount,
     }
-     //console.log(eventDetails);
+    console.log(eventDetails);
+    const fetchedImages = [eventDetails.image1,eventDetails.image2, eventDetails.image3];
+    const nonEmptyImages = fetchedImages.filter(image => {
+      return image !== "";
+    });
+    console.log("non empty image",nonEmptyImages);
+    console.log(eventDetails);
+     setImageArray(nonEmptyImages);
      setEventInfo({...eventDetails});
      //getHostInfo(eventDetails);
       
@@ -128,7 +159,21 @@ const ViewEvent= () => {
     <>
       <Box sx={styles.BoxContainer}>
         <Box sx={styles.ImageContainer}>
-          <img src= {eventInfo.image1} alt="pic of event" style= {{width:"70%",height:"40%"}}/>
+          <Carousel responsive={responsive} autoPlay={true} autoPlaySpeed={1000} containerClass="carousel-container" style= {{width:"70%",height:"40%"}} ssr={true} dotListClass="custom-dot-list-style" deviceType="desktop">
+            
+            {
+              imageArray.map((image,index) => {
+                console.log("image",image);
+              return (
+                <div style={styles.ImageContainer}>
+                  <img src= {image} key={index} alt="pic of event" style= {{width:"70%"}}/>
+                </div>
+                
+                )
+            })
+          }
+            
+          </Carousel>
         </Box>
         <Box id="content container" sx={{marginTop: "2%", padding: "1% 3% 3% 3%"}}>
           <Box id="heading section" sx={{marginTop: "1%"}}>
