@@ -1,5 +1,5 @@
 import { addReviewDb, editReviewByIdDb, getEventReviewsByEventIdDb, getReviewByReviewIdDb, 
-    getReviewLikeAmountDb, getReviewLikeDb, deleteReviewByIdDb } from '../db/review.db.js'
+    getReviewLikeAmountDb, getReviewLikeDb, deleteReviewByIdDb, addReviewLikeDb, deleteReviewLikeByIdDb } from '../db/review.db.js'
 import { getUserByIdDb } from '../db/user.db.js'
 import { getEventByIdDb } from '../db/event.db.js'
 
@@ -131,6 +131,66 @@ export const deleteEventReviewService = async(req, res) => {
     }
 }
 
+
+export const addLikeToEventReviewService = async(req, res) => {
+    try {
+        const reviewID = req.params.reviewID;
+        const review = await getReviewByReviewIdDb(reviewID);
+
+        if (review.length == 0) {
+            return {statusCode: 400, msg: 'Review does not exist'}
+        }
+
+        const userReviewLike = await getReviewLikeDb(reviewID, req.userID);
+        if (userReviewLike.length >= 1) {
+            return {statusCode: 400, msg: 'User has already liked this review'}
+        }
+
+        const newLike = await addReviewLikeDb(reviewID, req.userID);
+        let likes = await getReviewLikeAmountDb(reviewID);
+        return {reviews : {
+            reviewID: reviewID,
+            numLikes: parseInt(likes),
+            userID: review.userid,
+            userLiked: true
+        },
+        statusCode : 200, 
+        msg: 'Review Liked'}
+
+    } catch(e) {
+        throw e
+    }
+}
+
+export const removeLikeToEventReviewService = async(req, res) => {
+    try {
+        const reviewID = req.params.reviewID;
+        const review = await getReviewByReviewIdDb(reviewID);
+
+        if (review.length == 0) {
+            return {statusCode: 400, msg: 'Review does not exist'}
+        }
+
+        const userReviewLike = await getReviewLikeDb(reviewID, req.userID);
+        if (userReviewLike.length == 0) {
+            return {statusCode: 400, msg: 'User has not liked this review yet'}
+        }
+
+        const removeLike = await deleteReviewLikeByIdDb(reviewID, req.userID);
+        let likes = await getReviewLikeAmountDb(reviewID);
+        return {reviews : {
+            reviewID: reviewID,
+            numLikes: parseInt(likes),
+            userID: review.userid,
+            userLiked: false
+        },
+        statusCode : 200, 
+        msg: 'Review Unliked'}
+
+    } catch(e) {
+        throw e
+    }
+}
 
 
 export const createReviewReplyService = async(req, res) => {

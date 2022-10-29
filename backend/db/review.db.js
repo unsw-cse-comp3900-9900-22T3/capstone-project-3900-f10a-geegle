@@ -69,6 +69,14 @@ const getReviewLikeDb = async(reviewID, userID) => {
     return result.rows
 }
 
+// DELETE
+const deleteReviewLikeByIdDb = async(reviewID, userID) => {
+    const result = await db.query (
+        "DELETE FROM reviewLikes WHERE reviewID = $1 AND userID = $2",
+        [reviewID, userID]
+    )
+}
+
 export {
     getEventReviewsByEventIdDb,
     getReviewByReviewIdDb,
@@ -77,5 +85,6 @@ export {
     deleteReviewByIdDb,
     addReviewLikeDb,
     getReviewLikeAmountDb,
-    getReviewLikeDb
+    getReviewLikeDb,
+    deleteReviewLikeByIdDb
 }
