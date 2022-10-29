@@ -1,5 +1,5 @@
 import {addEventDb, getAllEventsNotSoldOutDb, getAllEventsDb, getEventByIdDb, getEventByIdDisplayDb,
-        getEventsByHostIdDb, getEventVenueByNameDb, getEventVenueByIdDb, addEventVenueDb, publishEventByIdDb, 
+        getEventsByHostIdDb, getEventVenueByNameDb, getEventVenueByIdDb, addEventVenueDb, publishEventByIdDb, isVenueSeatingAvailableDb,
         unpublishEventByIdDb, removeEventByIdDb} from '../db/event.db.js'
 import {addTicketDb} from '../db/ticket.db.js'
 
@@ -43,11 +43,14 @@ export const createEventsService = async(req, res) => {
         }
 
         let venue = await getEventVenueByNameDb(eventVenue)
+        let seatingAvailable = false
         if (venue.length === 0) {
             const { eventVenue, eventLocation, venueCapacity } = events
             venue = await addEventVenueDb(eventVenue, eventLocation, venueCapacity)
         } else {
             venue = venue[0]
+            const venueSeats = await isVenueSeatingAvailableDb(venue.venueid)
+            seatingAvailable = parseInt(venueSeats.count) ? true : false
         } 
 
         const newEvent = await addEventDb(eventName, req.userID, new Date(startDateTime), new Date(endDateTime), eventDescription,
@@ -71,6 +74,7 @@ export const createEventsService = async(req, res) => {
                             eventType: newEvent.eventtype,
                             eventVenue: venue.venuename,
                             eventLocation: venue.venuelocation,
+                            seatingAvailable: seatingAvailable,
                             capacity: newEvent.capacity,
                             totalTicketAmount: newEvent.totalticketamount,
                             image1: newEvent.image1,
