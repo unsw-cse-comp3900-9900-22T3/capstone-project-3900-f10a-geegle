@@ -136,6 +136,22 @@ CREATE TABLE reviewReply (
         references users (userID)
 );
 
+CREATE TABLE eventTicketToSeatingAllocation (
+    eventID SERIAL,
+    ticketType text,
+    seatSection text,
+    primary key (eventID, ticketType, seatSection),
+    foreign key (eventID) 
+        references events (eventID)
+);
+
+--CREATE TABLE eventTicketToSeatingAllocation (
+--    ticketID SERIAL,
+--    seatSection text,
+--    primary key (ticketID, seatSection),
+--    foreign key (ticketID) 
+--        references events (ticketID)
+--);
 
 INSERT INTO USERS (userID, firstName, lastName, email, userPassword) VALUES (DEFAULT, 'John', 'SMITH', 'jsmith@email.com', 'password123');
 

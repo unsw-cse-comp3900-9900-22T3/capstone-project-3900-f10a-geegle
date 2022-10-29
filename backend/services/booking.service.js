@@ -1,5 +1,6 @@
 import * as ticketdb from '../db/ticket.db.js'
 import * as venueSeatingdb from '../db/venueSeating.db.js'
+import * as eventdb from '../db/event.db.js'
 
 export const getEventTicketTypesService = async(req, res) => {
     try {
@@ -130,6 +131,21 @@ export const getEventAvailableSeatsService = async(req, res) => {
         return {seats: seats,
                 statusCode: 200,
                 msg: `Available seats for Event ${eventID}`}
+
+    } catch (error) {
+        throw error
+    }
+}
+
+export const getEventVenueSeatSectionsService = async(req, res) => {
+    try {
+        const eventID = req.params.eventID;
+        const event = await eventdb.getEventByIdDb(eventID)
+        const seats = await venueSeatingdb.getVenueSeatSectionsDb(event[0].eventvenue)
+        console.log(seats.map(seat => seat.seatsection))
+        return {seatSections: seats.map(seat => seat.seatsection),
+                statusCode: 200,
+                msg: `Seat sections at Event ${eventID} venue`}
 
     } catch (error) {
         throw error

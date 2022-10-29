@@ -11,6 +11,9 @@ bookingRouter.get('/:eventID/availableTickets', verifyToken, bookingController.g
 bookingRouter.get('/:eventID/availableTicketGroup', verifyToken, bookingController.getEventAvailableTicketGroupController);
 bookingRouter.get('/:eventID/seats', verifyToken, bookingController.getEventSeatsController);
 bookingRouter.get('/:eventID/availableSeats', verifyToken, bookingController.getEventAvailableSeatsController);
+// TODO: get available seats based on the ticket type
+//bookingRouter.get('/:eventID/availableSeatsFromTicketType', verifyToken, bookingController.getEventAvailableSeatsController);
+bookingRouter.get('/:eventID/seatSections', verifyToken, bookingController.getEventVenueSeatSectionsController);
 //bookingRouter.get('/:eventID/seatInfo/:seatID', verifyToken, bookingController.getEventSeatInfoController);
 // get seat info: seat name, ticket type for the seat, reserved or available, 
 // selecting which seat type belongs to which ticket type --> means we have to assign every seat to a tickettype? or let anyone choose any seat
