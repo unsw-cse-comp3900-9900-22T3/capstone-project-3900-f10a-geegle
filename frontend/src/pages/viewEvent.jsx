@@ -71,6 +71,7 @@ const ViewEvent= () => {
     })
     const eventJson = (await response.json()).event;
     const eventDetails = {
+      venueCapacity: eventJson.venueCapacity,
       capacity: eventJson.capacity,
       endDateTime: eventJson.endDateTime,
       eventDescription: eventJson.eventDescription,
@@ -80,6 +81,7 @@ const ViewEvent= () => {
       eventType: eventJson.eventType,
       eventVenue: eventJson.eventVenue,
       hostID: eventJson.hostID,
+      hostName: eventJson.hostName,
       image1: eventJson.image1,
       image2: eventJson.image2,
       image3: eventJson.image3,
@@ -136,7 +138,7 @@ const ViewEvent= () => {
               {eventInfo.eventName}
             </Typography>
             <Typography component = "div" variant="h5" color="text.secondary">
-              Host : {hostName}
+              Host : {eventInfo.hostName}
             </Typography>
           </Box>
           <Box id="details section" sx={{marginTop: "2%"}}>
