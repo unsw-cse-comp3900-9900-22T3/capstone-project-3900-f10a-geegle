@@ -7,6 +7,7 @@ const getEventByIdDb = async(eventID) => {
     return result.rows
 }
 
+// READ
 const getEventByIdDisplayDb = async(eventID) => {
     const result = await db.query (
         "SELECT * FROM events e JOIN users u ON (e.hostID = u.userID) " +

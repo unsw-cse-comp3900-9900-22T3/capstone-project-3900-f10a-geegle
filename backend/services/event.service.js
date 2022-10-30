@@ -1,7 +1,9 @@
 import {addEventDb, getAllEventsNotSoldOutDb, getAllEventsDb, getEventByIdDb, getEventByIdDisplayDb,
         getEventsByHostIdDb, getEventVenueByNameDb, getEventVenueByIdDb, addEventVenueDb, publishEventByIdDb, isVenueSeatingAvailableDb,
         unpublishEventByIdDb, removeEventByIdDb} from '../db/event.db.js'
+
 import {addTicketDb} from '../db/ticket.db.js'
+
 
 /*  Request
     All fields must be filled in
@@ -302,3 +304,6 @@ export const getHostEventsService = async(req, res) => {
         throw e
     }
 }
+
+
+
