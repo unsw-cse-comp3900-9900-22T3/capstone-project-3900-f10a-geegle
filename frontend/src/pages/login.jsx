@@ -27,7 +27,7 @@ const LoginPage = ({setLoggedIn}) => {
 
     const handleSubmit = async (e) => {
       e.preventDefault();
-      
+
       // set all the error to their default state
       setPasswordError(false); // check if password is correct for that email
       setInvalidEmailError(false); // check if email follows convention
@@ -38,7 +38,9 @@ const LoginPage = ({setLoggedIn}) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ 
+          email: email.toLowerCase(), 
+          password: password }),
       });
   
       const json = await response.json();
