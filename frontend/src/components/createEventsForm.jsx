@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Grid, TextField, FormControl, InputLabel, Select, MenuItem, Card, Typography, Button, Checkbox, Stack, Paper } from '@mui/material';
+import { Grid, TextField, FormControl, InputLabel, Select, MenuItem, Card, Typography, Button, Checkbox, Stack, Paper, Alert } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 //import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -43,6 +43,11 @@ function CreateEventsForm () {
     price:''
   });
   const [allTicketTypes, setAllTicketTypes] = useState([ticketInfo]);
+  // error check variables 
+  const [endTimeError, setEndTimeError] = useState(false); // End time before start time error
+  const [negCapacityError, setNegCapacityError] = useState(false); // capacity < 0
+  const [startTimeError, setStartTimeError] = useState(false); // start time is before the current time 
+  const [insufCapacityError, setInsufCapacityError] = useState(false); // venue capacity < total tickets
 
   const navigate = useNavigate();
   console.log(ticketInfo)
@@ -79,10 +84,11 @@ function CreateEventsForm () {
     console.log(newTicketInfo.price);
     setTicketInfo(newTicketInfo);
   }
-  const handleAddTicket = () => {
+  const handleAddTicket = (event) => {
     //setAllTicketTypes(prev => [...prev, ticketInfo]);
 
     // resetting the fields in ticketInfo
+    event.preventDefault();
     const newTicketInfo = { ...ticketInfo };
     newTicketInfo.ticketType= '';
     newTicketInfo.amount= '';
@@ -92,9 +98,15 @@ function CreateEventsForm () {
 
   }
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (event) => {
     // const resultStart = start.map(item => item.toLocaleDateString());
     // const resultEnd = end.map(item => item.toLocaleDateString());
+    event.preventDefault();
+    // setting errors back to default
+    setEndTimeError(false); // End time before start time error
+    negCapacityError(false); // capacity < 0
+    setStartTimeError(false); // start time is before the current time 
+    setInsufCapacityError(false); // venue capacity < total tickets
     console.log(thumbnail)
     const jsonString = JSON.stringify({
       events: {
@@ -122,11 +134,20 @@ function CreateEventsForm () {
       body: jsonString
     }
     const r = await fetch(`http://localhost:3000/events/create`, requestOptions);
+    const json = await r.json();
     if (r.ok) {
       navigate('/');
-    } else {
+    } else if (r.status === 400) {
       // alert the error code and the 
-     console.log(`error ${r.status}, ${r.text}`)
+      if (json === "Invalid Starting and Finishing Times" ) {
+        setEndTimeError(true)
+      } else if (json === "Invalid Capacity" ) {
+        setNegCapacityError(true);
+      } else if (json === "Invalid Event Date") {
+        setStartTimeError(true);
+      } else if (json === "Capacity not sufficient") {
+        setInsufCapacityError(true);
+      }
     } 
 
   }
@@ -298,6 +319,16 @@ function CreateEventsForm () {
               onClick = {handleSubmit}
             > Submit
             </Button>
+          </Grid>
+          <Grid item xs = {12}>
+            {endTimeError === true
+            ? (<Alert severity="error">Error, the End time before start time error</Alert>):null}
+            {negCapacityError === true
+            ? (<Alert severity="error">Error, the event capacity cannot be smaller than 0</Alert>):null}
+            {startTimeError=== true
+            ? (<Alert severity="error">Error, the event start time cannot be before the current time</Alert>):null}
+            {insufCapacityError=== true
+            ? (<Alert severity="error">Error, venue capacity is smaller than the tickets available</Alert>):null}
           </Grid>
         </Grid>
       </form>
