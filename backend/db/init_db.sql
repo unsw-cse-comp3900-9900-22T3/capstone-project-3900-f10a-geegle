@@ -109,32 +109,57 @@ CREATE TABLE ticketPurchases (
 );
 
 CREATE TABLE reviews (
-    reviewID SERIAL,
+    reviewID SERIAL PRIMARY KEY,
     eventID integer NOT NULL,
     userID integer NOT NULL,
     rating integer NOT NULL,
     review text,
     postedOn timestamptz NOT NULL,
-    primary key (eventID, reviewID),
     foreign key (eventID)
         references events (eventID),
     foreign key (userID)
         references users (userID)
 );
 
-CREATE TABLE reviewReply (
+CREATE TABLE reviewReplies (
     replyID SERIAL,
     reviewID integer NOT NULL,
-    eventID integer NOT NULL,
     userID integer NOT NULL,
     reply text NOT NULL,
     repliedOn timestamptz NOT NULL,
-    primary key (eventID, reviewID, replyID),
-    foreign key (eventID, reviewID)
-        references reviews (eventID, reviewID),
+    primary key (reviewID, replyID),
+    foreign key (reviewID)
+        references reviews (reviewID),
     foreign key (userID)
         references users (userID)
 );
+
+CREATE TABLE reviewLikes (
+    reviewID integer,
+    userID integer,
+    primary key (reviewID, userID),
+    foreign key (reviewID)
+        references reviews (reviewID),
+    foreign key (userID)
+        references users(userID)
+);
+
+CREATE TABLE eventTicketToSeatingAllocation (
+    eventID SERIAL,
+    ticketType text,
+    seatSection text,
+    primary key (eventID, ticketType, seatSection),
+    foreign key (eventID) 
+        references events (eventID)
+);
+
+--CREATE TABLE eventTicketToSeatingAllocation (
+--    ticketID SERIAL,
+--    seatSection text,
+--    primary key (ticketID, seatSection),
+--    foreign key (ticketID) 
+--        references events (ticketID)
+--);
 
 
 INSERT INTO USERS (userID, firstName, lastName, email, userPassword) VALUES (DEFAULT, 'John', 'SMITH', 'jsmith@email.com', 'password123');

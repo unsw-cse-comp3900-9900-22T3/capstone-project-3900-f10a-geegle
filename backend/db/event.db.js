@@ -7,6 +7,7 @@ const getEventByIdDb = async(eventID) => {
     return result.rows
 }
 
+// READ
 const getEventByIdDisplayDb = async(eventID) => {
     const result = await db.query (
         "SELECT * FROM events e JOIN users u ON (e.hostID = u.userID) " +
@@ -51,6 +52,23 @@ const getEventVenueByNameDb = async(venueName) => {
 const getEventVenueByIdDb = async(venueID) => {
     const result = await db.query(
         "SELECT * from venues where venueName = $1", [venueID])
+    return result.rows
+}
+
+//READ
+const getHostofEventDb = async(eventID) => {
+    const result = await db.query(
+        "SELECT hostid from events where eventid = $1", [eventID]
+    )
+    return result.rows
+}
+
+// READ
+const getEventGuestListByIdDb = async(eventID) => {
+    const result = await db.query(
+        "SELECT u.firstname, u.lastname, u.email from ticketPurchases tp " +
+        "JOIN tickets t ON tp.ticketid = t.ticketid " +
+        "JOIN users u ON tp.userid = u.userid WHERE t.eventid = $1", [eventID])
     return result.rows
 }
 
@@ -114,6 +132,8 @@ export {
     getAllEventsDb,
     getEventVenueByNameDb,
     getEventVenueByIdDb,
+    getEventGuestListByIdDb,
+    getHostofEventDb,
     addEventDb,
     addEventVenueDb,
     removeEventByIdDb,
