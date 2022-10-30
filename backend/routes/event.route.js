@@ -1,12 +1,14 @@
 import { Router } from 'express';
 import { getEventController, getUpcomingEventsController, getAllEventsController, createEventsController,
-         publishEventsController, unpublishEventsController, deleteEventsController, getHostEventsController, 
+         publishEventsController, unpublishEventsController, deleteEventsController, getHostEventsController, getEventGuestListController, 
          getEventReviewsController, createEventReviewController, editEventReviewController,
          deleteEventReviewController, addLikeToEventReviewController, removeLikeToEventReviewController, 
          getEventReviewReplyController, createEventReviewReplyController, editEventReviewReplyController,
-         deleteEventReviewReplyController } 
+         deleteEventReviewReplyController
+        } 
          from '../controllers/event.controller.js'
 import { verifyToken } from '../middleware/verifyToken.js';
+import bookingRouter from './booking.route.js';
 
 const eventRouter = Router();
 
@@ -18,8 +20,8 @@ eventRouter.get('/:eventID/info', getEventController);
 eventRouter.get('/upcoming', getUpcomingEventsController);
 eventRouter.get('/all', getAllEventsController);
 eventRouter.get('/host', verifyToken, getHostEventsController);
-eventRouter.post('/:eventID/purchase', (req, res) => {});
-eventRouter.get('/:eventID/guest', (req, res) => {});
+eventRouter.get('/:eventID/guest', verifyToken, getEventGuestListController);
+
 eventRouter.get('/:eventID/reviews', getEventReviewsController); //get all reviews for an event
 eventRouter.post('/:eventID/reviews', verifyToken, createEventReviewController); //send a review for an event
 eventRouter.put('/:eventID/reviews/:reviewID', verifyToken, editEventReviewController); // edit a review for an event if its yours
@@ -30,4 +32,7 @@ eventRouter.get('/:eventID/reviews/:reviewID/reply', getEventReviewReplyControll
 eventRouter.post('/:eventID/reviews/:reviewID/reply', verifyToken, createEventReviewReplyController); // reply to a review for an event
 eventRouter.put('/:eventID/reviews/:reviewID/reply/:replyID', verifyToken, editEventReviewReplyController); // edit a reply for an event if its yours
 eventRouter.delete('/:eventID/reviews/:reviewID/reply/:replyID', verifyToken, deleteEventReviewReplyController); // delete a review for an event if its yours
+
+eventRouter.use(bookingRouter)
+
 export default eventRouter;

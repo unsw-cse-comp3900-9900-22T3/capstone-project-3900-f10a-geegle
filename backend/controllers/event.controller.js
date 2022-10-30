@@ -1,5 +1,6 @@
 import { createEventsService, publishEventsService, unpublishEventsService, deleteEventsService, getEventService,
-         getUpcomingEventsService, getAllEventsService, getHostEventsService, } from "../services/event.service.js";
+         getUpcomingEventsService, getAllEventsService, getHostEventsService, getEventGuestListService } 
+         from "../services/event.service.js";
 
 import { getEventReviewsService, createEventReviewService, editEventReviewService, 
     deleteEventReviewService, addLikeToEventReviewService, removeLikeToEventReviewService,
@@ -51,7 +52,12 @@ export const unpublishEventsController = async(req, res) => {
 export const deleteEventsController = async(req, res) => {
     try {
         const {statusCode, msg} = await deleteEventsService(req, res);
-        res.status(statusCode).json(msg)
+        
+        if (!events) {
+            res.status(statusCode).json(msg)
+        } else {
+            res.status(statusCode).json({events, msg})
+        }
     } catch (e) {
         res.status(500).send(e.message)
     }
@@ -99,11 +105,8 @@ export const getAllEventsController = async(req, res) => {
 export const getHostEventsController = async(req, res) => {
     try {
         const {events, statusCode, msg} = await getHostEventsService(req, res);
-        if (!events) {
-            res.status(statusCode).json(msg)
-        } else {
-            res.status(statusCode).json({events, msg})
-        }
+        res.status(statusCode).json({events, msg})
+        
     } catch (e) {
         res.status(500).send(e.message)
     }
@@ -231,7 +234,19 @@ export const removeLikeToEventReviewController = async(req, res) => {
     }
 }
 
+export const getEventGuestListController = async(req, res) => {
+    try {
+        const {guests, statusCode, msg} = await getEventGuestListService(req, res);     
 
+        if (!guests) {
+            res.status(statusCode).json(msg)
+        } else {
+            res.status(statusCode).json({guests, msg})
+        }
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
 
 // const getUpcomingEventsController = (req, res) => {
 //     const upcomingEvents = {

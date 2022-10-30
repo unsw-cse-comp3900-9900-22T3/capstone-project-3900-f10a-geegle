@@ -1,7 +1,6 @@
 import {addEventDb, getAllEventsNotSoldOutDb, getAllEventsDb, getEventByIdDb, getEventByIdDisplayDb,
-        getEventsByHostIdDb, getEventVenueByNameDb, getEventVenueByIdDb, addEventVenueDb, publishEventByIdDb, isVenueSeatingAvailableDb,
-        unpublishEventByIdDb, removeEventByIdDb} from '../db/event.db.js'
-
+        getEventsByHostIdDb, getEventVenueByNameDb, getEventVenueByIdDb, getEventGuestListByIdDb, getHostofEventDb, addEventVenueDb, publishEventByIdDb, isVenueSeatingAvailableDb,
+        unpublishEventByIdDb, removeEventByIdDb} from '../db/event.db.js' 
 import {addTicketDb} from '../db/ticket.db.js'
 
 
@@ -305,5 +304,23 @@ export const getHostEventsService = async(req, res) => {
     }
 }
 
-
-
+export const getEventGuestListService = async(req, res) => {
+    try {
+        const eventID = req.params.eventID;
+        const host = await getHostofEventDb(eventID)
+        if (req.userID != host[0].hostid) {
+            return {guests: null, statusCode : 403, msg: 'You are not the owner of this event'}
+        }
+        
+        const guests = await getEventGuestListByIdDb(eventID)
+        
+        let guestList = [];
+        for (let guest of guests) {
+            guestList.push({name: guest.firstname + ' ' + guest.lastname, email: guest.email})
+        }
+        console.log(guestList)
+        return {guests: guestList, statusCode: 200, msg: 'Guest list'}
+    } catch (e) {
+        throw e
+    }
+}
