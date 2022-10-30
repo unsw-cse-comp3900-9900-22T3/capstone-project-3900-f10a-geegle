@@ -2,6 +2,9 @@ import { createEventsService, publishEventsService, unpublishEventsService, dele
          getUpcomingEventsService, getAllEventsService, getHostEventsService, getEventGuestListService } 
          from "../services/event.service.js";
 
+import { getEventReviewsService, createEventReviewService, editEventReviewService, 
+    deleteEventReviewService, addLikeToEventReviewService, removeLikeToEventReviewService,
+    createReviewReplyService, getReviewReplyService, editReviewReplyService, deleteReviewReplyService } from "../services/review.service.js"
 
 export const createEventsController = async(req, res) => {
     try {
@@ -63,7 +66,11 @@ export const deleteEventsController = async(req, res) => {
 export const getEventController = async(req, res) => {
     try {
         const {event, statusCode, msg} = await getEventService(req, res);
-        res.status(statusCode).json({event, msg})
+        if (!event) {
+            res.status(statusCode).json(msg)
+        } else {
+            res.status(statusCode).json({event, msg})
+        }
     } catch (e) {
         res.status(500).send(e.message)
     }
@@ -72,7 +79,11 @@ export const getEventController = async(req, res) => {
 export const getUpcomingEventsController = async(req, res) => {
     try {
         const {events, statusCode, msg} = await getUpcomingEventsService(req, res);
-        res.status(statusCode).json({events, msg})
+        if (!events) {
+            res.status(statusCode).json(msg)
+        } else {
+            res.status(statusCode).json({events, msg})
+        }
     } catch (e) {
         res.status(500).send(e.message)
     }
@@ -81,7 +92,11 @@ export const getUpcomingEventsController = async(req, res) => {
 export const getAllEventsController = async(req, res) => {
     try {
         const {events, statusCode, msg} = await getAllEventsService(req, res);
-        res.status(statusCode).json({events, msg})
+        if (!events) {
+            res.status(statusCode).json(msg)
+        } else {
+            res.status(statusCode).json({events, msg})
+        }
     } catch (e) {
         res.status(500).send(e.message)
     }
@@ -91,6 +106,129 @@ export const getHostEventsController = async(req, res) => {
     try {
         const {events, statusCode, msg} = await getHostEventsService(req, res);
         res.status(statusCode).json({events, msg})
+        
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
+
+export const createEventReviewController = async(req, res) => {
+    try {
+        const {reviews, statusCode, msg} = await createEventReviewService(req, res);
+        if (!reviews) {
+            res.status(statusCode).json(msg)
+        } else {
+            res.status(statusCode).json({reviews, msg})
+        }
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
+
+export const getEventReviewsController = async(req, res) => {
+    try {
+        const {reviews, statusCode, msg} = await getEventReviewsService(req, res);
+        if (!reviews) {
+            res.status(statusCode).json(msg)
+        } else {
+            res.status(statusCode).json({reviews, msg})
+        }
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
+
+export const editEventReviewController = async(req, res) => {
+    try {
+        const {reviews, statusCode, msg} = await editEventReviewService(req, res);
+        if (!events) {
+            res.status(statusCode).json(msg)
+        } else {
+            res.status(statusCode).json({reviews, msg})
+        }
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
+
+export const deleteEventReviewController = async(req, res) => {
+    try {
+        const {statusCode, msg} = await deleteEventReviewService(req, res);
+        res.status(statusCode).json({msg})
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
+
+export const createEventReviewReplyController = async(req, res) => {
+    try {
+        const {replies, statusCode, msg} = await createReviewReplyService(req, res);
+        if (!replies) {
+            res.status(statusCode).json(msg)
+        } else {
+            res.status(statusCode).json({replies, msg})
+        }
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
+
+export const getEventReviewReplyController = async(req, res) => {
+    try {
+        const {replies, statusCode, msg} = await getReviewReplyService(req, res);
+        if (!replies) {
+            res.status(statusCode).json(msg)
+        } else {
+            res.status(statusCode).json({replies, msg})
+        }
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
+
+export const editEventReviewReplyController = async(req, res) => {
+    try {
+        const {replies, statusCode, msg} = await editReviewReplyService(req, res);
+        if (!replies) {
+            res.status(statusCode).json(msg)
+        } else {
+            res.status(statusCode).json({replies, msg})
+        }
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
+
+export const deleteEventReviewReplyController = async(req, res) => {
+    try {
+        const {statusCode, msg} = await deleteReviewReplyService(req, res);
+        res.status(statusCode).json({msg})
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
+
+export const addLikeToEventReviewController = async(req, res) => {
+    try {
+        const {reviews, statusCode, msg} = await addLikeToEventReviewService(req, res);
+        if (!reviews) {
+            res.status(statusCode).json(msg)
+        } else {
+            res.status(statusCode).json({reviews, msg})
+        }
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
+
+export const removeLikeToEventReviewController = async(req, res) => {
+    try {
+        const {reviews, statusCode, msg} = await removeLikeToEventReviewService(req, res);
+        if (!reviews) {
+            res.status(statusCode).json(msg)
+        } else {
+            res.status(statusCode).json({reviews, msg})
+        }
     } catch (e) {
         res.status(500).send(e.message)
     }

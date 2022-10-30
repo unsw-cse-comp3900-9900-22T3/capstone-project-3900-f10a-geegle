@@ -7,6 +7,7 @@ const getEventByIdDb = async(eventID) => {
     return result.rows
 }
 
+// READ
 const getEventByIdDisplayDb = async(eventID) => {
     const result = await db.query (
         "SELECT * FROM events e JOIN users u ON (e.hostID = u.userID) " +
@@ -69,6 +70,13 @@ const getEventGuestListByIdDb = async(eventID) => {
         "JOIN tickets t ON tp.ticketid = t.ticketid " +
         "JOIN users u ON tp.userid = u.userid WHERE t.eventid = $1", [eventID])
     return result.rows
+}
+
+// READ - Move this to venue db later when merge
+export const isVenueSeatingAvailableDb = async(venueID) => {
+    const result = await db.query(
+        "SELECT count(*) from seats where venueID = $1", [venueID])
+    return result.rows[0]
 }
 
 // CREATE
