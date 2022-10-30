@@ -19,22 +19,13 @@ bookingRouter.get('/:eventID/seatSections', verifyToken, bookingController.getEv
 // selecting which seat type belongs to which ticket type --> means we have to assign every seat to a tickettype? or let anyone choose any seat
 
 /*
-    bookings: [
-        {ticketType: '',
-         seatID: ''}, 
-        {
-
-        }
-    ],
-    creditCard: {useStored: true/false, creditCardNum: '', ccv: '', expiryMonth: '', expiryYear: ''},
-    email: {useStored: true/false, emailAddr: }
-
-    OR
-
-    tickets: [],
-    seats: []
-    creditCard: {}
-    email: {}
+    {
+        tickets: [],
+        seats: []
+        creditCard: {useStored: true/false, creditCardNum: '', ccv: '', expiryMonth: '', expiryYear: ''}
+        email: {useStored: true/false, emailAddr: }
+    }
+    
 */
 bookingRouter.post('/:eventID/purchase', verifyToken, bookingController.bookEventController)
 
