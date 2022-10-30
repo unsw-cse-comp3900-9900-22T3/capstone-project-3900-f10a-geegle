@@ -2,7 +2,8 @@ import { createEventsService, publishEventsService, unpublishEventsService, dele
          getUpcomingEventsService, getAllEventsService, getHostEventsService, } from "../services/event.service.js";
 
 import { getEventReviewsService, createEventReviewService, editEventReviewService, 
-    deleteEventReviewService, addLikeToEventReviewService, removeLikeToEventReviewService } from "../services/review.service.js"
+    deleteEventReviewService, addLikeToEventReviewService, removeLikeToEventReviewService,
+    createReviewReplyService, getReviewReplyService, editReviewReplyService, deleteReviewReplyService } from "../services/review.service.js"
 
 export const createEventsController = async(req, res) => {
     try {
@@ -141,6 +142,24 @@ export const getEventReviewReplyController = async(req, res) => {
     try {
         const {replies, statusCode, msg} = await getReviewReplyService(req, res);
         res.status(statusCode).json({replies, msg})
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
+
+export const editEventReviewReplyController = async(req, res) => {
+    try {
+        const {replies, statusCode, msg} = await editReviewReplyService(req, res);
+        res.status(statusCode).json({replies, msg})
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
+
+export const deleteEventReviewReplyController = async(req, res) => {
+    try {
+        const {statusCode, msg} = await deleteReviewReplyService(req, res);
+        res.status(statusCode).json({msg})
     } catch (e) {
         res.status(500).send(e.message)
     }

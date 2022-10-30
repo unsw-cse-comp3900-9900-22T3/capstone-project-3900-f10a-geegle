@@ -2,6 +2,8 @@ import { addReviewDb, editReviewByIdDb, getEventReviewsByEventIdDb, getReviewByR
     getReviewLikeAmountDb, getReviewLikeDb, deleteReviewByIdDb, addReviewLikeDb, deleteReviewLikeByIdDb } from '../db/review.db.js'
 import { getUserByIdDb } from '../db/user.db.js'
 import { getEventByIdDb } from '../db/event.db.js'
+import { addReplyDb, editReplyByIdDb, getReplyAmountByReviewIDDb, getReplyByReplyIdDb, getReplyByReviewIdDb,
+    deleteReplyByIdDb } from '../db/reply.db.js'
 
 export const createEventReviewService = async(req, res) => {
     try {    
@@ -34,6 +36,7 @@ export const createEventReviewService = async(req, res) => {
             userID: newReview.userid,
             user: user.firstname + " " + user.lastname,
             numLikes: 0,
+            numReplies: 0,
             userLiked: false
         },
         statusCode : 201, 
@@ -58,6 +61,7 @@ export const getEventReviewsService = async(req, res) => {
             let likes = await getReviewLikeAmountDb(eventReviews[i].reviewid);
             let currentUserReviewLike = await getReviewLikeDb(eventReviews.reviewid, req.userID);
             let currentUserLiked = (currentUserReviewLike.length >= 1);
+            let numReplies = await getReplyAmountByReviewIDDb(eventReviews[i].reviewid);
             reviewList.push({
                 reviewID: eventReviews[i].reviewid,
                 review: eventReviews[i].review,
@@ -66,6 +70,7 @@ export const getEventReviewsService = async(req, res) => {
                 user: username.firstname + " " + username.lastname,
                 userID: eventReviews[i].userid,
                 numLikes: parseInt(likes),
+                numReplies: parseInt(numReplies),
                 userLiked: currentUserLiked
             });
         }
@@ -93,6 +98,7 @@ export const editEventReviewService = async(req, res) => {
         const newReview = await editReviewByIdDb(reviewID, review, rating, new Date(Date.now()));
         const currentUserReviewLike = await getReviewLikeDb(reviewID, req.userID);
         const currentUserLiked = (currentUserReviewLike.length >= 1);
+        let numReplies = await getReplyAmountByReviewIDDb(eventReviews[i].reviewid);
         return {reviews: {
             reviewID: newReview.reviewid,
             eventID: newReview.eventid,
@@ -102,6 +108,7 @@ export const editEventReviewService = async(req, res) => {
             userID: newReview.userid,
             user: user.firstname + " " + user.lastname,
             numLikes: parseInt(likes),
+            numReplies: parseInt(numReplies),
             userLiked: currentUserLiked
         },
         statusCode : 200, 
@@ -192,9 +199,128 @@ export const removeLikeToEventReviewService = async(req, res) => {
     }
 }
 
-
 export const createReviewReplyService = async(req, res) => {
+    try {
+        const reviewID = req.params.reviewID;
+        const {reply} = req.body;
+        
+        const review = await getReviewByReviewIdDb(reviewID);
 
+        if (review.length == 0) {
+            return {replies: null, statusCode: 400, msg: 'Review does not exist'}
+        }
+
+        if (reply == '') {
+            return {replies: null, statusCode: 400, msg: 'Reply contains no content'}
+        }
+
+        const newReply = await addReplyDb(reviewID, req.userID, reply, new Date(Date.now()));
+        const username = await getUserByIdDb(newReply.userid);
+        return {replies: {
+            replyID: newReply.replyid,
+            reviewID: newReply.reviewid,
+            reply: newReply.reply,
+            repliedOn: newReply.repliedon,
+            userID: newReply.userid,
+            user: username.firstname + " " + username.lastname
+        },
+        statusCode : 200, 
+        msg: 'Reply Created'}
+    } catch (e) {
+        throw e
+    }
 }
 
-export const getReviewReplyService = async(req, res) => {}
+export const getReviewReplyService = async(req, res) => {
+    try {
+        const reviewID = req.params.reviewID;
+        const {reply} = req.body;
+        
+        const review = await getReviewByReviewIdDb(reviewID);
+
+        if (review.length == 0) {
+            return {replies: null, statusCode: 400, msg: 'Review does not exist'}
+        }
+
+        const replies = await getReplyByReviewIdDb(reviewID);
+        let replyList = [];
+        for (let i = 0; i < replies.length; i++) {
+            let username = await getUserByIdDb(replies[i].userid);
+            replyList.push({
+                replyID: replies[i].replyid,
+                reviewID: replies[i].reviewid,
+                userID: replies[i].userid,
+                reply: replies[i].reply,
+                repliedOn: replies[i].repliedon,
+                user: username.firstname + " " + username.lastname
+            });
+        }
+        return {replies: replyList, statusCode: 200, msg: 'Replies found'}
+    } catch (e) {
+        throw e
+    }
+}
+
+export const editReviewReplyService = async(req, res) => {
+    try {    
+        const reviewID = req.params.reviewID;
+        const {reply} = req.body;
+        const review = await getReviewByReviewIdDb(reviewID);
+
+        if (review.length == 0) {
+            return {statusCode: 400, msg: 'Review does not exist'}
+        }
+        const replyFromId = await getReplyByReplyIdDb(req.params.replyID);
+
+        if (replyFromId.length == 0) {
+            return {statusCode: 403, msg: 'Reply does not exist'}
+        }
+        
+        if (replyFromId[0].userid != req.userID) {
+            return {statusCode: 403, msg: 'You do not have permission to delete this review'}
+        }
+
+        const editReply = await editReplyByIdDb(req.params.replyID, reply, new Date(Date.now()));
+        const user = await getUserByIdDb(editReply.userid)
+
+        return {replies: {
+            replyID: editReply.replyid,
+            reviewID: editReply.reviewid,
+            reply: editReply.reply,
+            repliedOn: editReply.repliedon,
+            userID: editReply.userid,
+            user: user.firstname + " " + user.lastname
+        },
+        statusCode : 200, 
+        msg: 'Reply Edited'}
+
+    } catch (e) {
+        throw e
+    }
+}
+
+export const deleteReviewReplyService = async(req, res) => {
+    try {    
+        const reviewID = req.params.reviewID;
+        const review = await getReviewByReviewIdDb(reviewID);
+
+        if (review.length == 0) {
+            return {statusCode: 400, msg: 'Review does not exist'}
+        }
+        const replyFromId = await getReplyByReplyIdDb(req.params.replyID);
+
+        if (replyFromId.length == 0) {
+            return {statusCode: 403, msg: 'Reply does not exist'}
+        }
+        
+        if (replyFromId[0].userid != req.userID) {
+            return {statusCode: 403, msg: 'You do not have permission to delete this review'}
+        }
+
+        await deleteReplyByIdDb(req.params.replyID);
+        return {statusCode : 200, msg: 'Reply Deleted'}
+
+    } catch (e) {
+        throw e
+    }
+}

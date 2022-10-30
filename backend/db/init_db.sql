@@ -121,7 +121,7 @@ CREATE TABLE reviews (
         references users (userID)
 );
 
-CREATE TABLE reviewReply (
+CREATE TABLE reviewReplies (
     replyID SERIAL,
     reviewID integer NOT NULL,
     userID integer NOT NULL,
