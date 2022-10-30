@@ -221,7 +221,7 @@ export const addLikeToEventReviewController = async(req, res) => {
 export const removeLikeToEventReviewController = async(req, res) => {
     try {
         const {reviews, statusCode, msg} = await removeLikeToEventReviewService(req, res);
-        if (!events) {
+        if (!reviews) {
             res.status(statusCode).json(msg)
         } else {
             res.status(statusCode).json({reviews, msg})

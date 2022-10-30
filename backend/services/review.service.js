@@ -145,12 +145,12 @@ export const addLikeToEventReviewService = async(req, res) => {
         const review = await getReviewByReviewIdDb(reviewID);
 
         if (review.length == 0) {
-            return {statusCode: 400, msg: 'Review does not exist'}
+            return {reviews: null, statusCode: 400, msg: 'Review does not exist'}
         }
 
         const userReviewLike = await getReviewLikeDb(reviewID, req.userID);
         if (userReviewLike.length >= 1) {
-            return {statusCode: 400, msg: 'User has already liked this review'}
+            return {reviews: null, statusCode: 400, msg: 'User has already liked this review'}
         }
 
         const newLike = await addReviewLikeDb(reviewID, req.userID);
@@ -268,16 +268,16 @@ export const editReviewReplyService = async(req, res) => {
         const review = await getReviewByReviewIdDb(reviewID);
 
         if (review.length == 0) {
-            return {statusCode: 400, msg: 'Review does not exist'}
+            return {replies: null, statusCode: 400, msg: 'Review does not exist'}
         }
         const replyFromId = await getReplyByReplyIdDb(req.params.replyID);
 
         if (replyFromId.length == 0) {
-            return {statusCode: 403, msg: 'Reply does not exist'}
+            return {replies: null, statusCode: 403, msg: 'Reply does not exist'}
         }
         
         if (replyFromId[0].userid != req.userID) {
-            return {statusCode: 403, msg: 'You do not have permission to delete this review'}
+            return {replies: null, statusCode: 403, msg: 'You do not have permission to delete this review'}
         }
 
         const editReply = await editReplyByIdDb(req.params.replyID, reply, new Date(Date.now()));
