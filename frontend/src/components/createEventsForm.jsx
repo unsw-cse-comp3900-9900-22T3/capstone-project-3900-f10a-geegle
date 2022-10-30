@@ -22,6 +22,7 @@ import { width } from '@mui/system';
 import TicketTypeInput from './TicketTypeInput';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import DefaultVenueInfo from './defaultVenueInfo';
+import { SentimentSatisfiedAltSharp } from '@mui/icons-material';
 /**
  * https://stackoverflow.com/questions/36280818/how-to-convert-file-to-base64-in-javascript
  *
@@ -45,6 +46,7 @@ function CreateEventsForm() {
   const [eventDescription, setEventDescription] = useState('');
   const [eventLocation, setEventLocation] = useState('');
   const [venue, setVenue] = useState('');
+  const [venueCapacity, setVenueCapacity] = useState('');
   const [capacity, setCapacity] = useState('');
   const [startDateTime, setStartDateTime] = useState(new Date());
   const [endDateTime, setEndDateTime] = useState(new Date());
@@ -57,6 +59,7 @@ function CreateEventsForm() {
     ticketType: '',
     ticketAmount: '',
     price: '',
+    seatSection: []
   });
   const [allTicketTypes, setAllTicketTypes] = useState([ticketInfo]);
 
@@ -64,6 +67,16 @@ function CreateEventsForm() {
   console.log(ticketInfo);
 
   console.log(startDateTime);
+
+  React.useEffect(() => {
+    console.log(venue)
+    if (venue === 'Accor Stadium' || venue === 'Doltone House - Jones Bay Wharf'){
+      setSeat(true)
+    } else {
+      setSeat(false)
+    }
+  },[venue])
+
   const handleImage2 = async (event) => {
     const image2Data = await fileToDataUrl(event.target.files[0]);
     setImage2(image2Data);
@@ -102,6 +115,7 @@ function CreateEventsForm() {
     newTicketInfo.ticketType = '';
     newTicketInfo.amount = '';
     newTicketInfo.ticketPrice = '';
+    newTicketInfo.seatSection = [];
     setTicketInfo(newTicketInfo);
     setAllTicketTypes((prev) => [...prev, ticketInfo]);
   };
@@ -125,22 +139,43 @@ function CreateEventsForm() {
     console.log(thumbnail);
     console.log(localStorage.getItem('token'));
     console.log(allTicketTypes);
-    const jsonString = JSON.stringify({
-      events: {
-        eventName: eventName,
-        startDateTime: startDateTime,
-        endDateTime: endDateTime,
-        eventDescription: eventDescription,
-        eventType: eventType,
-        eventLocation: eventLocation,
-        eventVenue: venue,
-        capacity: capacity,
-        image1: thumbnail,
-        image2: image2,
-        image3: image3,
-      },
-      tickets: allTicketTypes,
-    });
+    let jsonString = JSON.stringify({});
+    if (other) {
+      // add venue capacity
+      jsonString = JSON.stringify({
+        events: {
+          eventName: eventName,
+          startDateTime: startDateTime,
+          endDateTime: endDateTime,
+          eventDescription: eventDescription,
+          eventType: eventType,
+          eventLocation: eventLocation,
+          eventVenue: venue,
+          venueCapacity: venueCapacity,
+          capacity: capacity,
+          image1: thumbnail,
+          image2: image2,
+          image3: image3,
+        },
+        tickets: allTicketTypes,
+      });
+    } else {
+      jsonString = JSON.stringify({
+        events: {
+          eventName: eventName,
+          startDateTime: startDateTime,
+          endDateTime: endDateTime,
+          eventDescription: eventDescription,
+          eventType: eventType,
+          eventVenue: venue,
+          capacity: capacity,
+          image1: thumbnail,
+          image2: image2,
+          image3: image3,
+        },
+        tickets: allTicketTypes,
+      });
+    }
     const requestOptions = {
       method: 'POST',
       headers: {
@@ -253,8 +288,22 @@ function CreateEventsForm() {
               </Select>
             </FormControl>
           </Grid>
-          {!other && (<>
+          {(!other && !seat) && (<>
             <Grid item xs={12}>
+              <Typography variant="h6" component="div" color='red'>
+                  Seating Unavailable
+              </Typography>
+            </Grid>
+          </>)}
+          {(!other && seat) && (<>
+            <Grid item xs={12}>
+              <Typography variant="h6" component="div" color='green'>
+                  Seating Available
+              </Typography>
+            </Grid>
+          </>)}
+          {!other && (<>
+            {/* <Grid item xs={12}>
               <FormControlLabel
                 control={
                   <Checkbox
@@ -264,8 +313,20 @@ function CreateEventsForm() {
                 }
                 label="Seating Available"
               />
-            </Grid>
+              {}
+            </Grid> */}
             <DefaultVenueInfo venue={venue}/>
+            <Grid item xs={12}>
+              <TextField
+                id="Capacity"
+                label="Capacity"
+                aria-label="Capacity"
+                type="text"
+                variant="outlined"
+                onChange={(e) => setCapacity(e.target.value)}
+                fullWidth
+              />
+            </Grid>
             </>
           )}
           <>
@@ -296,7 +357,18 @@ function CreateEventsForm() {
                 <Grid item xs={12}>
                   <TextField
                     id="Capacity"
-                    label="Capacity"
+                    label="Venue Capacity"
+                    aria-label="Capacity"
+                    type="text"
+                    variant="outlined"
+                    onChange={(e) => setVenueCapacity(e.target.value)}
+                    fullWidth
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    id="Capacity"
+                    label="Event Capacity"
                     aria-label="Capacity"
                     type="text"
                     variant="outlined"
@@ -306,7 +378,7 @@ function CreateEventsForm() {
                 </Grid>
                 
                 <Grid item xs={12}>
-                <FormControlLabel
+                {/* <FormControlLabel
                   control={
                     <Checkbox
                       disabled
@@ -314,7 +386,11 @@ function CreateEventsForm() {
                     />
                   }
                   label="Seating Available"
-                />
+                /> */}
+                <Typography variant="h6" component="div" color='red'>
+                  Seating Unavailable
+                </Typography>
+
                 </Grid>
               </>
             )}

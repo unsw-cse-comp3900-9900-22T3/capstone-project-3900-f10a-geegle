@@ -49,6 +49,11 @@ const DefaultVenueInfo = (venue) => {
   return (
     <>
       <Grid item xs={12}>
+        <Grid item xs={12}>
+          <Typography variant="h6" component="div">
+            Event Location:
+          </Typography>
+        </Grid>
         <TextField
           disabled
           id="Event Location"
@@ -60,6 +65,11 @@ const DefaultVenueInfo = (venue) => {
           variant="filled"
           fullWidth
         />
+      </Grid>
+      <Grid item xs={12}>
+        <Typography variant="h6" component="div">
+          Venue Capacity:
+        </Typography>
       </Grid>
       <Grid item xs={12}>
         <TextField

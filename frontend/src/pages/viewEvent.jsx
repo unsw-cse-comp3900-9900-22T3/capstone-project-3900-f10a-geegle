@@ -44,27 +44,38 @@ const ViewEvent= () => {
     totalTicketAmount:'',
   });
   const [hostName, setHostName] = useState('');
-  const getHostInfo = async(eventDetails) => {
-    const requestOptions = {
+  // const getHostInfo = async(eventDetails) => {
+  //   const requestOptions = {
+  //     method: 'GET',
+  //     headers: {
+  //       'auth-token': localStorage.getItem('token'),
+  //     },
+  //   }
+  //   const response = await fetch(`http://localhost:3000/user/profile/${eventDetails.hostID}`, requestOptions
+  //   )
+  //   if (response.ok) {
+  //     const json = (await response.json()).user;
+  //     console.log(json);
+  //     const firstName = json.firstName;
+  //     const lastName = json.lastname;
+  //     setHostName(`${firstName} ${lastName}`);
+  //   } else {
+  //     alert(`error: ${response.status}`)
+  //   }
+  // }
+    
+  const getTicketInfo = async() => {
+    const response = await fetch(`http://localhost:3000/events/${eventId}/ticketTypes`, {
       method: 'GET',
       headers: {
+        'Content-Type': 'application/json',
         'auth-token': localStorage.getItem('token'),
       },
-    }
-    const response = await fetch(`http://localhost:3000/user/profile/${eventDetails.hostID}`, requestOptions
-    )
-    if (response.ok) {
-      const json = (await response.json()).user;
-      console.log(json);
-      const firstName = json.firstName;
-      const lastName = json.lastname;
-      setHostName(`${firstName} ${lastName}`);
-    } else {
-      alert(`error: ${response.status}`)
-    }
+    })
+    const json = await response.json();
+    console.log(json);
+
   }
-    
-  
   const getEventInfo = async() => {
     const response = await fetch(`http://localhost:3000/events/${eventId}/info`, {
       method: 'GET'
@@ -91,12 +102,12 @@ const ViewEvent= () => {
     }
      //console.log(eventDetails);
      setEventInfo({...eventDetails});
-     getHostInfo(eventDetails);
+     //getHostInfo(eventDetails);
       
   }
   useEffect(()=> {
     getEventInfo();
-    
+    getTicketInfo();
     
   },[]);
 

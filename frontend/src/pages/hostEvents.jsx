@@ -71,6 +71,7 @@ const HostEventsPage = () => {
       for (const eve of json.events) {
         events.push({
           eachEvent: {
+            venueCapacity: eve.venueCapacity,
             capacity: eve.capacity,
             endDateTime: eve.endDateTime,
             eventDescription: eve.eventDescription,
@@ -119,7 +120,7 @@ const HostEventsPage = () => {
           {obj.eachEvent.eventName}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-          {obj.eachEvent.eventType +' | '+ obj.eachEvent.eventVenue+' | '+obj.eachEvent.capacity}
+          {obj.eachEvent.eventType +' | '+ obj.eachEvent.eventVenue+' | Event Capacity: '+obj.eachEvent.capacity+'| Venue Capacity'+ obj.eachEvent.venueCapacity}
           </Typography>
           <Typography variant="body2" color="text.secondary">
           {"Description: "+ obj.eachEvent.eventDescription}
