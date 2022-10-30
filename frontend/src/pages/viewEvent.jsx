@@ -15,16 +15,7 @@ import { Navigate, useNavigate, Link, useParams } from 'react-router-dom';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { Grid } from '@mui/material';
-const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
-    boxShadow: 24,
-    p: 4,
-  };
+import PurchaseTicket from '../components/PurchaseTicket';
 // responsive prop for carousel 
 const responsive = {
   superLargeDesktop: {
@@ -66,6 +57,7 @@ const ViewEvent= () => {
   });
   const [hostName, setHostName] = useState('');
   const [imageArray, setImageArray] = useState([]);
+  const [ticketModal, setTicketModal] = useState(false); //opening and closing the purchasing ticket modal 
 
 
   const getHostInfo = async(eventDetails) => {
@@ -118,8 +110,8 @@ const ViewEvent= () => {
     });
     console.log("non empty image",nonEmptyImages);
     console.log(eventDetails);
-     setImageArray(nonEmptyImages);
-     setEventInfo({...eventDetails});
+    setImageArray(nonEmptyImages);
+    setEventInfo({...eventDetails});
      //getHostInfo(eventDetails);
       
   }
@@ -176,13 +168,27 @@ const ViewEvent= () => {
           </Carousel>
         </Box>
         <Box id="content container" sx={{marginTop: "2%", padding: "1% 3% 3% 3%"}}>
-          <Box id="heading section" sx={{marginTop: "1%"}}>
-            <Typography variant="h2" color="text.secondary">
-              {eventInfo.eventName}
-            </Typography>
-            <Typography component = "div" variant="h5" color="text.secondary">
-              Host : Host Name
-            </Typography>
+          <Box id="header section" sx={{marginTop: "1%", display: 'flex', gap: '20vw'}}>
+            <Box id="heading content">
+              <Typography variant="h2" color="text.secondary">
+                {eventInfo.eventName}
+              </Typography>
+              <Typography component = "div" variant="h5" color="text.secondary">
+                Host : Host Name
+              </Typography>
+            </Box>
+            <Box id="button container" style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+              <Button
+                variant ='outlined'
+                id = 'Purchase Ticket Button'
+                size='large'
+                onClick = {() => setTicketModal(true)}
+              > Buy Tickets
+              </Button>
+              {ticketModal === true ? (<PurchaseTicket eventInfo = {eventInfo} setEventInfo={setEventInfo} ticketModal={ticketModal} setTicketModal ={setTicketModal}/>):null}
+            </Box>
+            
+            
           </Box>
           <Box id="details section" sx={{marginTop: "2%"}}>
             <Typography  variant="h6" color="text.secondary" sx={{fontWeight: "bold", lineHeight: "1.2"}}>
