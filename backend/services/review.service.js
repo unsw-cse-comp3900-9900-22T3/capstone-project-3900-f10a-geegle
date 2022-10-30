@@ -224,7 +224,7 @@ export const createReviewReplyService = async(req, res) => {
             userID: newReply.userid,
             user: username.firstname + " " + username.lastname
         },
-        statusCode : 200, 
+        statusCode : 201, 
         msg: 'Reply Created'}
     } catch (e) {
         throw e
