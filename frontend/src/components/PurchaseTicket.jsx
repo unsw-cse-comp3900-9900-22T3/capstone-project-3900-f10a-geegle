@@ -34,6 +34,15 @@ const PurchaseTicket= ({
   };
   const [ticketTypes, setTicketTypes] = useState([]);
   const [quantity, setQuantity] = useState("");
+  const dateOptions = {
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric',
+    hour: 'numeric', 
+    minute: 'numeric', 
+    hour12: true
+  }
   const getTicketTypes = async() => {
     const response = await fetch(`http://localhost:3000//events/${eventInfo.eventId}/ticketTypes`, {
       method: 'GET',
@@ -67,7 +76,7 @@ const PurchaseTicket= ({
           {`Location ${eventInfo.eventVenue}, ${eventInfo.eventLocation}`}
         </Typography>
         <Typography aria-label="event dates" id="modal-modal-description">
-          {`Date: ${(new Date(eventInfo.startDateTime)).toLocaleString()} - ${(new Date(eventInfo.endDateTime)).toLocaleString()}`}
+          {`Date: ${(new Date(eventInfo.startDateTime)).toLocaleString('en-AU',dateOptions)} to ${(new Date(eventInfo.endDateTime)).toLocaleString('en-AU',dateOptions)}`}
         </Typography>
         <Box id="ticket container" sx ={{mt:'1.5vw'}}>
           <Card sx={{p:2}}>
