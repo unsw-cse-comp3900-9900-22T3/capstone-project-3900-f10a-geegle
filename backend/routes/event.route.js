@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { getEventController, getUpcomingEventsController, getAllEventsController, createEventsController,
-         publishEventsController, unpublishEventsController, deleteEventsController, getHostEventsController, getEventGuestListController, 
+         publishEventsController, unpublishEventsController, deleteEventsController, getHostEventsController, 
+         getEventsUserAttendingController, getEventGuestListController, 
          getEventReviewsController, createEventReviewController, editEventReviewController,
          deleteEventReviewController, addLikeToEventReviewController, removeLikeToEventReviewController, 
          getEventReviewReplyController, createEventReviewReplyController, editEventReviewReplyController,
@@ -20,6 +21,7 @@ eventRouter.get('/:eventID/info', getEventController);
 eventRouter.get('/upcoming', getUpcomingEventsController);
 eventRouter.get('/all', getAllEventsController);
 eventRouter.get('/host', verifyToken, getHostEventsController);
+eventRouter.get('/attending', verifyToken, getEventsUserAttendingController);
 eventRouter.get('/:eventID/guest', verifyToken, getEventGuestListController);
 
 eventRouter.get('/:eventID/reviews', getEventReviewsController); //get all reviews for an event

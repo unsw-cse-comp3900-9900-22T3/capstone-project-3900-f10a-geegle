@@ -59,11 +59,23 @@ const getVenueSeatSectionsByVenueNameDb = async(venueName) => {
     return result.rows
 }
 
+// READ
+const isSeatInSeatSectionAllocatedToTicketTypeDb = async(eventID, seatID, ticketType) => {
+    const result = await db.query (
+        "SELECT * FROM seats s WHERE s.seatID = $1 AND EXISTS " +
+        "(SELECT FROM eventTicketToSeatingAllocation etsa WHERE etsa.eventID = $2 AND " +
+        "etsa.seatSection = s.seatSection AND etsa.ticketType = $3)", 
+        [seatID, eventID, ticketType])
+    
+    return result.rows
+}
+
 export {
     getVenueSeatsByEventIdDb,
     getVenueAvailableSeatsByEventIdDb,
     getVenueAvailableSeatsByEventIdAndTicketTypeDb,
     getVenueSeatInfoByEventIdDb,
     getSeatOccupantDb,
-    getVenueSeatSectionsByVenueNameDb
+    getVenueSeatSectionsByVenueNameDb,
+    isSeatInSeatSectionAllocatedToTicketTypeDb
 }
