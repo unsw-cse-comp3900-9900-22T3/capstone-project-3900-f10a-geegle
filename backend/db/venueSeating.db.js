@@ -38,9 +38,9 @@ const getSeatOccupantDb = async(eventID, seatID) => {
 }
 
 // READ
-const getVenueSeatSectionsDb = async(venueID) => {
+const getVenueSeatSectionsByVenueNameDb = async(venueName) => {
     const result = await db.query (
-        "SELECT distinct seatSection FROM seats where venueID = $1", [venueID])
+        "SELECT distinct s.seatSection FROM seats s JOIN venues v on s.venueID = v.venueID where v.venueName = $1", [venueName])
     
     return result.rows
 }
@@ -50,5 +50,5 @@ export {
     getVenueAvailableSeatsByEventIdDb,
     getVenueSeatInfoByEventIdDb,
     getSeatOccupantDb,
-    getVenueSeatSectionsDb
+    getVenueSeatSectionsByVenueNameDb
 }
