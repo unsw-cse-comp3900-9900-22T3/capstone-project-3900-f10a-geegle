@@ -11,6 +11,7 @@ bookingRouter.get('/:eventID/availableTickets', verifyToken, bookingController.g
 bookingRouter.get('/:eventID/availableTicketGroup', verifyToken, bookingController.getEventAvailableTicketGroupController);
 bookingRouter.get('/:eventID/seats', verifyToken, bookingController.getEventSeatsController);
 bookingRouter.get('/:eventID/availableSeats', verifyToken, bookingController.getEventAvailableSeatsController);
+//Test route
 bookingRouter.get('/:eventID/availableSeatsByTicketType/:ticketType', verifyToken, bookingController.getEventAvailableSeatsByTicketType);
 bookingRouter.get('/:eventID/seatSections', verifyToken, bookingController.getEventVenueSeatSectionsController);
 //bookingRouter.get('/:eventID/seatInfo/:seatID', verifyToken, bookingController.getEventSeatInfoController);
