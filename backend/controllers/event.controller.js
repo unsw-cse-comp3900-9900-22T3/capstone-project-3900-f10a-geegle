@@ -141,7 +141,7 @@ export const getEventReviewsController = async(req, res) => {
 export const editEventReviewController = async(req, res) => {
     try {
         const {reviews, statusCode, msg} = await editEventReviewService(req, res);
-        if (!events) {
+        if (!reviews) {
             res.status(statusCode).json(msg)
         } else {
             res.status(statusCode).json({reviews, msg})
