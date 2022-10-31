@@ -139,13 +139,12 @@ export const getEventAvailableSeatsService = async(req, res) => {
 
 export const getEventVenueSeatSectionsService = async(req, res) => {
     try {
-        const eventID = req.params.eventID;
-        const event = await eventdb.getEventByIdDb(eventID)
-        const seats = await venueSeatingdb.getVenueSeatSectionsDb(event[0].eventvenue)
-        console.log(seats.map(seat => seat.seatsection))
+        const venueName = req.params.venueName;
+        const seats = await venueSeatingdb.getVenueSeatSectionsByVenueNameDb(venueName)
+        
         return {seatSections: seats.map(seat => seat.seatsection),
                 statusCode: 200,
-                msg: `Seat sections at Event ${eventID} venue`}
+                msg: `Seat sections at venue ${venueName}`}
 
     } catch (error) {
         throw error
