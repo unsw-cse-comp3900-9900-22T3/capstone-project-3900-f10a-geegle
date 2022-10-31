@@ -94,11 +94,11 @@ export const editEventReviewService = async(req, res) => {
             return {reviews: null, statusCode: 403, msg: 'You do not have permission to edit this review'}
         }
         const user = await getUserByIdDb(req.userID);
-        let likes = await getReviewLikeAmountDb(reviewID);
+        const likes = await getReviewLikeAmountDb(reviewID);
         const newReview = await editReviewByIdDb(reviewID, review, rating, new Date(Date.now()));
         const currentUserReviewLike = await getReviewLikeDb(reviewID, req.userID);
         const currentUserLiked = (currentUserReviewLike.length >= 1);
-        let numReplies = await getReplyAmountByReviewIDDb(eventReviews[i].reviewid);
+        const numReplies = await getReplyAmountByReviewIDDb(reviewID);
         return {reviews: {
             reviewID: newReview.reviewid,
             eventID: newReview.eventid,
