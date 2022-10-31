@@ -15,7 +15,12 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { Grid } from '@mui/material';
 import AccorStadium from '../components/AccorStadium';
-const PurchaseTicket= ({eventInfo, setEventInfo, ticketModal, setTicketModal}) => {
+import DoltonHouse from '../components/DoltonHouse';
+const PurchaseTicket= ({
+  eventInfo, 
+  setEventInfo, 
+  ticketModal, 
+  setTicketModal}) => {
   const style = {
     position: 'absolute',
     top: '50%',
@@ -28,7 +33,7 @@ const PurchaseTicket= ({eventInfo, setEventInfo, ticketModal, setTicketModal}) =
     p: 4,
   };
   const [ticketTypes, setTicketTypes] = useState([]);
-
+  const [quantity, setQuantity] = useState("");
   const getTicketTypes = async() => {
     const response = await fetch(`http://localhost:3000//events/${eventInfo.eventId}/ticketTypes`, {
       method: 'GET',
@@ -55,21 +60,43 @@ const PurchaseTicket= ({eventInfo, setEventInfo, ticketModal, setTicketModal}) =
       aria-describedby="purchasing ticket form"
     >
       <Box sx={style}>
-        <Typography aria-label="publishForm" id="modal-modal-title" variant="h6" component="h2">
+        <Typography aria-label="event name" id="modal-modal-title" variant="h6">
           {eventInfo.eventName}
         </Typography>
-        <Typography aria-label="selectYourDates" id="modal-modal-description">
+        <Typography aria-label="event location" id="modal-modal-description">
           {`Location ${eventInfo.eventVenue}, ${eventInfo.eventLocation}`}
         </Typography>
-        <Typography aria-label="selectYourDates" id="modal-modal-description">
-          {`Date: ${eventInfo.startDateTime} - ${eventInfo.endDateTime}`}
+        <Typography aria-label="event dates" id="modal-modal-description">
+          {`Date: ${(new Date(eventInfo.startDateTime)).toLocaleString()} - ${(new Date(eventInfo.endDateTime)).toLocaleString()}`}
         </Typography>
-        {/* <Box id="ticket grid" sx ={{}}>
-
-        </Box> */}
+        <Box id="ticket container" sx ={{mt:'1.5vw'}}>
+          <Card sx={{p:2}}>
+            <Typography aria-label="ticket type" variant="h4" width="100%">General Admission</Typography>
+            <FormControl >
+              <Typography aria-label="ticket price" variant="h5" sx={{mt: 2}}>Price: $100</Typography>
+              <Typography aria-label="quantity label" sx={{mt: 2}}>
+                Quantity:
+              </Typography>
+              <TextField
+                id="quantity"
+                label="quantity"
+                type="text"
+                variant="outlined"
+                aria-label="quantity textbox"
+                onChange={e=>setQuantity(e.target.value)}
+                fullWidth
+              />  
+            </FormControl>
+          </Card>
+        </Box>
+        <Box id="total section" sx={{mt: 4}}>
+          <Typography aria-label="total price" variant="h5" width="100%">
+            Total ticket price: $500
+          </Typography>
+        </Box>
         {/* check the seat allocation boolean */}
         <Box id= "seat allocations">
-          <AccorStadium/>
+          {/* <AccorStadium/> */}
           {/* <DoltonHouse /> */}
         </Box>
         
