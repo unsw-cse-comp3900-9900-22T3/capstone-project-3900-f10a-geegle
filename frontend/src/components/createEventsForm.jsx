@@ -65,8 +65,7 @@ function CreateEventsForm() {
   const [ticketInput, setTicketInput] = useState(1);
   const navigate = useNavigate();
   console.log(ticketInfo);
-
-  console.log(startDateTime);
+  console.log(allTicketTypes);
 
   React.useEffect(() => {
     console.log(venue)
@@ -90,36 +89,50 @@ function CreateEventsForm() {
     setThumbnail(thumbnailData);
   };
 
-  const handleAmount = (event) => {
+  const handleAmount = (index, event) => {
     const newTicketInfo = { ...ticketInfo };
+    const allNewTicketTypes = [...allTicketTypes];
     newTicketInfo.ticketAmount = event.target.value;
+    allNewTicketTypes[index] = newTicketInfo;
     setTicketInfo(newTicketInfo);
+    setAllTicketTypes(allNewTicketTypes);
   };
-  const handleTicketType = (event) => {
+  const handleTicketType = (index, event) => {
     const newTicketInfo = { ...ticketInfo };
+    const allNewTicketTypes = [...allTicketTypes];
     newTicketInfo.ticketType = event.target.value;
+    allNewTicketTypes[index] = newTicketInfo;
     setTicketInfo(newTicketInfo);
+    setAllTicketTypes(allNewTicketTypes);
   };
 
-  const handleTicketPrice = (event) => {
+  const handleTicketPrice = (index, event) => {
     const newTicketInfo = { ...ticketInfo };
+    const allNewTicketTypes = [...allTicketTypes];
     newTicketInfo.price = event.target.value;
-    console.log(newTicketInfo.price);
+    allNewTicketTypes[index] = newTicketInfo;
     setTicketInfo(newTicketInfo);
+    setAllTicketTypes(allNewTicketTypes);
   };
 
   const handleTicketSeatSection = (index, event) => {
     const newTicketInfo = { ...ticketInfo };
-    const allNewTicketTypes = { ...allTicketTypes};
+    const allNewTicketTypes = [...allTicketTypes];
     if (event.target.checked) {
       allNewTicketTypes[index].seatSection.push(event.target.value);
     } else {
-      allNewTicketTypes[index].seatSection.remove(event.target.value);
+      // const oldSeatSection = allNewTicketTypes[index].seatSection;
+      // oldSeatSection.remove(event.target.value);
+      // const updateSeatSection = oldSeatSection;
+      const updatedSeats = allNewTicketTypes[index].seatSection.filter((section) => !section.includes(event.target.value));
+      allNewTicketTypes[index].seatSection = updatedSeats;
+      //allNewTicketTypes[index].seatSection.remove(event.target.value);
     }
     setAllTicketTypes(allNewTicketTypes);
+    console.log(allNewTicketTypes);
     
   }
-  const handleAddTicket = () => {
+  const handleAddTicket = (index) => {
     //setAllTicketTypes(prev => [...prev, ticketInfo]);
 
     // resetting the fields in ticketInfo
@@ -128,8 +141,9 @@ function CreateEventsForm() {
     newTicketInfo.amount = '';
     newTicketInfo.ticketPrice = '';
     newTicketInfo.seatSection = [];
-    setTicketInfo(newTicketInfo);
-    setAllTicketTypes((prev) => [...prev, ticketInfo]);
+    // setTicketInfo(newTicketInfo);
+    setAllTicketTypes((prev) => [...prev, newTicketInfo]);
+    console.log(allTicketTypes);
   };
 
   const handleVenue = (event) => {
@@ -202,6 +216,7 @@ function CreateEventsForm() {
     );
     const json = await r.json();
     if (r.ok) {
+      console.log(json);
       navigate('/');
     } else {
       // alert the error code and the

@@ -6,6 +6,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 //import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { width } from '@mui/system';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import PropTypes from 'prop-types';
 
 
@@ -17,9 +18,10 @@ function TicketTypeInput( {
   index,
   venue
 }) {
-  const [eventSeatSection, setEventSeatSection] = useState([]);
+  const [eventSeatSection, setEventSeatSection] = useState({0: []});
   const fetchSeatSection = async () => {
-    const response = await fetch(`http://localhost:3000/events/${venue.venue}/seatSelections`, {
+    // console.log(venue);
+    const response = await fetch(`http://localhost:3000/events/venues/${venue}/seatSections`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -34,11 +36,12 @@ function TicketTypeInput( {
       const venueSection = [];
       venueSection.push(json.seatSections);
       setEventSeatSection(venueSection);
+      // console.log(venueSection);
     }
   }
   useEffect(() => {
     fetchSeatSection();
-  }, [venue.venue])
+  }, [venue])
   
 
 return (
@@ -50,7 +53,7 @@ return (
       aria-label="Ticket Type"
       type="text"
       variant="outlined"
-      onChange={handleTicketType}
+      onChange={(e) => handleTicketType(index, e)}
       fullWidth
     />
     </Grid>
@@ -61,7 +64,7 @@ return (
       aria-label="Quantity"
       type="text"
       variant="outlined"
-      onChange={handleAmount}
+      onChange={(e) => handleAmount(index, e)}
       fullWidth
     />
     </Grid>
@@ -72,19 +75,23 @@ return (
       aria-label="price"
       type="text"
       variant="outlined"
-      onChange={handleTicketPrice}
+      onChange={(e) => handleTicketPrice(index, e)}
       fullWidth
     />
     </Grid>
     <Grid item xs = {12}>
-      {eventSeatSection.map((obj, idx) => {
+      {eventSeatSection[0].map((elem, idx) => {
         return (
-          <div key={index}>
-            <Checkbox
-              label = {obj} 
-              value = {obj}
-              onChange = {(e)=>handleTicketSeatSection(index, e)}
-              // onChange = 
+          <div key={idx} style={{display: "inline"}}>
+            <FormControlLabel
+              control = {
+                <Checkbox
+                  value = {elem}
+                  onClick = {(e)=>handleTicketSeatSection(index, e)}
+                  // onChange = 
+                />
+              }
+              label = {elem} 
             />
           </div>
           );
