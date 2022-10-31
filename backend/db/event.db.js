@@ -101,6 +101,15 @@ const addEventVenueDb = async(venueName, venueLocation, venueCapacity) => {
     return result.rows[0]
 }
 
+// CREATE
+const addEventTicketTypeSeatingAllocation = async(eventID, ticketType, seatSection) => {
+    const result = await db.query(
+        "INSERT INTO eventTicketToSeatingAllocation (eventID, ticketType, seatSection) VALUES ($1, $2, $3) RETURNING *",
+        [eventID, ticketType, seatSection]
+    )
+    return result.rows[0]
+}
+
 // DELETE
 const removeEventByIdDb = async(ID) => {
     const result = await db.query (
@@ -136,6 +145,7 @@ export {
     getHostofEventDb,
     addEventDb,
     addEventVenueDb,
+    addEventTicketTypeSeatingAllocation,
     removeEventByIdDb,
     publishEventByIdDb,
     unpublishEventByIdDb

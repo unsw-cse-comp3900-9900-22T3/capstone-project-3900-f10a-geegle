@@ -1,5 +1,6 @@
 import {addEventDb, getAllEventsNotSoldOutDb, getAllEventsDb, getEventByIdDb, getEventByIdDisplayDb,
-        getEventsByHostIdDb, getEventVenueByNameDb, getEventVenueByIdDb, getEventGuestListByIdDb, getHostofEventDb, addEventVenueDb, publishEventByIdDb, isVenueSeatingAvailableDb,
+        getEventsByHostIdDb, getEventVenueByNameDb, getEventVenueByIdDb, getEventGuestListByIdDb, getHostofEventDb, 
+        addEventVenueDb, publishEventByIdDb, isVenueSeatingAvailableDb, addEventTicketTypeSeatingAllocation,
         unpublishEventByIdDb, removeEventByIdDb} from '../db/event.db.js' 
 import {addTicketDb} from '../db/ticket.db.js'
 
@@ -54,15 +55,23 @@ export const createEventsService = async(req, res) => {
             seatingAvailable = parseInt(venueSeats.count) ? true : false
         } 
 
+        if (venue.maxcapacity < capacity) {
+            return {events: null, statusCode : 400, msg: 'Venue capacity not sufficient for event'}
+        }
+
         const newEvent = await addEventDb(eventName, req.userID, new Date(startDateTime), new Date(endDateTime), eventDescription,
                 eventType, venue.venueid, capacity, totalTickets, image1, image2, image3)
     
 
         for (let i = 0; i < tickets.length; i++) {
-            const {ticketType, price, ticketAmount} = tickets[i]
+            const {ticketType, price, ticketAmount, seatSections} = tickets[i]
             for (let j = 0 ; j < ticketAmount; j++) {
                 const tickets = await addTicketDb(ticketType, price, newEvent.eventid)
-            }   
+            }  
+
+            for (let seatSection of seatSections) {
+                const allocation = await addEventTicketTypeSeatingAllocation(newEvent.eventid, ticketType, seatSection)
+            }
         }
 
         return {events: {

@@ -11,8 +11,7 @@ bookingRouter.get('/:eventID/availableTickets', verifyToken, bookingController.g
 bookingRouter.get('/:eventID/availableTicketGroup', verifyToken, bookingController.getEventAvailableTicketGroupController);
 bookingRouter.get('/:eventID/seats', verifyToken, bookingController.getEventSeatsController);
 bookingRouter.get('/:eventID/availableSeats', verifyToken, bookingController.getEventAvailableSeatsController);
-// TODO: get available seats based on the ticket type
-//bookingRouter.get('/:eventID/availableSeatsFromTicketType', verifyToken, bookingController.getEventAvailableSeatsController);
+bookingRouter.get('/:eventID/availableSeatsByTicketType/:ticketType', verifyToken, bookingController.getEventAvailableSeatsByTicketType);
 bookingRouter.get('/:eventID/seatSections', verifyToken, bookingController.getEventVenueSeatSectionsController);
 //bookingRouter.get('/:eventID/seatInfo/:seatID', verifyToken, bookingController.getEventSeatInfoController);
 // get seat info: seat name, ticket type for the seat, reserved or available, 
@@ -20,8 +19,8 @@ bookingRouter.get('/:eventID/seatSections', verifyToken, bookingController.getEv
 
 /*
     {
-        tickets: [],
-        seats: []
+        tickets: [ticketTypes],
+        seats: [seatID]
         creditCard: {useStored: true/false, creditCardNum: '', ccv: '', expiryMonth: '', expiryYear: ''}
         email: {useStored: true/false, emailAddr: }
     }

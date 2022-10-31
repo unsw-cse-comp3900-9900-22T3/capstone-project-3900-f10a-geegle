@@ -137,6 +137,31 @@ export const getEventAvailableSeatsService = async(req, res) => {
     }
 }
 
+export const getEventAvailableSeatsByTicketTypeService = async(req, res) => {
+    try {
+        const { eventID, ticketType } = req.params;
+        const seats = await venueSeatingdb.getVenueAvailableSeatsByEventIdAndTicketTypeDb(eventID, ticketType)
+        
+        for (let seat of seats) {
+            seat['seatID'] = seat['seatid']
+            delete seat['seatID']
+            seat['seatSection'] = seat['seatsection']
+            delete seat['seatsection']
+            seat['seatRow'] = seat['seatrow']
+            delete seat['seatrow']
+            seat['seatNo'] = seat['seatno']
+            delete seat['seatno']
+        }
+
+        return {seats: seats,
+                statusCode: 200,
+                msg: `Available seats for Event ${eventID} and ticket type ${ticketType}`}
+
+    } catch (error) {
+        throw error
+    }
+}
+
 export const getEventVenueSeatSectionsService = async(req, res) => {
     try {
         const eventID = req.params.eventID;
@@ -187,16 +212,35 @@ export const getEventSeatInfoService = async(req, res) => {
 
 export const bookEventService = async(req, res) => {
     try {
-        const { bookings } = req.body;
+        const eventID = req.params.eventID
+        const { tickets, seats } = req.body;
 
+        if (seats.length != 0 && tickets.length != seats.length) {
+            return { booking: null, statusCode: 400, msg: "Select correct number of seats for all tickets"}
+        }
         // Check credit card correct
 
         // Check no. of tickets booked of each type are available
-        // In event create make sure total tickets for sale does not exceed venue capacity
-        for (let book of bookings) {
-
+        let count = {}
+        for (const ticketType of tickets) {
+            count[ticketType] = count[ticketType] ? count[ticketType] + 1 : 1
         }
         
+        for (const ticketType in count) {
+            const available = await ticketdb.getAvailableTicketsByTicketTypeDb(eventID, ticketType)
+            if (count[ticketType] > available.count) {
+                return { booking: null, statusCode: 400, msg: `Insufficient tickets available for ticketType '${ticketType}'`}
+            }
+        }
+
+        // Check seat not taken
+        for (const seat of seats) {
+            const seatFromDB = await venueSeatingdb.getSeatOccupantDb(eventID)
+            if (seatFromDB.length != 0) {
+                return { booking: null, statusCode: 400, msg: `Seat '${seat} already taken'`}
+            }
+        }
+
         // DB: get all available tickets at event
         // https://stackoverflow.com/questions/3396088/how-do-i-remove-an-object-from-an-array-with-javascript
         // - Use array.findIndex to find ticket matching the ticket type
