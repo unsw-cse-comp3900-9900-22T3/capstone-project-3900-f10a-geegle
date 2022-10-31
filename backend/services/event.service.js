@@ -1,7 +1,9 @@
 import {addEventDb, getAllEventsNotSoldOutDb, getAllEventsDb, getEventByIdDb, getEventByIdDisplayDb,
         getEventsByHostIdDb, getEventVenueByNameDb, getEventVenueByIdDb, getEventGuestListByIdDb, getHostofEventDb, addEventVenueDb, publishEventByIdDb, isVenueSeatingAvailableDb,
         unpublishEventByIdDb, removeEventByIdDb} from '../db/event.db.js' 
+import { getEventReviewsByEventIdDb } from '../db/review.db.js'
 import {addTicketDb} from '../db/ticket.db.js'
+import { getUserByIdDb } from '../db/user.db.js'
 
 
 /*  Request
@@ -318,8 +320,60 @@ export const getEventGuestListService = async(req, res) => {
         for (let guest of guests) {
             guestList.push({name: guest.firstname + ' ' + guest.lastname, email: guest.email})
         }
-        console.log(guestList)
+        // console.log(guestList)
         return {guests: guestList, statusCode: 200, msg: 'Guest list'}
+    } catch (e) {
+        throw e
+    }
+}
+
+export const getHostDetailsService = async(req, res) => {
+    try {
+        const {hostID} = req.body;
+
+        const host = getUserByIdDb(hostID);
+        if (host.length == 0) {
+            return {events: null, hostRating: null, statusCode : 404, msg: 'Host does not exist'}
+        }
+        const eventsByHost = await getEventsByHostIdDb(hostID);
+
+        let eventSummary = [];
+        let runningTotalReviewRatings = 0.00;
+        let totalReviews = 0;
+        for (let i = 0; i < eventsByHost.length; i++) {
+            let eventReviews = await getEventReviewsByEventIdDb(eventsByHost[i].eventid);
+            let eventReviewNum = 0;
+            let eventReviewScore = 0.00;
+            for (let j = 0; j < eventReviews.length; j++) {
+                totalReviews++;
+                eventReviewNum++;
+                runningTotalReviewRatings += parseFloat(eventReviews[j].rating);
+                eventReviewScore += parseFloat(eventReviews[j].rating);
+            }
+            if (eventReviewNum != 0) {
+                eventReviewScore = eventReviewScore/eventReviewNum;
+            } else {
+                eventReviewScore = 0;
+            }
+            // consider adding top few reviews ordered by likes
+            eventSummary.push({
+                eventID: eventsByHost[i].eventid,
+                eventName: eventsByHost[i].eventname,
+                startDateTime: eventsByHost[i].startdatetime,
+                endDateTime: eventsByHost[i].enddatetime,
+                eventVenue: eventsByHost[i].venuename,
+                eventScore: eventReviewScore,
+                numReviews: eventReviewNum
+            });   
+        }
+
+        if (totalReviews != 0) {
+            runningTotalReviewRatings = runningTotalReviewRatings / totalReviews;
+        } else {
+            runningTotalReviewRatings = 0;
+        }
+        return {events: eventSummary, hostRating: runningTotalReviewRatings, statusCode: 200, msg: 'Details found'}
+
     } catch (e) {
         throw e
     }
