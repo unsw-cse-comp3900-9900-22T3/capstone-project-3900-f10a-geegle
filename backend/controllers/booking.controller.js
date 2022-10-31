@@ -60,6 +60,16 @@ export const getEventAvailableSeatsController = async(req, res) => {
     }
 }
 
+export const getEventAvailableSeatsByTicketType = async(req, res) => {
+    try {
+        const {seats, statusCode, msg} = await bookingService.getEventAvailableSeatsByTicketTypeService(req, res);
+        res.status(statusCode).json({seats, msg})
+
+    } catch (error) {
+        res.status(500).send(error.message)
+    }
+}
+
 export const getEventVenueSeatSectionsController = async(req, res) => {
     try {
         const {seatSections, statusCode, msg} = await bookingService.getEventVenueSeatSectionsService(req, res);
@@ -82,7 +92,7 @@ export const getEventSeatInfoController = async(req, res) => {
 
 export const bookEventController = async(req, res) => {
     try {
-        const {booking,statusCode, msg} = await bookingService.bookEventService(req, res);
+        const {booking, statusCode, msg} = await bookingService.bookEventService(req, res);
 
         if (!booking) {
             res.status(statusCode).json(msg)

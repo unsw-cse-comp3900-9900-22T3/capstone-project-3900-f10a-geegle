@@ -24,7 +24,7 @@ const getTicketTypesByEventIdDb = async(eventId) => {
 // READ
 const getAvailableTicketsByEventIdDb = async(eventId) => {
     const result = await db.query (
-        "SELECT t.ticketid, t.tickettype, t.price FROM tickets t WHERE t.eventId = $1 and " +
+        "SELECT t.ticketid, t.tickettype, t.price FROM tickets t WHERE t.eventId = $1 AND " +
         "NOT EXISTS (SELECT from ticketpurchases where t.ticketid = ticketid)", [eventId])
     return result.rows
 }
@@ -32,9 +32,26 @@ const getAvailableTicketsByEventIdDb = async(eventId) => {
 // READ
 const getAvailableTicketTypeGroupByEventIdDb = async(eventId) => {
     const result = await db.query (
-        "SELECT t.tickettype, t.price, count(*) FROM tickets t WHERE t.eventId = $1 and " +
+        "SELECT t.tickettype, t.price, count(*) FROM tickets t WHERE t.eventId = $1 AND " +
         "NOT EXISTS (SELECT from ticketpurchases where t.ticketid = ticketid) GROUP BY t.tickettype, t.price", [eventId])
     return result.rows
+}
+
+// READ
+const getAvailableTicketsByTicketTypeDb = async(eventId, ticketType) => {
+    const result = await db.query (
+        "SELECT * FROM tickets t WHERE t.eventId = $1 and t.tickettype = $2 AND " +
+        "NOT EXISTS (SELECT from ticketpurchases where t.ticketid = ticketid) " +
+        "ORDER BY t.ticketID", [eventId, ticketType])
+    return result.rows
+}
+
+// READ
+const getAvailableTicketsCountByTicketTypeDb = async(eventId, ticketType) => {
+    const result = await db.query (
+        "SELECT count(*) FROM tickets t WHERE t.eventId = $1 and t.tickettype = $2 AND " +
+        "NOT EXISTS (SELECT from ticketpurchases where t.ticketid = ticketid)", [eventId, ticketType])
+    return result.rows[0]
 }
 
 // CREATE
@@ -45,7 +62,6 @@ const addTicketDb = async(ticketType, price, eventID) => {
     )
     return result.rows[0]
 }
-
 
 // CREATE
 const addTicketPurchaseDb = async(ticketID, userID, time) => {
@@ -68,6 +84,7 @@ const assignSeatToTicketDb = async(ticketID, seatID) => {
     const result = await db.query(
         "UPDATE tickets SET seatid = $1 where ticketid = $2 RETURNING *", [seatID, ticketID]
     )
+    return result.rows[0]
 }
 
 export {
@@ -76,6 +93,8 @@ export {
     getTicketTypesByEventIdDb,
     getAvailableTicketsByEventIdDb,
     getAvailableTicketTypeGroupByEventIdDb,
+    getAvailableTicketsByTicketTypeDb,
+    getAvailableTicketsCountByTicketTypeDb,
     addTicketDb,
     removeTicketByIdDb,
     assignSeatToTicketDb,

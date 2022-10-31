@@ -21,6 +21,20 @@ const getVenueAvailableSeatsByEventIdDb = async(eventID) => {
 }
 
 // READ
+const getVenueAvailableSeatsByEventIdAndTicketTypeDb = async(eventID, ticketType) => {
+    const result = await db.query (
+        "SELECT s.seatid, s.seatsection, s.seatrow, s.seatno FROM events e JOIN venues v ON e.eventVenue = v.venueID " +
+        "JOIN seats s ON v.venueID = s.venueID WHERE e.eventID = $1" +
+        "AND NOT EXISTS (SELECT FROM ticketPurchases tp JOIN tickets t ON tp.ticketID = t.ticketID " +
+        "WHERE t.seatID = s.seatID AND t.eventID = $2)" +
+        "AND s.seatsection IN " +
+        "(SELECT etsa.seatSection from eventTicketToSeatingAllocation etsa where etsa.eventID = $3 and etsa.tickettype = $4)"
+        , [eventID, eventID, eventID, ticketType])
+
+    return result.rows
+}
+
+// READ
 const getVenueSeatInfoByEventIdDb = async(eventID, seatID) => {
     const result = await db.query (
         "SELECT s.seatid, s.seatsection, s.seatrow, s.seatno, t.ticketType, t.price " +
@@ -45,10 +59,23 @@ const getVenueSeatSectionsByVenueNameDb = async(venueName) => {
     return result.rows
 }
 
+// READ
+const isSeatInSeatSectionAllocatedToTicketTypeDb = async(eventID, seatID, ticketType) => {
+    const result = await db.query (
+        "SELECT * FROM seats s WHERE s.seatID = $1 AND EXISTS " +
+        "(SELECT FROM eventTicketToSeatingAllocation etsa WHERE etsa.eventID = $2 AND " +
+        "etsa.seatSection = s.seatSection AND etsa.ticketType = $3)", 
+        [seatID, eventID, ticketType])
+    
+    return result.rows
+}
+
 export {
     getVenueSeatsByEventIdDb,
     getVenueAvailableSeatsByEventIdDb,
+    getVenueAvailableSeatsByEventIdAndTicketTypeDb,
     getVenueSeatInfoByEventIdDb,
     getSeatOccupantDb,
-    getVenueSeatSectionsByVenueNameDb
+    getVenueSeatSectionsByVenueNameDb,
+    isSeatInSeatSectionAllocatedToTicketTypeDb
 }

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { getEventController, getUpcomingEventsController, getAllEventsController, createEventsController,
-         publishEventsController, unpublishEventsController, deleteEventsController, getHostEventsController, getEventGuestListController, 
-         getHostDetailsController } 
+         publishEventsController, unpublishEventsController, deleteEventsController, getHostEventsController, 
+         getEventsUserAttendingController, getEventGuestListController, getHostDetailsController } 
          from '../controllers/event.controller.js'
 import { verifyToken } from '../middleware/verifyToken.js';
 import bookingRouter from './booking.route.js';
@@ -18,9 +18,8 @@ eventRouter.get('/upcoming', getUpcomingEventsController);
 eventRouter.get('/all', getAllEventsController);
 eventRouter.get('/host', verifyToken, getHostEventsController);
 eventRouter.get('/host/details', getHostDetailsController);
+eventRouter.get('/attending', verifyToken, getEventsUserAttendingController);
 eventRouter.get('/:eventID/guest', verifyToken, getEventGuestListController);
-
-
 
 eventRouter.use(bookingRouter)
 eventRouter.use(reviewRouter)

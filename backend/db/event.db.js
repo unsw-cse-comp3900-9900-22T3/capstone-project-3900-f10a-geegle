@@ -23,6 +23,15 @@ const getEventsByHostIdDb = async(userID) => {
 }
 
 // READ
+const getEventsUserAttendingDb = async(userID) => {
+    const result = await db.query (
+        "SELECT DISTINCT e.eventID from ticketPurchases tp " +
+        "JOIN tickets t ON tp.ticketid = t.ticketid " +
+        "JOIN events e ON t.eventID = e.eventID WHERE tp.userID = $1", [userID])
+    return result.rows
+}
+
+// READ
 const getAllEventsNotSoldOutDb = async() => {
     const result = await db.query (
         "SELECT * FROM events e JOIN venues v ON (e.eventVenue = v.venueID) " +
@@ -101,6 +110,15 @@ const addEventVenueDb = async(venueName, venueLocation, venueCapacity) => {
     return result.rows[0]
 }
 
+// CREATE
+const addEventTicketTypeSeatingAllocation = async(eventID, ticketType, seatSection) => {
+    const result = await db.query(
+        "INSERT INTO eventTicketToSeatingAllocation (eventID, ticketType, seatSection) VALUES ($1, $2, $3) RETURNING *",
+        [eventID, ticketType, seatSection]
+    )
+    return result.rows[0]
+}
+
 // DELETE
 const removeEventByIdDb = async(ID) => {
     const result = await db.query (
@@ -128,6 +146,7 @@ export {
     getEventByIdDb,
     getEventByIdDisplayDb,
     getEventsByHostIdDb,
+    getEventsUserAttendingDb,
     getAllEventsNotSoldOutDb,
     getAllEventsDb,
     getEventVenueByNameDb,
@@ -136,6 +155,7 @@ export {
     getHostofEventDb,
     addEventDb,
     addEventVenueDb,
+    addEventTicketTypeSeatingAllocation,
     removeEventByIdDb,
     publishEventByIdDb,
     unpublishEventByIdDb

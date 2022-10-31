@@ -174,14 +174,14 @@ INSERT INTO SEATS (seatID, seatSection, seatRow, seatNo, venueID) VALUES (DEFAUL
 INSERT INTO SEATS (seatID, seatSection, seatRow, seatNo, venueID) VALUES (DEFAULT, 'Level 1', 'A', '2', 1);
 INSERT INTO SEATS (seatID, seatSection, seatRow, seatNo, venueID) VALUES (DEFAULT, 'Level 1', 'A', '3', 1);
 INSERT INTO SEATS (seatID, seatSection, seatRow, seatNo, venueID) VALUES (DEFAULT, 'Level 1', 'A', '4', 1);
-INSERT INTO SEATS (seatID, seatSection, seatRow, seatNo, venueID) VALUES (DEFAULT, 'Level 1', 'B', '1', 1);
-INSERT INTO SEATS (seatID, seatSection, seatRow, seatNo, venueID) VALUES (DEFAULT, 'Level 1', 'B', '2', 1);
-INSERT INTO SEATS (seatID, seatSection, seatRow, seatNo, venueID) VALUES (DEFAULT, 'Level 1', 'B', '3', 1);
-INSERT INTO SEATS (seatID, seatSection, seatRow, seatNo, venueID) VALUES (DEFAULT, 'Level 1', 'B', '4', 1);
+INSERT INTO SEATS (seatID, seatSection, seatRow, seatNo, venueID) VALUES (DEFAULT, 'Level 1', 'B', '5', 1);
+INSERT INTO SEATS (seatID, seatSection, seatRow, seatNo, venueID) VALUES (DEFAULT, 'Level 1', 'B', '6', 1);
+INSERT INTO SEATS (seatID, seatSection, seatRow, seatNo, venueID) VALUES (DEFAULT, 'Level 1', 'B', '7', 1);
+INSERT INTO SEATS (seatID, seatSection, seatRow, seatNo, venueID) VALUES (DEFAULT, 'Level 1', 'B', '8', 1);
 INSERT INTO SEATS (seatID, seatSection, seatRow, seatNo, venueID) VALUES (DEFAULT, 'Level 2', 'A', '1', 1);
 INSERT INTO SEATS (seatID, seatSection, seatRow, seatNo, venueID) VALUES (DEFAULT, 'Level 2', 'A', '2', 1);
-INSERT INTO SEATS (seatID, seatSection, seatRow, seatNo, venueID) VALUES (DEFAULT, 'Level 2', 'B', '1', 1);
-INSERT INTO SEATS (seatID, seatSection, seatRow, seatNo, venueID) VALUES (DEFAULT, 'Level 2', 'B', '2', 1);
+INSERT INTO SEATS (seatID, seatSection, seatRow, seatNo, venueID) VALUES (DEFAULT, 'Level 2', 'B', '3', 1);
+INSERT INTO SEATS (seatID, seatSection, seatRow, seatNo, venueID) VALUES (DEFAULT, 'Level 2', 'B', '4', 1);
 INSERT INTO SEATS (seatID, seatSection, seatRow, seatNo, venueID) VALUES (DEFAULT, 'Private Suites', 'A', '1', 1);
 INSERT INTO SEATS (seatID, seatSection, seatRow, seatNo, venueID) VALUES (DEFAULT, 'Private Suites', 'A', '2', 1);
 

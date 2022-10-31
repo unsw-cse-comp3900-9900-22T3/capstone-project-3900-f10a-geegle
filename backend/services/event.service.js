@@ -1,6 +1,7 @@
 import {addEventDb, getAllEventsNotSoldOutDb, getAllEventsDb, getEventByIdDb, getEventByIdDisplayDb,
-        getEventsByHostIdDb, getEventVenueByNameDb, getEventVenueByIdDb, getEventGuestListByIdDb, getHostofEventDb, addEventVenueDb, publishEventByIdDb, isVenueSeatingAvailableDb,
-        unpublishEventByIdDb, removeEventByIdDb} from '../db/event.db.js' 
+        getEventsByHostIdDb, getEventVenueByNameDb, getEventVenueByIdDb, getEventGuestListByIdDb, getHostofEventDb, 
+        addEventVenueDb, publishEventByIdDb, isVenueSeatingAvailableDb, addEventTicketTypeSeatingAllocation,
+        unpublishEventByIdDb, removeEventByIdDb, getEventsUserAttendingDb} from '../db/event.db.js' 
 import { getEventReviewsByEventIdDb } from '../db/review.db.js'
 import {addTicketDb} from '../db/ticket.db.js'
 import { getUserByIdDb } from '../db/user.db.js'
@@ -56,15 +57,23 @@ export const createEventsService = async(req, res) => {
             seatingAvailable = parseInt(venueSeats.count) ? true : false
         } 
 
+        if (venue.maxcapacity < capacity) {
+            return {events: null, statusCode : 400, msg: 'Venue capacity not sufficient for event'}
+        }
+
         const newEvent = await addEventDb(eventName, req.userID, new Date(startDateTime), new Date(endDateTime), eventDescription,
                 eventType, venue.venueid, capacity, totalTickets, image1, image2, image3)
     
 
         for (let i = 0; i < tickets.length; i++) {
-            const {ticketType, price, ticketAmount} = tickets[i]
+            const {ticketType, price, ticketAmount, seatSections} = tickets[i]
             for (let j = 0 ; j < ticketAmount; j++) {
                 const tickets = await addTicketDb(ticketType, price, newEvent.eventid)
-            }   
+            }  
+
+            for (let seatSection of seatSections) {
+                const allocation = await addEventTicketTypeSeatingAllocation(newEvent.eventid, ticketType, seatSection)
+            }
         }
 
         return {events: {
@@ -301,6 +310,41 @@ export const getHostEventsService = async(req, res) => {
         }
         
         return {events: upcomingEventList, statusCode: 200, msg: 'Events found'}
+    } catch (e) {
+        throw e
+    }
+}
+
+export const getEventsUserAttendingService = async(req, res) => {
+    try {
+        let eventList = await getEventsUserAttendingDb(req.userID);
+        
+        let events = [];
+        for (let i = 0; i < eventList.length; i++) {
+            const event = await getEventByIdDisplayDb(eventList[i].eventid)
+            events.push({
+                eventID: event[0].eventid,
+                eventName: event[0].eventname,
+                hostID: event[0].hostid,
+                hostName: event[0].firstname + ' ' + event[0].lastname,
+                hostEmail: event[0].email,
+                startDateTime: event[0].startdatetime,
+                endDateTime: event[0].enddatetime,
+                eventDescription: event[0].eventdescription,
+                eventType: event[0].eventtype,
+                eventVenue: event[0].venuename,
+                eventLocation: event[0].venuelocation,
+                venueCapacity: event[0].maxcapacity,
+                capacity: event[0].capacity,
+                totalTicketAmount: event[0].totalticketamount,
+                image1: event[0].image1,
+                image2: event[0].image2,
+                image3: event[0].image3,
+                published: event[0].published
+                });
+        }
+        
+        return {events: events, statusCode: 200, msg: 'Events found'}
     } catch (e) {
         throw e
     }
