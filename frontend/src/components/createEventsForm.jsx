@@ -62,7 +62,7 @@ function CreateEventsForm() {
     seatSection: []
   });
   const [allTicketTypes, setAllTicketTypes] = useState([ticketInfo]);
-
+  const [ticketInput, setTicketInput] = useState(1);
   const navigate = useNavigate();
   console.log(ticketInfo);
 
@@ -107,6 +107,18 @@ function CreateEventsForm() {
     console.log(newTicketInfo.price);
     setTicketInfo(newTicketInfo);
   };
+
+  const handleTicketSeatSection = (index, event) => {
+    const newTicketInfo = { ...ticketInfo };
+    const allNewTicketTypes = { ...allTicketTypes};
+    if (event.target.checked) {
+      allNewTicketTypes[index].seatSection.push(event.target.value);
+    } else {
+      allNewTicketTypes[index].seatSection.remove(event.target.value);
+    }
+    setAllTicketTypes(allNewTicketTypes);
+    
+  }
   const handleAddTicket = () => {
     //setAllTicketTypes(prev => [...prev, ticketInfo]);
 
@@ -462,7 +474,9 @@ function CreateEventsForm() {
                     handleAmount={handleAmount}
                     handleTicketType={handleTicketType}
                     handleTicketPrice={handleTicketPrice}
+                    handleTicketSeatSection={handleTicketSeatSection}
                     index={index}
+                    venue={venue}
                   />
                 </div>
               );

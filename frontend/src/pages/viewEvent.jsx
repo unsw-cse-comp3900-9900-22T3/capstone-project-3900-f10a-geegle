@@ -44,6 +44,7 @@ const ViewEvent= () => {
     totalTicketAmount:'',
   });
   const [hostName, setHostName] = useState('');
+  const [allTicketTypes, setAllTicketTypes] = useState([]);
   // const getHostInfo = async(eventDetails) => {
   //   const requestOptions = {
   //     method: 'GET',
@@ -73,8 +74,12 @@ const ViewEvent= () => {
       },
     })
     const json = await response.json();
+    const tickets = []
     console.log(json);
-
+    for (const ticket of json.tickets) {
+      tickets.push(ticket);
+    }
+    setAllTicketTypes(tickets);
   }
   const getEventInfo = async() => {
     const response = await fetch(`http://localhost:3000/events/${eventId}/info`, {
@@ -177,9 +182,19 @@ const ViewEvent= () => {
               {eventInfo.eventDescription}
             </Typography>
           </Box>
-          
+          <div>
+            <Typography variant="h5"color="text.secondary" sx={{fontWeight: "bold", lineHeight: "1.2"}}>
+            Ticket types and price
+            </Typography>
+            {allTicketTypes.map((obj,idx)=> {
+              return (
+              <Typography variant="body1" color="text.secondary" sx={{fontSize: "1.12rem"}}>
+                {"Type: "+obj.ticketType +" | Price:$"+obj.price}
+              </Typography>
+              )
+            })}
+          </div>
         </Box>
-          
       </Box>
     </>
     
