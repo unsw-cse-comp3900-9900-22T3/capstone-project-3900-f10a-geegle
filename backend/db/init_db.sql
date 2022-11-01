@@ -10,6 +10,23 @@ CREATE TABLE users(
     userPassword text NOT NULL
 );
 
+CREATE TABLE venues (
+    venueID SERIAL PRIMARY KEY,
+    venueName text NOT NULL,
+    venueLocation text NOT NULL,
+    maxCapacity integer NOT NULL
+);
+
+CREATE TABLE seats (
+    seatID SERIAL PRIMARY KEY,
+    seatSection text,
+    seatRow text,
+    seatNo integer,
+    venueID integer,
+    foreign key (venueID)
+        references venues (venueID)
+);
+
 CREATE TABLE events(
     eventID SERIAL PRIMARY KEY,
     eventName text NOT NULL,
@@ -18,8 +35,7 @@ CREATE TABLE events(
     endDateTime timestamptz NOT NULL,
     eventDescription text,
     eventType text,
-    eventLocation text NOT NULL,
-    eventVenue text NOT NULL,
+    eventVenue integer NOT NULL,
     capacity integer NOT NULL,
     totalTicketAmount integer NOT NULL,
     published boolean DEFAULT FALSE,
@@ -27,14 +43,20 @@ CREATE TABLE events(
     image2 text,
     image3 text,
     foreign key (hostID)
-        references users(userID)
+        references users(userID),
+    foreign key (eventVenue)
+        references venues (venueID)
 );
 
--- CREATE TABLE venues (
---     venueID SERIAL PRIMARY KEY,
---     venueLocation text NOT NULL,
-
--- )
+CREATE TABLE eventMessages (
+    messageID SERIAL,
+    eventID integer NOT NULL,
+    msg text NOT NULL,
+    msgTime timestamptz NOT NULL,
+    primary key (eventID, messageID),
+    foreign key (eventID)
+        references events (eventID)
+);
 
 -- CREATE TABLE ticketType (
 --     ticketTypeID SERIAL PRIMARY KEY,
@@ -51,8 +73,11 @@ CREATE TABLE tickets(
     ticketType text NOT NULL,
     price decimal NOT NULL,
     eventID integer NOT NULL,
+    seatID integer,
     foreign key (eventID)
-        references events(eventID) ON DELETE CASCADE
+        references events(eventID) ON DELETE CASCADE,
+    foreign key (seatID)
+        references seats(seatID)
 );
 
 CREATE TABLE creditCardDetails(
@@ -75,7 +100,7 @@ CREATE TABLE paypalDetails (
 CREATE TABLE ticketPurchases (
     userID integer NOT NULL,
     ticketID integer NOT NULL,
-    ticketPurchaseTime timestamp NOT NULL,
+    ticketPurchaseTime timestamptz NOT NULL,
     primary key(ticketID),
     foreign key (userID)
         references users(userID),
@@ -83,5 +108,95 @@ CREATE TABLE ticketPurchases (
         references tickets(ticketID) ON DELETE CASCADE
 );
 
+CREATE TABLE reviews (
+    reviewID SERIAL PRIMARY KEY,
+    eventID integer NOT NULL,
+    userID integer NOT NULL,
+    rating integer NOT NULL,
+    review text,
+    postedOn timestamptz NOT NULL,
+    foreign key (eventID)
+        references events (eventID),
+    foreign key (userID)
+        references users (userID)
+);
+
+CREATE TABLE reviewReplies (
+    replyID SERIAL,
+    reviewID integer NOT NULL,
+    userID integer NOT NULL,
+    reply text NOT NULL,
+    repliedOn timestamptz NOT NULL,
+    primary key (reviewID, replyID),
+    foreign key (reviewID)
+        references reviews (reviewID),
+    foreign key (userID)
+        references users (userID)
+);
+
+CREATE TABLE reviewLikes (
+    reviewID integer,
+    userID integer,
+    primary key (reviewID, userID),
+    foreign key (reviewID)
+        references reviews (reviewID),
+    foreign key (userID)
+        references users(userID)
+);
+
+CREATE TABLE eventTicketToSeatingAllocation (
+    eventID SERIAL,
+    ticketType text,
+    seatSection text,
+    primary key (eventID, ticketType, seatSection),
+    foreign key (eventID) 
+        references events (eventID)
+);
+
+--CREATE TABLE eventTicketToSeatingAllocation (
+--    ticketID SERIAL,
+--    seatSection text,
+--    primary key (ticketID, seatSection),
+--    foreign key (ticketID) 
+--        references events (ticketID)
+--);
+
 
 INSERT INTO USERS (userID, firstName, lastName, email, userPassword) VALUES (DEFAULT, 'John', 'SMITH', 'jsmith@email.com', 'password123');
+
+INSERT INTO VENUES (venueID, venueName, venueLocation, maxCapacity) VALUES (DEFAULT, 'Accor Stadium', 'Edwin Flack Ave, Sydney Olympic Park NSW 2127', 83500);
+INSERT INTO VENUES (venueID, venueName, venueLocation, maxCapacity) VALUES (DEFAULT, 'ICC Sydney', '14 Darling Dr, Sydney NSW 2000', 5000);
+INSERT INTO VENUES (venueID, venueName, venueLocation, maxCapacity) VALUES (DEFAULT, 'Ivy Precinct', '330 George St, Sydney NSW 2000', 1000);
+INSERT INTO VENUES (venueID, venueName, venueLocation, maxCapacity) VALUES (DEFAULT, 'Doltone House - Jones Bay Wharf', 'level 3/26-32 Pirrama Rd, Pyrmont NSW 2009', 750);
+INSERT INTO VENUES (venueID, venueName, venueLocation, maxCapacity) VALUES (DEFAULT, 'UNSW Roundhouse', 'Roundhouse (E6), Anzac Parade, UNSW Sydney, Kensington NSW 2052', 2200);
+
+INSERT INTO SEATS (seatID, seatSection, seatRow, seatNo, venueID) VALUES (DEFAULT, 'Level 1', 'A', '1', 1);
+INSERT INTO SEATS (seatID, seatSection, seatRow, seatNo, venueID) VALUES (DEFAULT, 'Level 1', 'A', '2', 1);
+INSERT INTO SEATS (seatID, seatSection, seatRow, seatNo, venueID) VALUES (DEFAULT, 'Level 1', 'A', '3', 1);
+INSERT INTO SEATS (seatID, seatSection, seatRow, seatNo, venueID) VALUES (DEFAULT, 'Level 1', 'A', '4', 1);
+INSERT INTO SEATS (seatID, seatSection, seatRow, seatNo, venueID) VALUES (DEFAULT, 'Level 1', 'B', '5', 1);
+INSERT INTO SEATS (seatID, seatSection, seatRow, seatNo, venueID) VALUES (DEFAULT, 'Level 1', 'B', '6', 1);
+INSERT INTO SEATS (seatID, seatSection, seatRow, seatNo, venueID) VALUES (DEFAULT, 'Level 1', 'B', '7', 1);
+INSERT INTO SEATS (seatID, seatSection, seatRow, seatNo, venueID) VALUES (DEFAULT, 'Level 1', 'B', '8', 1);
+INSERT INTO SEATS (seatID, seatSection, seatRow, seatNo, venueID) VALUES (DEFAULT, 'Level 2', 'A', '1', 1);
+INSERT INTO SEATS (seatID, seatSection, seatRow, seatNo, venueID) VALUES (DEFAULT, 'Level 2', 'A', '2', 1);
+INSERT INTO SEATS (seatID, seatSection, seatRow, seatNo, venueID) VALUES (DEFAULT, 'Level 2', 'B', '3', 1);
+INSERT INTO SEATS (seatID, seatSection, seatRow, seatNo, venueID) VALUES (DEFAULT, 'Level 2', 'B', '4', 1);
+INSERT INTO SEATS (seatID, seatSection, seatRow, seatNo, venueID) VALUES (DEFAULT, 'Private Suites', 'A', '1', 1);
+INSERT INTO SEATS (seatID, seatSection, seatRow, seatNo, venueID) VALUES (DEFAULT, 'Private Suites', 'A', '2', 1);
+
+
+INSERT INTO SEATS (seatID, seatSection, seatNo, venueID) VALUES (DEFAULT, 'Table 1', 1, 4);
+INSERT INTO SEATS (seatID, seatSection, seatNo, venueID) VALUES (DEFAULT, 'Table 1', 2, 4);
+INSERT INTO SEATS (seatID, seatSection, seatNo, venueID) VALUES (DEFAULT, 'Table 1', 3, 4);
+INSERT INTO SEATS (seatID, seatSection, seatNo, venueID) VALUES (DEFAULT, 'Table 2', 1, 4);
+INSERT INTO SEATS (seatID, seatSection, seatNo, venueID) VALUES (DEFAULT, 'Table 2', 2, 4);
+INSERT INTO SEATS (seatID, seatSection, seatNo, venueID) VALUES (DEFAULT, 'Table 2', 3, 4);
+INSERT INTO SEATS (seatID, seatSection, seatNo, venueID) VALUES (DEFAULT, 'Table 3', 1, 4);
+INSERT INTO SEATS (seatID, seatSection, seatNo, venueID) VALUES (DEFAULT, 'Table 3', 2, 4);
+INSERT INTO SEATS (seatID, seatSection, seatNo, venueID) VALUES (DEFAULT, 'Table 3', 3, 4);
+INSERT INTO SEATS (seatID, seatSection, seatNo, venueID) VALUES (DEFAULT, 'Table 4', 1, 4);
+INSERT INTO SEATS (seatID, seatSection, seatNo, venueID) VALUES (DEFAULT, 'Table 4', 2, 4);
+INSERT INTO SEATS (seatID, seatSection, seatNo, venueID) VALUES (DEFAULT, 'Table 4', 3, 4);
+INSERT INTO SEATS (seatID, seatSection, seatNo, venueID) VALUES (DEFAULT, 'Table 4', 4, 4);
+INSERT INTO SEATS (seatID, seatSection, seatNo, venueID) VALUES (DEFAULT, 'Table 4', 5, 4);

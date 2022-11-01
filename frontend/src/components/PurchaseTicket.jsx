@@ -8,6 +8,7 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import Alert from '@mui/material/Alert';
 import CardHeader from '@mui/material/CardHeader';
 import { FormControl } from '@mui/material';
 import { Navigate, useNavigate, Link, useParams } from 'react-router-dom';
@@ -16,6 +17,7 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { Grid } from '@mui/material';
 import AccorStadium from '../components/AccorStadium';
 import DoltonHouse from '../components/DoltonHouse';
+import TicketTypeCard from '../components/TicketTypeCard';
 const PurchaseTicket= ({
   eventInfo, 
   setEventInfo, 
@@ -32,8 +34,22 @@ const PurchaseTicket= ({
     boxShadow: 24,
     p: 4,
   };
-  const [ticketTypes, setTicketTypes] = useState([]);
-  const [quantity, setQuantity] = useState("");
+  const [availTicketTypes, setAvailTicketTypes] = useState([]); // this is non-sold out ticket types for the event
+  const [quantity, setQuantity] = useState([]);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [inputError, setInputError] = useState(false);
+  const [nextPage, setNextPage] = useState(false);
+  const [exceedError, setExceedError] = useState(false);
+  const [inputErrorTic, setInputErrorTic] = useState("");
+  const [ticketTypeExceeded, setTicketTypeExceeded] = useState("");
+  const [allSeats, setAllSeats] = useState([]);
+  const [hasSeats, setHasSeats] = useState(false);
+  // page 1 is ticket selection page
+  // page 2 is seat allocation page
+  // page 3 is confirmation page
+  const [currentPage, setCurrentPage] = useState(1);
+  const [seatAllocationPage, setSeatAllocationPage] = useState(false);
+  const [confirmationPage, setConfirmationPage] = useState(false);
   const dateOptions = {
     weekday: 'long', 
     year: 'numeric', 
@@ -43,21 +59,139 @@ const PurchaseTicket= ({
     minute: 'numeric', 
     hour12: true
   }
-  const getTicketTypes = async() => {
-    const response = await fetch(`http://localhost:3000//events/${eventInfo.eventId}/ticketTypes`, {
+  const handleNextPage = () => {
+    // check for input error 
+    if (currentPage === 1) {
+      // reset the error states
+      setInputError(false);
+      setExceedError(false);
+      let idx = 0;
+      for (const qty of quantity) {
+        if (isNaN(qty)) {
+          console.log("here");
+          console.log(qty)
+          setInputError(true);
+          setInputErrorTic(availTicketTypes[idx].ticketType);
+          return;
+        }
+      idx++;
+      }
+      // check for quantity exceeding the remaining ticket
+      idx = 0;
+      for (const qty of quantity) {
+        if (parseInt(qty) > parseInt(availTicketTypes[idx].remaining)) {
+          setExceedError(true);
+          setTicketTypeExceeded(availTicketTypes[idx].ticketType);
+          return;
+        }
+        idx++;
+      }
+      // when there are no errors then we allow the use to go to the 
+      // next page for seat allocations
+      if (inputError === false && exceedError === false) {
+        // go to page 2
+        if (hasSeats === true) {
+          seatAllocationPage(true);
+          setCurrentPage(2);
+        } else {
+          // go to confirmation page
+          // setCurrentPage(3)
+        }
+      } else {
+        // stay in page 1
+        seatAllocationPage(false);
+        // confirmation page is false
+        // set current page back to 1
+        setCurrentPage(1)
+      }
+    } 
+    
+  }
+  const handleQuantity = (event, index) => {
+    let newQty = event.target.value;
+    let tempQtys = [...quantity];
+    tempQtys[index] = newQty;
+    setQuantity(tempQtys);
+
+    // updating the total price
+    let newTotal = 0;
+    let idx = 0;
+    for (const qty of tempQtys) {
+      // skipping on adding if the number is not a number
+      if (!isNaN(parseInt(qty))) {
+        
+        newTotal = newTotal + parseInt(qty)*(availTicketTypes[idx].price);
+      }
+      idx++;
+    }
+    setTotalPrice(newTotal);
+    
+  }
+
+  // get available ticket types
+  const getAvailTicketTypes = async() => {
+    const response = await fetch(`http://localhost:3000/events/${eventInfo.eventID}/availableTicketGroup`, {
       method: 'GET',
       headers: {
       'Content-Type': 'application/json',
-      'auth-token': localStorage.getItem('token'),
-      },
+       },
     });
     const ticketData = (await response.json());
     if (response.ok) {
-      setTicketTypes(ticketData.tickets)
+      setAvailTicketTypes(ticketData.tickets)
     };
   }
+
+  // get seats for the event
+  const getSeats = async() => {
+    const response = await fetch(`http://localhost:3000/events/${eventInfo.eventID}/seats`, {
+      method: 'GET',
+      headers: {
+      'Content-Type': 'application/json',
+      'auth-token': localStorage.getItem('token')
+       },
+    });
+    const seatData = (await response.json());
+    if (response.ok) {
+      setAllSeats(seatData.seats);
+      if ((seatData.seats).length === 0) {
+        setHasSeats(false);
+      } else {
+        setHasSeats(true);
+        
+      }
+    };
+  }
+
+  const pageControl = () => {
+    if (currentPage === 1) {
+      return (
+        <>
+          <Box id="ticket container" sx ={{mt:'1.5vw'}}>
+            {availTicketTypes.map((ticket,index) => {
+              return <TicketTypeCard  
+              eventInfo = {eventInfo}
+              setEventInfo = {setEventInfo} 
+              quantity = {quantity}
+              setQuantity = {setQuantity}
+              handleQuantity = {handleQuantity}
+              index = {index}
+              ticket = {ticket}
+              key={index}/>
+            })}
+          </Box>
+          <Box id="total price section" sx={{mt: 4}}>
+            <Typography aria-label="total price" variant="h5" width="100%">
+              Total ticket price: ${totalPrice}
+            </Typography>
+          </Box>
+        </>
+      )
+    } 
+  }
   useEffect(() => {
-    getTicketTypes();
+    getAvailTicketTypes();
+    getSeats();
   },[])
 
   console.log("here in modal")
@@ -78,36 +212,51 @@ const PurchaseTicket= ({
         <Typography aria-label="event dates" id="modal-modal-description">
           {`Date: ${(new Date(eventInfo.startDateTime)).toLocaleString('en-AU',dateOptions)} to ${(new Date(eventInfo.endDateTime)).toLocaleString('en-AU',dateOptions)}`}
         </Typography>
-        <Box id="ticket container" sx ={{mt:'1.5vw'}}>
-          <Card sx={{p:2}}>
-            <Typography aria-label="ticket type" variant="h4" width="100%">General Admission</Typography>
-            <FormControl >
-              <Typography aria-label="ticket price" variant="h5" sx={{mt: 2}}>Price: $100</Typography>
-              <Typography aria-label="quantity label" sx={{mt: 2}}>
-                Quantity:
+        {currentPage === 1 ? (
+          <>
+            <Box id="ticket container" sx ={{mt:'1.5vw'}}>
+              {availTicketTypes.map((ticket,index) => {
+                return <TicketTypeCard  
+                eventInfo = {eventInfo}
+                setEventInfo = {setEventInfo} 
+                quantity = {quantity}
+                setQuantity = {setQuantity}
+                handleQuantity = {handleQuantity}
+                index = {index}
+                ticket = {ticket}
+                key={index}/>
+              })}
+            </Box>
+            <Box id="total price section" sx={{mt: 4}}>
+              <Typography aria-label="total price" variant="h5" width="100%">
+                Total ticket price: ${totalPrice}
               </Typography>
-              <TextField
-                id="quantity"
-                label="quantity"
-                type="text"
-                variant="outlined"
-                aria-label="quantity textbox"
-                onChange={e=>setQuantity(e.target.value)}
-                fullWidth
-              />  
-            </FormControl>
-          </Card>
+            </Box>
+          </>
+        ) : null}
+        
+
+        
+        <Box id="navigation buttons">
+          <Button 
+            variant="contained"
+            onClick={() => setTicketModal(false) }>
+              Close
+          </Button>
+          <Button 
+            variant="contained"
+            onClick = {event => handleNextPage()}
+          >
+            Next
+          </Button>
         </Box>
-        <Box id="total section" sx={{mt: 4}}>
-          <Typography aria-label="total price" variant="h5" width="100%">
-            Total ticket price: $500
-          </Typography>
-        </Box>
-        {/* check the seat allocation boolean */}
-        <Box id= "seat allocations">
-          {/* <AccorStadium/> */}
-          {/* <DoltonHouse /> */}
-        </Box>
+        {inputError === true 
+          ? (<Alert severity="error">Error, make sure quanity for {inputErrorTic} are numbers before going to next page</Alert>) 
+          : null}
+        {exceedError === true 
+          ? (<Alert severity="error">Error, quantity exceeded for {ticketTypeExceeded} is below the remaining ticket</Alert>) 
+          : null}
+    
         
       </Box>
     </Modal>

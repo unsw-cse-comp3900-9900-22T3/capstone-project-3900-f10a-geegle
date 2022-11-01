@@ -58,35 +58,39 @@ const ViewEvent= () => {
   const [hostName, setHostName] = useState('');
   const [imageArray, setImageArray] = useState([]);
   const [ticketModal, setTicketModal] = useState(false); //opening and closing the purchasing ticket modal 
-
-
-  const getHostInfo = async(eventDetails) => {
-    const requestOptions = {
+  const [allTicketTypes, setAllTicketTypes] = useState([]);
+  const dateOptions = {
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric',
+    hour: 'numeric', 
+    minute: 'numeric', 
+    hour12: true
+  }
+  const getTicketInfo = async() => {
+    const response = await fetch(`http://localhost:3000/events/${eventId}/ticketTypes`, {
       method: 'GET',
       headers: {
+        'Content-Type': 'application/json',
         'auth-token': localStorage.getItem('token'),
       },
+    })
+    const json = await response.json();
+    const tickets = []
+    console.log(json);
+    for (const ticket of json.tickets) {
+      tickets.push(ticket);
     }
-    const response = await fetch(`http://localhost:3000/user/profile/${eventDetails.hostID}`, requestOptions
-    )
-    if (response.ok) {
-      const json = (await response.json()).user;
-      console.log(json);
-      const firstName = json.firstName;
-      const lastName = json.lastname;
-      setHostName(`${firstName} ${lastName}`);
-    } else {
-      alert(`error: ${response.status}`)
-    }
+    setAllTicketTypes(tickets);
   }
-    
-  
   const getEventInfo = async() => {
     const response = await fetch(`http://localhost:3000/events/${eventId}/info`, {
       method: 'GET'
     })
     const eventJson = (await response.json()).event;
     const eventDetails = {
+      venueCapacity: eventJson.venueCapacity,
       capacity: eventJson.capacity,
       endDateTime: eventJson.endDateTime,
       eventDescription: eventJson.eventDescription,
@@ -96,6 +100,7 @@ const ViewEvent= () => {
       eventType: eventJson.eventType,
       eventVenue: eventJson.eventVenue,
       hostID: eventJson.hostID,
+      hostName: eventJson.hostName,
       image1: eventJson.image1,
       image2: eventJson.image2,
       image3: eventJson.image3,
@@ -117,7 +122,7 @@ const ViewEvent= () => {
   }
   useEffect(()=> {
     getEventInfo();
-    
+    getTicketInfo();
     
   },[]);
 
@@ -155,9 +160,8 @@ const ViewEvent= () => {
             
             {
               imageArray.map((image,index) => {
-                console.log("image",image);
               return (
-                <div style={styles.ImageContainer}>
+                <div key={index} style={styles.ImageContainer}>
                   <img src= {image} key={index} alt="pic of event" style= {{width:"70%"}}/>
                 </div>
                 
@@ -174,7 +178,7 @@ const ViewEvent= () => {
                 {eventInfo.eventName}
               </Typography>
               <Typography component = "div" variant="h5" color="text.secondary">
-                Host : Host Name
+                Host : {eventInfo.hostName}
               </Typography>
             </Box>
             <Box id="button container" style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
@@ -187,9 +191,7 @@ const ViewEvent= () => {
               </Button>
               {ticketModal === true ? (<PurchaseTicket eventInfo = {eventInfo} setEventInfo={setEventInfo} ticketModal={ticketModal} setTicketModal ={setTicketModal}/>):null}
             </Box>
-            
-            
-          </Box>
+            </Box>
           <Box id="details section" sx={{marginTop: "2%"}}>
             <Typography  variant="h6" color="text.secondary" sx={{fontWeight: "bold", lineHeight: "1.2"}}>
               Event Type: {eventInfo.eventType}
@@ -201,10 +203,10 @@ const ViewEvent= () => {
               Location: {eventInfo.eventLocation}
             </Typography>
             <Typography  variant="h6" color="text.secondary" sx={{fontWeight: "bold", lineHeight: "1.2"}}>
-              Start Date and Time: {eventInfo.startDateTime}
+              Start Date and Time: {(new Date(eventInfo.startDateTime)).toLocaleString("en-AU",dateOptions)}
             </Typography>
             <Typography  variant="h6" color="text.secondary" sx={{fontWeight: "bold", lineHeight: "1.2"}}>
-              End Date and Time: {eventInfo.endDateTime}
+              End Date and Time: {(new Date(eventInfo.endDateTime)).toLocaleString("en-AU",dateOptions)}
             </Typography>
           </Box>
           <Box id="description section" sx={{marginTop: "4%"}}>
@@ -215,9 +217,19 @@ const ViewEvent= () => {
               {eventInfo.eventDescription}
             </Typography>
           </Box>
-          
+          <div>
+            <Typography variant="h5"color="text.secondary" sx={{fontWeight: "bold", lineHeight: "1.2"}}>
+            Ticket types and price
+            </Typography>
+            {allTicketTypes.map((obj,idx)=> {
+              return (
+              <Typography variant="body1" color="text.secondary" sx={{fontSize: "1.12rem"}}>
+                {"Type: "+obj.ticketType +" | Price:$"+obj.price}
+              </Typography>
+              )
+            })}
+          </div>
         </Box>
-          
       </Box>
     </>
     
