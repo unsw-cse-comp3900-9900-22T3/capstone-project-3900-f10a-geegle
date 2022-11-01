@@ -43,11 +43,15 @@ const ViewEvent= () => {
     endDateTime: '',
     eventDescription: '',
     eventID: '',
+    hostEmail: '',
+    eventVenueId: '',
     eventLocation: '',
     eventName: '',
     eventType: '',
     eventVenue: '',
     hostID: '',
+    hostName: '',
+    seatAvailable: '',
     image1: '',
     image2: '',
     image3: '',
@@ -99,6 +103,9 @@ const ViewEvent= () => {
       eventName: eventJson.eventName,
       eventType: eventJson.eventType,
       eventVenue: eventJson.eventVenue,
+      eventVenueId: eventJson.eventVenueId,
+      hostEmail: eventJson.hostEmail,
+      seatAvailable: eventJson.seatAvailable,
       hostID: eventJson.hostID,
       hostName: eventJson.hostName,
       image1: eventJson.image1,
@@ -223,7 +230,7 @@ const ViewEvent= () => {
             </Typography>
             {allTicketTypes.map((obj,idx)=> {
               return (
-              <Typography variant="body1" color="text.secondary" sx={{fontSize: "1.12rem"}}>
+              <Typography key={idx} variant="body1" color="text.secondary" sx={{fontSize: "1.12rem"}}>
                 {"Type: "+obj.ticketType +" | Price:$"+obj.price}
               </Typography>
               )

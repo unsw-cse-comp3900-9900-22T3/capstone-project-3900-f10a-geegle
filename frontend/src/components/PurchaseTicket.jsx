@@ -18,6 +18,7 @@ import { Grid } from '@mui/material';
 import AccorStadium from '../components/AccorStadium';
 import DoltonHouse from '../components/DoltonHouse';
 import TicketTypeCard from '../components/TicketTypeCard';
+import SeatAllocation from '../components/SeatAllocation';
 const PurchaseTicket= ({
   eventInfo, 
   setEventInfo, 
@@ -91,7 +92,7 @@ const PurchaseTicket= ({
       if (inputError === false && exceedError === false) {
         // go to page 2
         if (hasSeats === true) {
-          seatAllocationPage(true);
+          //setSeatAllocationPage(true);
           setCurrentPage(2);
         } else {
           // go to confirmation page
@@ -99,7 +100,7 @@ const PurchaseTicket= ({
         }
       } else {
         // stay in page 1
-        seatAllocationPage(false);
+        //setSeatAllocationPage(false);
         // confirmation page is false
         // set current page back to 1
         setCurrentPage(1)
@@ -187,7 +188,13 @@ const PurchaseTicket= ({
           </Box>
         </>
       )
-    } 
+    } else if (currentPage === 2) {
+      return (<SeatAllocation 
+        eventInfo = {eventInfo}
+        allSeats = {allSeats}
+        availTicketTypes = {availTicketTypes}
+        quantity = {quantity}/>)
+    }
   }
   useEffect(() => {
     getAvailTicketTypes();
@@ -212,7 +219,7 @@ const PurchaseTicket= ({
         <Typography aria-label="event dates" id="modal-modal-description">
           {`Date: ${(new Date(eventInfo.startDateTime)).toLocaleString('en-AU',dateOptions)} to ${(new Date(eventInfo.endDateTime)).toLocaleString('en-AU',dateOptions)}`}
         </Typography>
-        {currentPage === 1 ? (
+        {/* {currentPage === 1 ? (
           <>
             <Box id="ticket container" sx ={{mt:'1.5vw'}}>
               {availTicketTypes.map((ticket,index) => {
@@ -234,8 +241,13 @@ const PurchaseTicket= ({
             </Box>
           </>
         ) : null}
-        
-
+        {currentPage === 2 ? (<SeatAllocation 
+          eventInfo = {eventInfo}
+          allSeats = {allSeats}
+          availTicketTypes = {availTicketTypes}
+          quanitity = {quantity}/>) : null}
+         */}
+        {pageControl()}
         
         <Box id="navigation buttons">
           <Button 
