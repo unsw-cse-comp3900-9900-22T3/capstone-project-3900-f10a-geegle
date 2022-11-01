@@ -70,6 +70,13 @@ const isSeatInSeatSectionAllocatedToTicketTypeDb = async(eventID, seatID, ticket
     return result.rows
 }
 
+// READ
+const isVenueSeatingAvailableDb = async(venueID) => {
+    const result = await db.query(
+        "SELECT count(*) from seats where venueID = $1", [venueID])
+    return result.rows[0]
+}
+
 export {
     getVenueSeatsByEventIdDb,
     getVenueAvailableSeatsByEventIdDb,
@@ -77,5 +84,6 @@ export {
     getVenueSeatInfoByEventIdDb,
     getSeatOccupantDb,
     getVenueSeatSectionsByVenueNameDb,
-    isSeatInSeatSectionAllocatedToTicketTypeDb
+    isSeatInSeatSectionAllocatedToTicketTypeDb,
+    isVenueSeatingAvailableDb
 }

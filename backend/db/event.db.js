@@ -81,13 +81,6 @@ const getEventGuestListByIdDb = async(eventID) => {
     return result.rows
 }
 
-// READ - Move this to venue db later when merge
-export const isVenueSeatingAvailableDb = async(venueID) => {
-    const result = await db.query(
-        "SELECT count(*) from seats where venueID = $1", [venueID])
-    return result.rows[0]
-}
-
 // CREATE
 const addEventDb = async(eventName, hostID, startDateTime, endDateTime, eventDescription, eventType,
                          eventVenue, capacity, totalTicketAmount, image1, image2, image3) => {
