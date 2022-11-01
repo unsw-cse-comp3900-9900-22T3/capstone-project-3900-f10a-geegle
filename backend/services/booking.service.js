@@ -137,6 +137,31 @@ export const getEventAvailableSeatsService = async(req, res) => {
     }
 }
 
+export const getEventPurchasedSeatsService = async(req, res) => {
+    try {
+        const eventID = req.params.eventID;
+        const seats = await venueSeatingdb.getVenuePurchasedSeatsByEventIdDb(eventID)
+        
+        for (let seat of seats) {
+            seat['seatID'] = seat['seatid']
+            delete seat['seatID']
+            seat['seatSection'] = seat['seatsection']
+            delete seat['seatsection']
+            seat['seatRow'] = seat['seatrow']
+            delete seat['seatrow']
+            seat['seatNo'] = seat['seatno']
+            delete seat['seatno']
+        }
+
+        return {seats: seats,
+                statusCode: 200,
+                msg: `Purchased seats for Event ${eventID}`}
+
+    } catch (error) {
+        throw error
+    }
+}
+
 export const getEventAvailableSeatsByTicketTypeService = async(req, res) => {
     try {
         const { eventID, ticketType } = req.params;
@@ -170,6 +195,29 @@ export const getEventVenueSeatSectionsService = async(req, res) => {
         return {seatSections: seats.map(seat => seat.seatsection),
                 statusCode: 200,
                 msg: `Seat sections at venue ${venueName}`}
+
+    } catch (error) {
+        throw error
+    }
+}
+
+export const getEventSeatSectionTicketAllocationService = async(req, res) => {
+    try {
+        const eventID = req.params.eventID;
+        const seatSectionsDb = await eventdb.getEventSeatSectionTicketAllocationDb(eventID)
+        
+        const seatSection = {}
+        for (let ss of seatSectionsDb) {
+            if (ss.seatsection in seatSection) {
+                seatSection[ss.seatsection].push(ss.tickettype)
+            } else {
+                seatSection[ss.seatsection] = [ss.tickettype]
+            } 
+        }
+
+        return {seatSections: seatSection,
+                statusCode: 200,
+                msg: `Ticket types allocated to seat sections at Event ${eventID}`}
 
     } catch (error) {
         throw error

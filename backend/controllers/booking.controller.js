@@ -60,6 +60,16 @@ export const getEventAvailableSeatsController = async(req, res) => {
     }
 }
 
+export const getEventPurchasedSeatsController = async(req, res) => {
+    try {
+        const {seats, statusCode, msg} = await bookingService.getEventPurchasedSeatsService(req, res);
+        res.status(statusCode).json({seats, msg})
+
+    } catch (error) {
+        res.status(500).send(error.message)
+    }
+}
+
 export const getEventAvailableSeatsByTicketType = async(req, res) => {
     try {
         const {seats, statusCode, msg} = await bookingService.getEventAvailableSeatsByTicketTypeService(req, res);
@@ -73,6 +83,16 @@ export const getEventAvailableSeatsByTicketType = async(req, res) => {
 export const getEventVenueSeatSectionsController = async(req, res) => {
     try {
         const {seatSections, statusCode, msg} = await bookingService.getEventVenueSeatSectionsService(req, res);
+        res.status(statusCode).json({seatSections, msg})
+
+    } catch (error) {
+        res.status(500).send(error.message)
+    }
+}
+
+export const getEventSeatSectionTicketAllocationController = async(req, res) => {
+    try {
+        const {seatSections, statusCode, msg} = await bookingService.getEventSeatSectionTicketAllocationService(req, res);
         res.status(statusCode).json({seatSections, msg})
 
     } catch (error) {

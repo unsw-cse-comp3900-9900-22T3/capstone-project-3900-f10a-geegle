@@ -1,5 +1,5 @@
-import { createEventsService, publishEventsService, unpublishEventsService, deleteEventsService, getEventService,
-         getUpcomingEventsService, getAllEventsService, getHostEventsService, getHostDetailsService, 
+import { createEventsService, publishEventsService, unpublishEventsService, editEventsService, deleteEventsService, 
+         getEventService, getUpcomingEventsService, getAllEventsService, getHostEventsService, getHostDetailsService, 
          getEventsUserAttendingService, getEventGuestListService } 
          from "../services/event.service.js";
 
@@ -50,15 +50,25 @@ export const unpublishEventsController = async(req, res) => {
     }
 }
 
-export const deleteEventsController = async(req, res) => {
+export const editEventsController = async(req, res) => {
     try {
-        const {statusCode, msg} = await deleteEventsService(req, res);
-        
+        const {events, statusCode, msg} = await editEventsService(req, res);
+
         if (!events) {
             res.status(statusCode).json(msg)
         } else {
             res.status(statusCode).json({events, msg})
         }
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
+
+export const deleteEventsController = async(req, res) => {
+    try {
+        const {statusCode, msg} = await deleteEventsService(req, res);  
+        res.status(statusCode).json(msg)
+
     } catch (e) {
         res.status(500).send(e.message)
     }

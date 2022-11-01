@@ -1,6 +1,6 @@
 import {addEventDb, getAllEventsNotSoldOutDb, getAllEventsDb, getEventByIdDb, getEventByIdDisplayDb,
         getEventsByHostIdDb, getEventVenueByNameDb, getEventVenueByIdDb, getEventGuestListByIdDb, getHostofEventDb, 
-        addEventVenueDb, publishEventByIdDb, addEventTicketTypeSeatingAllocation,
+        isSeatedEventDb, addEventVenueDb, publishEventByIdDb, addEventTicketTypeSeatingAllocation,
         unpublishEventByIdDb, removeEventByIdDb, getEventsUserAttendingDb} from '../db/event.db.js' 
 import { getEventReviewsByEventIdDb } from '../db/review.db.js'
 import {addTicketDb} from '../db/ticket.db.js'
@@ -156,6 +156,31 @@ export const unpublishEventsService = async(req, res) => {
     }
 }
 
+export const editEventsService = async(req, res) => {
+    try {
+        const eventID = req.params.eventID;
+        const event = await getEventByIdDb(eventID);
+        if (event.length != 1) {
+            return {events: null, statusCode : 404, msg: 'Event does not exist'}
+        }
+        if (req.userID != event[0].hostid) {
+            return {events: null, statusCode : 403, msg: 'You are not the owner of this event'}
+        }
+        
+        const unpublishedEvent = await unpublishEventByIdDb(eventID);
+
+        return {events: {
+                    eventID: unpublishedEvent.eventid,
+                    published: unpublishedEvent.published
+                },
+                statusCode : 200, 
+                msg: 'Event Unpublished'}
+
+    } catch(e) {
+        throw e
+    }
+}
+
 export const deleteEventsService = async(req, res) => {
     try {
         const eventID = req.params.eventID;
@@ -182,8 +207,8 @@ export const getEventService = async(req, res) => {
             return {events: null, statusCode: 404, msg: 'Event Id Not Found'}
         } 
 
-        const seating = await isVenueSeatingAvailableDb(event[0].venueid)
-        console.log(seating.count)
+        const seating = await isSeatedEventDb(req.params.eventID)
+        
         return {event: {
                     eventID: event[0].eventid,
                     eventName: event[0].eventname,
@@ -198,7 +223,7 @@ export const getEventService = async(req, res) => {
                     eventVenue: event[0].venuename,
                     eventLocation: event[0].venuelocation,
                     venueCapacity: event[0].maxcapacity,
-                    seatingAvailable: parseInt(seating.count) ? true : false,
+                    seatedEvent: seating.length > 0 ? true : false,
                     capacity: event[0].capacity,
                     totalTicketAmount: event[0].totalticketamount,
                     image1: event[0].image1,
