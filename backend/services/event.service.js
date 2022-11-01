@@ -1,10 +1,11 @@
 import {addEventDb, getAllEventsNotSoldOutDb, getAllEventsDb, getEventByIdDb, getEventByIdDisplayDb,
         getEventsByHostIdDb, getEventVenueByNameDb, getEventVenueByIdDb, getEventGuestListByIdDb, getHostofEventDb, 
-        addEventVenueDb, publishEventByIdDb, isVenueSeatingAvailableDb, addEventTicketTypeSeatingAllocation,
+        addEventVenueDb, publishEventByIdDb, addEventTicketTypeSeatingAllocation,
         unpublishEventByIdDb, removeEventByIdDb, getEventsUserAttendingDb} from '../db/event.db.js' 
 import { getEventReviewsByEventIdDb } from '../db/review.db.js'
 import {addTicketDb} from '../db/ticket.db.js'
 import { getUserByIdDb } from '../db/user.db.js'
+import { isVenueSeatingAvailableDb } from '../db/venueSeating.db.js'
 
 
 /*  Request
@@ -181,6 +182,8 @@ export const getEventService = async(req, res) => {
             return {events: null, statusCode: 404, msg: 'Event Id Not Found'}
         } 
 
+        const seating = await isVenueSeatingAvailableDb(event[0].venueid)
+        console.log(seating.count)
         return {event: {
                     eventID: event[0].eventid,
                     eventName: event[0].eventname,
@@ -191,9 +194,11 @@ export const getEventService = async(req, res) => {
                     endDateTime: event[0].enddatetime,
                     eventDescription: event[0].eventdescription,
                     eventType: event[0].eventtype,
+                    eventVenueId: event[0].venueid,
                     eventVenue: event[0].venuename,
                     eventLocation: event[0].venuelocation,
                     venueCapacity: event[0].maxcapacity,
+                    seatingAvailable: parseInt(seating.count) ? true : false,
                     capacity: event[0].capacity,
                     totalTicketAmount: event[0].totalticketamount,
                     image1: event[0].image1,
