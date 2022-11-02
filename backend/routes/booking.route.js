@@ -11,8 +11,10 @@ bookingRouter.get('/:eventID/availableTickets', verifyToken, bookingController.g
 bookingRouter.get('/:eventID/availableTicketGroup', bookingController.getEventAvailableTicketGroupController);
 bookingRouter.get('/:eventID/seats', verifyToken, bookingController.getEventSeatsController);
 bookingRouter.get('/:eventID/availableSeats', verifyToken, bookingController.getEventAvailableSeatsController);
+bookingRouter.get('/:eventID/purchasedSeats', verifyToken, bookingController.getEventPurchasedSeatsController);
 bookingRouter.get('/:eventID/availableSeatsByTicketType/:ticketType', verifyToken, bookingController.getEventAvailableSeatsByTicketType);
 bookingRouter.get('/venues/:venueName/seatSections', verifyToken, bookingController.getEventVenueSeatSectionsController);
+bookingRouter.get('/:eventID/seatSectionsTicketAllocation', verifyToken, bookingController.getEventSeatSectionTicketAllocationController);
 
 //bookingRouter.get('/:eventID/seatInfo/:seatID', verifyToken, bookingController.getEventSeatInfoController);
 // get seat info: seat name, ticket type for the seat, reserved or available, 

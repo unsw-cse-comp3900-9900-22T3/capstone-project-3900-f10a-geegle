@@ -15,7 +15,18 @@ const getVenueAvailableSeatsByEventIdDb = async(eventID) => {
         "SELECT s.seatid, s.seatsection, s.seatrow, s.seatno FROM events e JOIN venues v ON e.eventVenue = v.venueID " +
         "JOIN seats s ON v.venueID = s.venueID WHERE e.eventID = $1" +
         "AND NOT EXISTS (SELECT FROM ticketPurchases tp JOIN tickets t ON tp.ticketID = t.ticketID " +
-        "WHERE t.seatID = s.seatID AND t.eventID = $2)", [eventID, eventID])
+        "WHERE t.seatID = s.seatID AND t.eventID = $2) " +
+        "AND s.seatsection IN (SELECT seatsection from eventTicketToSeatingAllocation WHERE eventID = $3)"
+        , [eventID, eventID, eventID])
+
+    return result.rows
+}
+
+// READ
+const getVenuePurchasedSeatsByEventIdDb = async(eventID) => {
+    const result = await db.query (
+        "SELECT s.seatid, s.seatsection, s.seatrow, s.seatno FROM ticketPurchases tp JOIN tickets t ON tp.ticketID = t.ticketID " +
+        "JOIN seats s ON t.seatID = s.seatID WHERE t.eventID = $1", [eventID])
 
     return result.rows
 }
@@ -80,6 +91,7 @@ const isVenueSeatingAvailableDb = async(venueID) => {
 export {
     getVenueSeatsByEventIdDb,
     getVenueAvailableSeatsByEventIdDb,
+    getVenuePurchasedSeatsByEventIdDb,
     getVenueAvailableSeatsByEventIdAndTicketTypeDb,
     getVenueSeatInfoByEventIdDb,
     getSeatOccupantDb,

@@ -81,6 +81,22 @@ const getEventGuestListByIdDb = async(eventID) => {
     return result.rows
 }
 
+//READ
+const getEventSeatSectionTicketAllocationDb = async(eventID) => {
+    const result = await db.query(
+        "SELECT ticketType, seatSection from eventTicketToSeatingAllocation where eventid = $1", [eventID]
+    )
+    return result.rows
+}
+
+//READ
+const isSeatedEventDb = async(eventID) => {
+    const result = await db.query(
+        "SELECT * from eventTicketToSeatingAllocation where eventid = $1", [eventID]
+    )
+    return result.rows
+}
+
 // CREATE
 const addEventDb = async(eventName, hostID, startDateTime, endDateTime, eventDescription, eventType,
                          eventVenue, capacity, totalTicketAmount, image1, image2, image3) => {
@@ -146,6 +162,8 @@ export {
     getEventVenueByIdDb,
     getEventGuestListByIdDb,
     getHostofEventDb,
+    getEventSeatSectionTicketAllocationDb,
+    isSeatedEventDb,
     addEventDb,
     addEventVenueDb,
     addEventTicketTypeSeatingAllocation,

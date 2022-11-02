@@ -55,7 +55,7 @@ CREATE TABLE eventMessages (
     msgTime timestamptz NOT NULL,
     primary key (eventID, messageID),
     foreign key (eventID)
-        references events (eventID)
+        references events (eventID) ON DELETE CASCADE
 );
 
 -- CREATE TABLE ticketType (
@@ -116,7 +116,7 @@ CREATE TABLE reviews (
     review text,
     postedOn timestamptz NOT NULL,
     foreign key (eventID)
-        references events (eventID),
+        references events (eventID) ON DELETE CASCADE,
     foreign key (userID)
         references users (userID)
 );
@@ -129,7 +129,7 @@ CREATE TABLE reviewReplies (
     repliedOn timestamptz NOT NULL,
     primary key (reviewID, replyID),
     foreign key (reviewID)
-        references reviews (reviewID),
+        references reviews (reviewID) ON DELETE CASCADE,
     foreign key (userID)
         references users (userID)
 );
@@ -139,13 +139,13 @@ CREATE TABLE reviewLikes (
     userID integer,
     primary key (reviewID, userID),
     foreign key (reviewID)
-        references reviews (reviewID),
+        references reviews (reviewID) ON DELETE CASCADE,
     foreign key (userID)
         references users(userID)
 );
 
 CREATE TABLE eventTicketToSeatingAllocation (
-    eventID SERIAL,
+    eventID SERIAL ON DELETE CASCADE,
     ticketType text,
     seatSection text,
     primary key (eventID, ticketType, seatSection),
