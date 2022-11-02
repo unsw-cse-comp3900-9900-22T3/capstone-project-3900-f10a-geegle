@@ -7,6 +7,14 @@ const getTicketPurchaseByTicketIdDb = async(ticketId) => {
     return result.rows[0]
 }
 
+// READ
+const getTicketPurchaseByUserIdDb = async(eventID, userID) => {
+    const result = await db.query (
+        "SELECT * FROM ticketPurchases tp JOIN tickets t on tp.ticketid = t.ticketid WHERE t.eventID = $1 AND tp.userID = $2", 
+        [eventID, userID])
+    return result.rows
+}
+
 // CREATE
 const addTicketPurchaseDb = async(userId, ticketId, ticketPurchaseTime) => {
     const result = await db.query (
@@ -27,6 +35,7 @@ const removeTicketPurchaseByTicketIdDb = async(ticketId) => {
 
 export {
     getTicketPurchaseByTicketIdDb,
+    getTicketPurchaseByUserIdDb,
     addTicketPurchaseDb,
     removeTicketPurchaseByTicketIdDb
 }

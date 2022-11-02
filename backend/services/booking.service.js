@@ -1,6 +1,7 @@
 import * as ticketdb from '../db/ticket.db.js'
 import * as venueSeatingdb from '../db/venueSeating.db.js'
 import * as eventdb from '../db/event.db.js'
+import * as ticketPurchasedb from '../db/ticketpurchase.db.js'
 
 export const getEventTicketTypesService = async(req, res) => {
     try {
@@ -337,6 +338,44 @@ export const bookEventService = async(req, res) => {
         // Send email confirmation
 
         return { booking: ticketPurchases, statusCode: 200, msg: `Tickets purchased to Event ${eventID}`}
+
+    } catch (error) {
+        throw error
+    }
+}
+
+export const getEventTicketsUserPurchasedService = async(req, res) => {
+    try {
+        const userID = req.userID
+        const eventID = req.params.eventID
+        const tickets = await ticketPurchasedb.getTicketPurchaseByUserIdDb(eventID, userID) 
+        
+        for (const ticket of tickets) {
+            ticket['ticketID'] = ticket['ticketid']
+            delete ticket['ticketid']
+            ticket['ticketType '] = ticket['tickettype ']
+            delete ticket['tickettype']
+            ticket['eventID'] = ticket['eventid']
+            delete ticket['eventid']
+            ticket['seatID'] = ticket['seatid']
+            delete ticket['seatid']
+            ticket['userID'] = ticket['userid']
+            delete ticket['userid']
+            ticket['ticketPurchaseTime'] = ticket['ticketpurchasetime']
+            delete ticket['ticketpurchasetime']
+        }
+
+        return { tickets: tickets, statusCode: 200, msg: `User ${userID} tickets to Event ${eventID}`}
+    } catch (error) {
+        throw error
+    }
+}
+
+export const cancelEventUserBookingService = async(req, res) => {
+    try {
+        await venueSeatingdb.unassignSeatFromTicketDb(req.params.ticketID)
+        await ticketPurchasedb.removeTicketPurchaseByTicketIdDb(req.params.ticketID)
+        return {statusCode: 200, msg: `Ticket ${req.params.ticketID} has been cancelled`}
 
     } catch (error) {
         throw error
