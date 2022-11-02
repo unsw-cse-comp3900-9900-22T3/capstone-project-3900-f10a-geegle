@@ -30,5 +30,7 @@ bookingRouter.get('/:eventID/seatSectionsTicketAllocation', verifyToken, booking
     
 */
 bookingRouter.post('/:eventID/purchase', verifyToken, bookingController.bookEventController)
+bookingRouter.get('/:eventID/ticketsPurchased', verifyToken, bookingController.getEventTicketsUserPurchasedController)
+bookingRouter.delete('/cancelBooking/:ticketID', verifyToken, bookingController.cancelEventUserBookingController)
 
 export default bookingRouter;

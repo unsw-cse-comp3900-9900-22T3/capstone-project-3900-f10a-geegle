@@ -1,6 +1,6 @@
 import { createEventsService, publishEventsService, unpublishEventsService, editEventsService, deleteEventsService, 
          getEventService, getUpcomingEventsService, getAllEventsService, getHostEventsService, getHostDetailsService, 
-         getEventsUserAttendingService, getEventGuestListService } 
+         getEventsUserAttendingService, getEventGuestListService, isEventSoldOutService, getSoldOutEventsService } 
          from "../services/event.service.js";
 
 import { getEventReviewsService, createEventReviewService, editEventReviewService, 
@@ -282,6 +282,25 @@ export const getEventGuestListController = async(req, res) => {
     }
 }
 
+export const isEventSoldOutController = async(req, res) => {
+    try {
+        const {soldOut, statusCode, msg} = await isEventSoldOutService(req, res);     
+        res.status(statusCode).json({soldOut, msg})
+        
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
+
+export const getSoldOutEventsController = async(req, res) => {
+    try {
+        const {events, statusCode, msg} = await getSoldOutEventsService(req, res);     
+        res.status(statusCode).json({events, msg})
+        
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
 
 
 // const getUpcomingEventsController = (req, res) => {
