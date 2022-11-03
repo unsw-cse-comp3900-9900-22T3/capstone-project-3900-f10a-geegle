@@ -30,6 +30,7 @@ const PublicLanding = () => {
   const [averageRatingHook, setAverageRating] =React.useState(0);
   const [ratingRatioHook, setRatingRatio] = React.useState(0);
   const [toggleState, setToggleState] = React.useState('All Events');
+  const [allEventReviews, setAllEventReviews] = React.useState(['']);
 
   const handleChange = (event, newAlignment) => {
     setToggleState(newAlignment);
@@ -47,6 +48,7 @@ const PublicLanding = () => {
     let totalRating = 0
     let ratingRatio = 0
     let averageRating = 0
+    let allInfo = [allReviews, averageRating, ratingRatio];
     console.log(json);
     if (json.reviews.length !== 0) {
       for (const rev of json.reviews) {
@@ -55,11 +57,21 @@ const PublicLanding = () => {
       }
       averageRating = (totalRating)/(json.reviews.length)
       ratingRatio = (totalRating)/(json.reviews.length * 5)
-      setRatingRatio(ratingRatio)
-      setAverageRating(averageRating)
-      setReviews(allReviews)
+      // setRatingRatio(ratingRatio)
+      // setAverageRating(averageRating)
+      // setReviews(allReviews)
+
+    } else {
+      // setRatingRatio(0)
+      // setAverageRating(0)
+      // setReviews([])
     }
+    //return allInfo
+    setAllEventReviews([...allEventReviews, ''])
+    allInfo = [allReviews, averageRating, ratingRatio];
+    return allInfo;
   }
+
 
   const fetchAllEvents = async () => {
     
@@ -70,7 +82,7 @@ const PublicLanding = () => {
       console.log(json);
       const events = []
       for (const eve of json.events) {
-        await getReviews(eve.eventID)
+        const allInfoArray = await getReviews(eve.eventID)
         events.push({
           eachEvent: {
             capacity: eve.capacity,
@@ -88,13 +100,15 @@ const PublicLanding = () => {
             published: eve.published,
             startDateTime: eve.startDateTime,
             totalTicketAmount:eve.totalTicketAmount,
-            reviews: reviews,
-            averageRating: averageRatingHook,
-            ratingRatio: ratingRatioHook
+            reviews:allInfoArray[0],
+            averageRating: allInfoArray[1],
+            ratingRatio: allInfoArray[2]
           }
         })
       }
+      console.log(allListings);
       setAllListings(events)
+      return events;
       //console.log(allListings)
       // setMyListings(json);
   }
@@ -107,7 +121,7 @@ const PublicLanding = () => {
     const json = await response.json();
       const events = []
       for (const eve of json.events) {
-        await getReviews(eve.eventID)
+        const allInfoArray = await getReviews(eve.eventID)
         events.push({
           eachEvent: {
             capacity: eve.capacity,
@@ -125,8 +139,9 @@ const PublicLanding = () => {
             published: eve.published,
             startDateTime: eve.startDateTime,
             totalTicketAmount:eve.totalTicketAmount,
-            averageRating: averageRatingHook,
-            ratingRatio: ratingRatioHook
+            reviews:allInfoArray[0],
+            averageRating: allInfoArray[1],
+            ratingRatio: allInfoArray[2]
           }
         })
       }

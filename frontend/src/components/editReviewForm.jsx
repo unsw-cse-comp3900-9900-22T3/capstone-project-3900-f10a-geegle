@@ -17,21 +17,17 @@ const style = {
   p: 4,
 };
 
-export default function LeaveReviewForm({openReviewForm, setOpenReviewForm, obj}) {
+export default function EditReviewForm({editForm, setEditForm, obj, myReview}) {
   const [submitted, setSubmitted] = React.useState(false);
   const [review, setReview] = React.useState('');
   const [rating, setRating] = React.useState('');
-  const [ratingError, setRatingError] = React.useState(false);
   // const handleOpen = () => setOpen(true);
-  const handleClose = () => {
-    setOpenReviewForm(false);
-    setSubmitted(false);
-  } 
+  const handleClose = () => setEditForm(false);
 
   const handleSubmit = async() => {
     console.log('submitted')
-    const response = await fetch(`http://localhost:3000/events/${obj.eventID}/reviews`, {
-      method: 'POST',
+    const response = await fetch(`http://localhost:3000/events/${obj.eventID}/reviews/${myReview.reviewID}`, {
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         'auth-token': localStorage.getItem('token'),
@@ -48,20 +44,12 @@ export default function LeaveReviewForm({openReviewForm, setOpenReviewForm, obj}
       setSubmitted(false)
     }
   }
-  const handleRating = async(e) => {
-    if (parseFloat(e.target.value) > 5){
-      setRatingError(true);
-    } else {
-      setRating(e.target.value);
-      setRatingError(false);
-    }
-  }
 
   return (
     <div>
       {/* <Button onClick={handleOpen}>Open modal</Button> */}
       <Modal
-        open={openReviewForm}
+        open={editForm}
         onClose={handleClose}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
@@ -69,7 +57,7 @@ export default function LeaveReviewForm({openReviewForm, setOpenReviewForm, obj}
         <Box sx={style}>
           {!submitted && <form onSubmit={handleSubmit}>
             <Typography id="modal-modal-title" variant="h6" component="h2">
-              Leave A Review
+              Edit Your Review
             </Typography>
             <Typography id="modal-modal-description" sx={{ mt: 2 }}>
               Your Review:
@@ -81,6 +69,7 @@ export default function LeaveReviewForm({openReviewForm, setOpenReviewForm, obj}
               fullWidth
               rows={6}
               type='text'
+              defaultValue={myReview.review}
               onChange={(e)=>setReview(e.target.value)}
             />
             <Typography id="modal-modal-description" sx={{ mt: 2 }}>
@@ -92,17 +81,15 @@ export default function LeaveReviewForm({openReviewForm, setOpenReviewForm, obj}
               multiline
               fullWidth
               type='number'
-              onChange={(e)=>handleRating(e)}
+              onChange={(e)=>setRating(e.target.value)}
+              defaultValue={myReview.rating}
             />
             <Button onClick={handleSubmit}>
               Submit
             </Button>
           </form>}
           {submitted &&  <Typography variant="h6" component="div" color='green'>
-              Review Submitted, close this modal to edit!
-          </Typography>}
-          {ratingError &&  <Typography variant="h6" component="div" color='red'>
-              Rating must be smaller than 5
+              Review Edited!
           </Typography>}
         </Box>
       </Modal>

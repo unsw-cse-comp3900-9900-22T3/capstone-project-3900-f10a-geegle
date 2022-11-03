@@ -55,7 +55,7 @@ function ChildModal({reviewId, eventId}) {
 
   return (
     <React.Fragment>
-      <Button onClick={handleOpen}>Open Child Modal</Button>
+      <Button onClick={handleOpen}>Replies</Button>
       <Modal
         hideBackdrop
         open={open}
@@ -79,7 +79,6 @@ function ChildModal({reviewId, eventId}) {
                   </Typography>
                 </CardContent>
                 <CardActions>
-                  <Button onClick={handleClose}>Back</Button>
                 </CardActions>
               </Card>
             );
@@ -88,6 +87,7 @@ function ChildModal({reviewId, eventId}) {
           <p id="parent-modal-description">
             Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
           </p> */} 
+          <Button onClick={handleClose}>Back</Button>
         </Box>
       </Modal>
     </React.Fragment>

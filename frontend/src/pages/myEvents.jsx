@@ -11,10 +11,17 @@ import CardHeader from '@mui/material/CardHeader';
 import { FormControl } from '@mui/material';
 import { Navigate, useNavigate, Link } from 'react-router-dom';
 import LeaveReviewForm from '../components/leaveReviewForm';
+import EditReviewForm from '../components/editReviewForm';
 
 const MyEvents = () => {
   const [attendingEvents, setAttendingEvents] = React.useState([]);
   const [openReviewForm, setOpenReviewForm] = React.useState(false);
+  const [reviews, setReviews] = React.useState([]);
+  const [averageRatingHook, setAverageRating] =React.useState(0);
+  const [ratingRatioHook, setRatingRatio] = React.useState(0);
+  const [edited, setEdited] = React.useState(false);
+  const [myReview, setMyReview] = React.useState('');
+  const [editForm, setEditForm] = React.useState(false);
 
   const handleForm = () => {
     if(openReviewForm) {
@@ -23,6 +30,61 @@ const MyEvents = () => {
       setOpenReviewForm(true);
     }
   }
+
+  const handleEdit = () => {
+    if(editForm) {
+      setEditForm(false);
+    } else {
+      setEditForm(true);
+    }
+  }
+  const getReviews = async(eventId) => {
+    const response = await fetch(`http://localhost:3000/events/${eventId}/reviews`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    })
+    const json = await response.json();
+    const allReviews = []
+    let totalRating = 0
+    let ratingRatio = 0
+    let averageRating = 0
+    let allInfo = [allReviews, averageRating, ratingRatio];
+    console.log(json);
+    if (json.reviews.length !== 0) {
+      for (const rev of json.reviews) {
+        allReviews.push(rev);
+        totalRating = totalRating + rev.rating;
+      }
+      averageRating = (totalRating)/(json.reviews.length)
+      ratingRatio = (totalRating)/(json.reviews.length * 5)
+      // setRatingRatio(ratingRatio)
+      // setAverageRating(averageRating)
+      // setReviews(allReviews)
+    }
+    allInfo = [allReviews, averageRating, ratingRatio];
+    return allInfo;
+  }
+
+  const checkReview = async(eventId) => {
+    const response = await fetch(`http://localhost:3000/events/${eventId}/reviews/leftReview`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'auth-token': localStorage.getItem('token'),
+      },
+    })
+    const json = await response.json();
+    if(json.reviews.length !== 0) {
+      setEdited(true);
+      setMyReview(json.reviews[0])
+    } else {
+      setEdited(false);
+    }
+    console.log('edited',json)
+  }
+
   const fetchAttendingEvents = async () => {
     const response = await fetch(`http://localhost:3000/events/attending`, {
       method: 'GET',
@@ -42,7 +104,10 @@ const MyEvents = () => {
           //'auth-token': localStorage.getItem('token'),
         },
       });
-      const eventJson = (await response.json()).event;
+      const eventJson = (await eventInfoRes.json()).event;
+      const allInfoArray = await getReviews(eventId);
+      await checkReview(eventId);
+      console.log(eventJson);
 
       allMyEvents.push({
         venueCapacity: eventJson.venueCapacity,
@@ -62,6 +127,9 @@ const MyEvents = () => {
         published: eventJson.published,
         startDateTime: eventJson.startDateTime,
         totalTicketAmount:eventJson.totalTicketAmount,
+        reviews: allInfoArray[0],
+        averageRating: allInfoArray[1],
+        ratingRatio: allInfoArray[2]
       })
     }
     setAttendingEvents(allMyEvents);
@@ -71,42 +139,50 @@ const MyEvents = () => {
   React.useEffect(() => {
     // fetch bookings if token is available
     fetchAttendingEvents();
-  }, []);
+  }, [reviews.length]);
   return (
     <>
     <div>My events Page</div>
-    <LeaveReviewForm openReviewForm={openReviewForm} setOpenReviewForm={setOpenReviewForm}></LeaveReviewForm>
     {attendingEvents.map((obj, idx) => {
       return (
-      <Card sx={{ maxWidth: '100%' ,display: 'grid', gridTemplateColumns: '3fr 6fr'}}>
-        <CardMedia
-            component="img"
-            height="100%"
-            image={obj.eachEvent.image1}
-            alt="green iguana"
-        />
-        <CardContent>
-          <Typography gutterBottom variant="h5" component="div">
-          {obj.eventName}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-          {obj.eventType +' | '+ obj.eventVenue+' | Event Capacity: '+obj.eachEvent.capacity+'| Venue Capacity'+ obj.eachEvent.venueCapacity}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-          {"Description: "+ obj.eventDescription}
-          </Typography>
-        </CardContent>
-        <CardActions>
-            <Button component={Link}
-              to= {{pathname: `/event/view/${obj.eventID}`}}
-              size="small">
-                view
-            </Button>
-            <Button onClick={handleForm}>
-              Leave Review
-            </Button>
-        </CardActions>
-      </Card> 
+      <>
+        <LeaveReviewForm openReviewForm={openReviewForm} setOpenReviewForm={setOpenReviewForm} obj={obj}></LeaveReviewForm>
+        <EditReviewForm editForm={editForm} setEditForm={setEditForm} obj={obj} myReview={myReview}></EditReviewForm>
+        <Card sx={{ maxWidth: '100%' ,display: 'grid', gridTemplateColumns: '3fr 6fr'}}>
+          <CardMedia
+              component="img"
+              height="100%"
+              image={obj.image1}
+              alt="green iguana"
+          />
+          <CardContent>
+            <Typography gutterBottom variant="h5" component="div">
+            {obj.eventName}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+            {obj.eventType +' | '+ obj.eventVenue+' | Event Capacity: '+obj.capacity+'| Venue Capacity'+ obj.venueCapacity}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+            {"Description: "+ obj.eventDescription}
+            </Typography>
+          </CardContent>
+          <CardActions>
+              <Button component={Link}
+                to= {{pathname: `/event/view/${obj.eventID}`}}
+                state= {obj}
+                size="small">
+                  view
+              </Button>
+              {!edited && <Button onClick={handleForm}>
+                Leave Review
+              </Button>}
+              {/* <Button onClick={handleForm}>
+                Leave Review
+              </Button> */}
+              {edited && <Button onClick={handleEdit}>Edit Review</Button>}
+          </CardActions>
+        </Card> 
+      </>
       )
     })}
     </>

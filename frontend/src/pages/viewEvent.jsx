@@ -18,43 +18,12 @@ import { Grid } from '@mui/material';
 import Stack from '@mui/material/Stack';
 import { GifBoxOutlined } from '@mui/icons-material';
 import ViewReviews from './viewReviews';
-const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
-    boxShadow: 24,
-    p: 4,
-  };
-
 import PurchaseTicket from '../components/PurchaseTicket';
-// responsive prop for carousel 
-const responsive = {
-  superLargeDesktop: {
-    // the naming can be any, depends on you.
-    breakpoint: { max: 4000, min: 3000 },
-    items: 1
-  },
-  desktop: {
-    breakpoint: { max: 3000, min: 1024 },
-    items: 1
-  },
-  tablet: {
-    breakpoint: { max: 1024, min: 464 },
-    items: 1
-  },
-  mobile: {
-    breakpoint: { max: 464, min: 0 },
-    items: 1
-  }
-};
 const ViewEvent= () => {
   const { eventId} = useParams();
   const state = useLocation();
-  console.log(state);
   const eventObj = state.state;
+  console.log(eventObj);
   const [eventInfo, setEventInfo] = useState({
     capacity: '',
     endDateTime: '',
@@ -82,6 +51,62 @@ const ViewEvent= () => {
   const [allTicketTypes, setAllTicketTypes] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [showReviews, setShowReviews] = useState(false);
+  const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    boxShadow: 24,
+    p: 4,
+  };
+  // responsive prop for carousel 
+  const responsive = {
+    superLargeDesktop: {
+      // the naming can be any, depends on you.
+      breakpoint: { max: 4000, min: 3000 },
+      items: 1
+    },
+    desktop: {
+      breakpoint: { max: 3000, min: 1024 },
+      items: 1
+    },
+    tablet: {
+      breakpoint: { max: 1024, min: 464 },
+      items: 1
+    },
+    mobile: {
+      breakpoint: { max: 464, min: 0 },
+      items: 1
+    }
+  };
+
+  const styles = {
+    BoxContainer: {
+      display: 'flex',
+      // alignItems: 'center',
+      // justifyContent: 'center',
+      flexDirection: 'column',
+      padding: '3vw',
+      margin: '1vw 5vw 5vw 5vw'
+    },
+    ImageContainer: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      // padding: '3vw',
+      // margin: '9vw'
+    },
+    detailSec: {
+      margin: '0',
+      fontFamily: "Helvetica",
+      fontSize: "1rem",
+      letterSpacing: "0.00938em",
+      color: "rgba(0, 0, 0, 0.6)",
+      fontWeight: "bold"
+    }
+  }
   // const getHostInfo = async(eventDetails) => {
   //   const requestOptions = {
   //     method: 'GET',
@@ -126,6 +151,7 @@ const ViewEvent= () => {
     } else {
       setShowReviews(true);
     }
+  }
   const dateOptions = {
     weekday: 'long', 
     year: 'numeric', 
@@ -196,32 +222,6 @@ const ViewEvent= () => {
     
   },[]);
 
-  const styles = {
-    BoxContainer: {
-      display: 'flex',
-      // alignItems: 'center',
-      // justifyContent: 'center',
-      flexDirection: 'column',
-      padding: '3vw',
-      margin: '1vw 5vw 5vw 5vw'
-    },
-    ImageContainer: {
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      // padding: '3vw',
-      // margin: '9vw'
-    },
-    detailSec: {
-      margin: '0',
-      fontFamily: "Helvetica",
-      fontSize: "1rem",
-      letterSpacing: "0.00938em",
-      color: "rgba(0, 0, 0, 0.6)",
-      fontWeight: "bold"
-    }
-
-  }
   return (
     <>
       <Box sx={styles.BoxContainer}>
@@ -340,7 +340,6 @@ const ViewEvent= () => {
         </Box>
       </Box>
     </>
-    
   );
 };
-export default ViewEvent ;
+export default ViewEvent;
