@@ -20,7 +20,7 @@ function TicketTypeInput( {
 }) {
   const [eventSeatSection, setEventSeatSection] = useState({0: []});
   const fetchSeatSection = async () => {
-    // console.log(venue);
+    console.log(venue);
     const response = await fetch(`http://localhost:3000/events/venues/${venue}/seatSections`, {
       method: 'GET',
       headers: {

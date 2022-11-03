@@ -19,6 +19,8 @@ import AccorStadium from '../components/AccorStadium';
 import DoltonHouse from '../components/DoltonHouse';
 import TicketTypeCard from '../components/TicketTypeCard';
 import SeatAllocation from '../components/SeatAllocation';
+import PaymentConfirmation from '../components/PaymentConfirmation';
+import { KeyboardReturnRounded } from '@mui/icons-material';
 const PurchaseTicket= ({
   eventInfo, 
   setEventInfo, 
@@ -34,23 +36,9 @@ const PurchaseTicket= ({
     border: '2px solid #000',
     boxShadow: 24,
     p: 4,
+    height: '50vw',
+    overflow:'scroll'
   };
-  const [availTicketTypes, setAvailTicketTypes] = useState([]); // this is non-sold out ticket types for the event
-  const [quantity, setQuantity] = useState([]);
-  const [totalPrice, setTotalPrice] = useState(0);
-  const [inputError, setInputError] = useState(false);
-  const [nextPage, setNextPage] = useState(false);
-  const [exceedError, setExceedError] = useState(false);
-  const [inputErrorTic, setInputErrorTic] = useState("");
-  const [ticketTypeExceeded, setTicketTypeExceeded] = useState("");
-  const [allSeats, setAllSeats] = useState([]);
-  const [hasSeats, setHasSeats] = useState(false);
-  // page 1 is ticket selection page
-  // page 2 is seat allocation page
-  // page 3 is confirmation page
-  const [currentPage, setCurrentPage] = useState(1);
-  const [seatAllocationPage, setSeatAllocationPage] = useState(false);
-  const [confirmationPage, setConfirmationPage] = useState(false);
   const dateOptions = {
     weekday: 'long', 
     year: 'numeric', 
@@ -60,6 +48,40 @@ const PurchaseTicket= ({
     minute: 'numeric', 
     hour12: true
   }
+  const [currentPage, setCurrentPage] = useState(1);
+  const [availTicketTypes, setAvailTicketTypes] = useState([]); // this is non-sold out ticket types for the event
+  const [quantity, setQuantity] = useState([]);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [inputError, setInputError] = useState(false);
+  const [exceedError, setExceedError] = useState(false);
+  const [inputErrorTic, setInputErrorTic] = useState("");
+  const [ticketTypeExceeded, setTicketTypeExceeded] = useState("");
+  const [hasSeats, setHasSeats] = useState(false);
+  // page 1 is ticket selection page
+  // page 2 is seat allocation page
+  // page 3 is payment and confirmation page
+
+  // seat allocation page variables (page 2)
+  const [duplicateError, setDuplicateError] = useState(false);
+  const [chosenSeats, setChosenSeats] = useState([{
+    ticketType: '',
+    section: '',
+    seatId: ''
+  }]);
+  
+  // payment confirmation page variables (page 3)
+  const [paymentOption, setPaymentOption] = useState("stored");
+  const [newCreditCardNum, setNewCreditCardNum] = useState('');
+  const [newCCV, setNewCCV] = useState('');
+  const [newMonth, setNewMonth] = useState('');
+  const [newYear, setNewYear] = useState('');
+  
+
+
+  /**
+   * handleNextPage error checks the current page before
+   * going to the next page
+   */
   const handleNextPage = () => {
     // check for input error 
     if (currentPage === 1) {
@@ -92,21 +114,72 @@ const PurchaseTicket= ({
       if (inputError === false && exceedError === false) {
         // go to page 2
         if (hasSeats === true) {
-          //setSeatAllocationPage(true);
           setCurrentPage(2);
         } else {
-          // go to confirmation page
-          // setCurrentPage(3)
+          // go to payment page
+          setCurrentPage(3)
         }
       } else {
         // stay in page 1
-        //setSeatAllocationPage(false);
-        // confirmation page is false
-        // set current page back to 1
         setCurrentPage(1)
       }
-    } 
-    
+    } else if (currentPage === 2) {
+      setDuplicateError(false);
+      const seatIdChosen = chosenSeats.map((seat,index) => {
+        return seat.seatId;
+      })
+
+      const duplicate = seatIdChosen.some((seat,index)=> seatIdChosen.indexOf(seat) !== index
+      )
+      if (duplicate === true) {
+        setDuplicateError(true);
+        setCurrentPage(2)
+      } else {
+        setDuplicateError(false);
+        // no error, allow user to move to the next page
+        setCurrentPage(3);
+      }
+
+
+    }
+  }
+  const handleCheckout = (event, index) => {
+    // const jsonString = JSON.stringify({
+    //   title: formState.title,
+    //   address: formState.address,
+    //   price: formState.price,
+    //   thumbnail: formState.thumbnail,
+    //   metadata: {
+    //     propertyType: formState.propertyType,
+    //     bathrooms: formState.bathrooms,
+    //     bedrooms: formState.bedrooms,
+    //     beds: formState.beds,
+    //     amenities: formState.amenities,
+    //     image: [formState.image1, formState.image2, formState.image3]
+    //   }
+    // });
+    // const requestOptions = {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     Authorization: 'Bearer ' + localStorage.getItem('token')
+    //   },
+    //   body: jsonString
+
+    // };
+    // const r = await fetch('http://localhost:5005/listings/new', requestOptions)
+    // if (r.status === 400) {
+    //   // setErrorInput(true);
+    // } else if (r.status === 403) {
+    //   // setErrorForb(true);
+    //   console.log('access error')
+    // } else {
+    //   console.log('listing created');
+    //   navigateTo('/listings/your');
+
+    //   // const data = await r.json();
+    // }
+    return
   }
   const handleQuantity = (event, index) => {
     let newQty = event.target.value;
@@ -140,30 +213,18 @@ const PurchaseTicket= ({
     const ticketData = (await response.json());
     if (response.ok) {
       setAvailTicketTypes(ticketData.tickets)
+      //for ()
     };
   }
 
-  // get seats for the event
-  const getSeats = async() => {
-    const response = await fetch(`http://localhost:3000/events/${eventInfo.eventID}/seats`, {
-      method: 'GET',
-      headers: {
-      'Content-Type': 'application/json',
-      'auth-token': localStorage.getItem('token')
-       },
-    });
-    const seatData = (await response.json());
-    if (response.ok) {
-      setAllSeats(seatData.seats);
-      if ((seatData.seats).length === 0) {
-        setHasSeats(false);
-      } else {
-        setHasSeats(true);
-        
-      }
-    };
+  // check if event has seat allocated to it
+  const eventHasSeats = async() => {
+    if (eventInfo.seatedEvent === true) {
+      setHasSeats(true);
+    } else {
+      setHasSeats(false);
+    }
   }
-
   const pageControl = () => {
     if (currentPage === 1) {
       return (
@@ -191,14 +252,51 @@ const PurchaseTicket= ({
     } else if (currentPage === 2) {
       return (<SeatAllocation 
         eventInfo = {eventInfo}
-        allSeats = {allSeats}
         availTicketTypes = {availTicketTypes}
-        quantity = {quantity}/>)
+        quantity = {quantity}
+        chosenSeats={chosenSeats}
+        setChosenSeats={setChosenSeats}/>)
+    } else if (currentPage === 3) {
+      return (
+        <PaymentConfirmation
+        paymentOption = {paymentOption}
+        setPaymentOption = {setPaymentOption}
+        setNewCreditCardNum= {setNewCreditCardNum}
+        setNewCCV={setNewCCV}
+        setNewMonth={setNewMonth}
+        setNewYear={setNewYear}
+        hasSeats={hasSeats}
+        quantity={quantity}
+        availTicketTypes={availTicketTypes}
+        />
+      )
+    }
+  }
+  const nextOrCheckoutButton = () => {
+    if (currentPage === 1 || currentPage === 2) {
+      return (
+        <Button 
+            variant="contained"
+            onClick = {event => handleNextPage()}
+          >
+            Next
+        </Button>
+      )
+    } else if (currentPage === 3) {
+        return(
+          <Button 
+            variant="contained"
+            onClick = {event => handleCheckout()}
+          >
+            Check out
+          </Button>
+        )
+       
     }
   }
   useEffect(() => {
     getAvailTicketTypes();
-    getSeats();
+    eventHasSeats();
   },[])
 
   console.log("here in modal")
@@ -219,34 +317,6 @@ const PurchaseTicket= ({
         <Typography aria-label="event dates" id="modal-modal-description">
           {`Date: ${(new Date(eventInfo.startDateTime)).toLocaleString('en-AU',dateOptions)} to ${(new Date(eventInfo.endDateTime)).toLocaleString('en-AU',dateOptions)}`}
         </Typography>
-        {/* {currentPage === 1 ? (
-          <>
-            <Box id="ticket container" sx ={{mt:'1.5vw'}}>
-              {availTicketTypes.map((ticket,index) => {
-                return <TicketTypeCard  
-                eventInfo = {eventInfo}
-                setEventInfo = {setEventInfo} 
-                quantity = {quantity}
-                setQuantity = {setQuantity}
-                handleQuantity = {handleQuantity}
-                index = {index}
-                ticket = {ticket}
-                key={index}/>
-              })}
-            </Box>
-            <Box id="total price section" sx={{mt: 4}}>
-              <Typography aria-label="total price" variant="h5" width="100%">
-                Total ticket price: ${totalPrice}
-              </Typography>
-            </Box>
-          </>
-        ) : null}
-        {currentPage === 2 ? (<SeatAllocation 
-          eventInfo = {eventInfo}
-          allSeats = {allSeats}
-          availTicketTypes = {availTicketTypes}
-          quanitity = {quantity}/>) : null}
-         */}
         {pageControl()}
         
         <Box id="navigation buttons">
@@ -255,12 +325,7 @@ const PurchaseTicket= ({
             onClick={() => setTicketModal(false) }>
               Close
           </Button>
-          <Button 
-            variant="contained"
-            onClick = {event => handleNextPage()}
-          >
-            Next
-          </Button>
+          {nextOrCheckoutButton()} 
         </Box>
         {inputError === true 
           ? (<Alert severity="error">Error, make sure quanity for {inputErrorTic} are numbers before going to next page</Alert>) 
@@ -268,7 +333,9 @@ const PurchaseTicket= ({
         {exceedError === true 
           ? (<Alert severity="error">Error, quantity exceeded for {ticketTypeExceeded} is below the remaining ticket</Alert>) 
           : null}
-    
+        {duplicateError === true 
+          ? (<Alert severity="error">Error, please make sure chosen seats are not the same seats for yor tickets</Alert>) 
+          : null}
         
       </Box>
     </Modal>

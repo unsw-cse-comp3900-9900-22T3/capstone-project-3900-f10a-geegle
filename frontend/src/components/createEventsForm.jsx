@@ -112,29 +112,30 @@ function CreateEventsForm() {
     const newTicketInfo = { ...ticketInfo };
     const allNewTicketTypes = [...allTicketTypes];
     if (event.target.checked) {
-      allNewTicketTypes[index].seatSection.push(event.target.value);
+      allNewTicketTypes[index].seatSections.push(event.target.value);
     } else {
       // const oldSeatSection = allNewTicketTypes[index].seatSection;
       // oldSeatSection.remove(event.target.value);
       // const updateSeatSection = oldSeatSection;
-      const updatedSeats = allNewTicketTypes[index].seatSection.filter((section) => !section.includes(event.target.value));
+      const updatedSeats = allNewTicketTypes[index].seatSections.filter((section) => !section.includes(event.target.value));
       allNewTicketTypes[index].seatSections = updatedSeats;
       //allNewTicketTypes[index].seatSection.remove(event.target.value);
     }
     setAllTicketTypes(allNewTicketTypes);
-    console.log(allNewTicketTypes);
+    console.log('allNewTicketTypes',allNewTicketTypes);
     
   }
   const handleAddTicket = (index) => {
     //setAllTicketTypes(prev => [...prev, ticketInfo]);
 
     // resetting the fields in ticketInfo
-    const newTicketInfo = { ...ticketInfo };
-    newTicketInfo.ticketType = '';
-    newTicketInfo.ticketAmount = '';
-    newTicketInfo.price = '';
-    newTicketInfo.seatSections = [];
-    // setTicketInfo(newTicketInfo);
+    const newTicketInfo = {  
+      ticketType: '',
+      ticketAmount:'',
+      price:'',
+      seatSections: []
+    }
+    setTicketInfo(newTicketInfo);
     setAllTicketTypes((prev) => [...prev, newTicketInfo]);
     console.log(allTicketTypes);
   };
