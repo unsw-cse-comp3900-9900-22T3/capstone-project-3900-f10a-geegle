@@ -44,6 +44,7 @@ const TicketTypeCard= ({
           type="text"
           variant="outlined"
           aria-label="quantity textbox"
+          defaultValue={0}
           onChange={event=>handleQuantity(event,index)}
           fullWidth
         />  

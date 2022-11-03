@@ -20,7 +20,7 @@ const SeatAllocation= ({
   setChosenSeats}) => {
   
   const [seatingSectionAllocation, setSeatingSectionAllocation] = useState({});
-  
+  const [seatSections, setSeatSections] = useState([]);
 
   const fetchSeatingSectionAllocation = async() => {
     const response = await fetch(`http://localhost:3000/events/${eventInfo.eventID}/seatSectionsTicketAllocation`, {
@@ -34,6 +34,8 @@ const SeatAllocation= ({
     if (response.ok) {
       console.log('seat data frist instance',seatData);
       setSeatingSectionAllocation(seatData.seatSections);
+      const seatKeys = Object.keys(seatData.seatSections);
+      setSeatSections(seatKeys);
     }
   }
   
@@ -48,7 +50,6 @@ const SeatAllocation= ({
 
   useEffect(()=>{
     fetchSeatingSectionAllocation();
-    
     let chosenSeatsArray = [];
     quantity.map((q, ticketTypeIdx) => {
       for(let ticketNum=0; ticketNum< q; ticketNum++) {
@@ -70,12 +71,23 @@ const SeatAllocation= ({
         {displaySeatMap()}
       </Box>
       <Box id="seat information" sx ={{mt:'1.5vw'}}>
-        <Typography aria-label="ticket price" variant="h5" sx={{mt: 2}}>Ticket Name and it's allocated section</Typography>
-        <Typography aria-label="ticket price" variant="h5" sx={{mt: 2}}>Ticket Name and it's allocated section</Typography>
+        {seatSections.map((section,idx)=> {
+          return(
+            <Box>
+              <Typography aria-label="section" variant="h5" sx={{mt: 2}}>Tickets Types For {section}:</Typography>
+              <Box sx={{display:'flex', gap:'20px'}}>
+                {seatingSectionAllocation[`${section}`].map((ticketType,idx2)=> {
+                  return (
+                    <Typography aria-label="ticket type for section" variant="h6" sx={{mt: 2}}>{ticketType}</Typography>
+                  )
+                })}
+              </Box> 
+            </Box>
+          )
+        })}
       </Box>
       <Box id="seat allocation form" sx ={{mt:'1.5vw'}}>
         {chosenSeats.map((seat, index) => {
-          
             return (<SeatSelectionCard
               singleTicketType={seat.ticketType}
               index={index}
