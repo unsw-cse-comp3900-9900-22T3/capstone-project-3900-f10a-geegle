@@ -26,13 +26,53 @@ const style = {
 const PublicLanding = () => {
   const [allListings, setAllListings] = React.useState([]);
   const [upcomingListings, setUpcomingListings] = React.useState([]);
+  const [reviews, setReviews] = React.useState([]);
+  const [averageRatingHook, setAverageRating] =React.useState(0);
+  const [ratingRatioHook, setRatingRatio] = React.useState(0);
   const [toggleState, setToggleState] = React.useState('All Events');
+  const [allEventReviews, setAllEventReviews] = React.useState(['']);
 
   const handleChange = (event, newAlignment) => {
     setToggleState(newAlignment);
     //console.log(newAlignment);
   };
-  
+  const getReviews = async(eventId) => {
+    const response = await fetch(`http://localhost:3000/events/${eventId}/reviews`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    })
+    const json = await response.json();
+    const allReviews = []
+    let totalRating = 0
+    let ratingRatio = 0
+    let averageRating = 0
+    let allInfo = [allReviews, averageRating, ratingRatio];
+    console.log(json);
+    if (json.reviews.length !== 0) {
+      for (const rev of json.reviews) {
+        allReviews.push(rev);
+        totalRating = totalRating + rev.rating;
+      }
+      averageRating = (totalRating)/(json.reviews.length)
+      ratingRatio = (totalRating)/(json.reviews.length * 5)
+      // setRatingRatio(ratingRatio)
+      // setAverageRating(averageRating)
+      // setReviews(allReviews)
+
+    } else {
+      // setRatingRatio(0)
+      // setAverageRating(0)
+      // setReviews([])
+    }
+    //return allInfo
+    setAllEventReviews([...allEventReviews, ''])
+    allInfo = [allReviews, averageRating, ratingRatio];
+    return allInfo;
+  }
+
+
   const fetchAllEvents = async () => {
     
     const response = await fetch(`http://localhost:3000/events/all`, {
@@ -42,6 +82,7 @@ const PublicLanding = () => {
       console.log(json);
       const events = []
       for (const eve of json.events) {
+        const allInfoArray = await getReviews(eve.eventID)
         events.push({
           eachEvent: {
             capacity: eve.capacity,
@@ -59,10 +100,15 @@ const PublicLanding = () => {
             published: eve.published,
             startDateTime: eve.startDateTime,
             totalTicketAmount:eve.totalTicketAmount,
+            reviews:allInfoArray[0],
+            averageRating: allInfoArray[1],
+            ratingRatio: allInfoArray[2]
           }
         })
       }
+      console.log(allListings);
       setAllListings(events)
+      return events;
       //console.log(allListings)
       // setMyListings(json);
   }
@@ -75,6 +121,7 @@ const PublicLanding = () => {
     const json = await response.json();
       const events = []
       for (const eve of json.events) {
+        const allInfoArray = await getReviews(eve.eventID)
         events.push({
           eachEvent: {
             capacity: eve.capacity,
@@ -92,6 +139,9 @@ const PublicLanding = () => {
             published: eve.published,
             startDateTime: eve.startDateTime,
             totalTicketAmount:eve.totalTicketAmount,
+            reviews:allInfoArray[0],
+            averageRating: allInfoArray[1],
+            ratingRatio: allInfoArray[2]
           }
         })
       }
@@ -143,11 +193,52 @@ const PublicLanding = () => {
             <Typography variant="body2" color="text.secondary">
             {"Description: "+ obj.eachEvent.eventDescription}
             </Typography>
+            {Array(Math.ceil(obj.eachEvent.ratingRatio * 5))
+              .fill(0)
+              .map((_, i) => (
+                <svg
+                  key={i}
+                  height="35"
+                  width="35"
+                  aria-label="coloured star rating"
+                >
+                  <polygon
+                    points="9.9, 1.1, 3.3, 21.78, 19.8, 8.58, 0, 8.58, 16.5, 21.78"
+                    fill="#ffd800"
+                  />
+                </svg>
+              ))}
+            {Array(5 - Math.ceil(obj.eachEvent.ratingRatio * 5))
+              .fill(0)
+              .map((_, i) => (
+                <svg
+                  key={i}
+                  height="35"
+                  width="35"
+                  aria-label="uncoloured star rating"
+                >
+                  <polygon
+                    points="9.9, 1.1, 3.3, 21.78, 19.8, 8.58, 0, 8.58, 16.5, 21.78"
+                    fill="#7e7e7e"
+                    stroke="#7e7e7e"
+                    strokeWidth="1"
+                  />
+                </svg>
+              ))}
+            <Typography variant="body2" color="text.secondary">
+              Average Rating: {obj.eachEvent.averageRating}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Reviews: {obj.eachEvent.reviews.length}
+            </Typography>
+
           </CardContent>
           <CardActions>
             <Button 
               component={Link}
               to= {{pathname: `/event/view/${obj.eachEvent.eventID}`}}
+              //state= {{state: obj.eachEvent}}
+              state= {obj.eachEvent}
               size="small">
                 view
             </Button>
@@ -174,11 +265,51 @@ const PublicLanding = () => {
             <Typography variant="body2" color="text.secondary">
             {"Description: "+ obj.eachEvent.eventDescription}
             </Typography>
+            {Array(Math.ceil(obj.eachEvent.ratingRatio * 5))
+              .fill(0)
+              .map((_, i) => (
+                <svg
+                  key={i}
+                  height="35"
+                  width="35"
+                  aria-label="coloured star rating"
+                >
+                  <polygon
+                    points="9.9, 1.1, 3.3, 21.78, 19.8, 8.58, 0, 8.58, 16.5, 21.78"
+                    fill="#ffd800"
+                  />
+                </svg>
+              ))}
+            {Array(5 - Math.ceil(obj.eachEvent.ratingRatio * 5))
+              .fill(0)
+              .map((_, i) => (
+                <svg
+                  key={i}
+                  height="35"
+                  width="35"
+                  aria-label="uncoloured star rating"
+                >
+                  <polygon
+                    points="9.9, 1.1, 3.3, 21.78, 19.8, 8.58, 0, 8.58, 16.5, 21.78"
+                    fill="#7e7e7e"
+                    stroke="#7e7e7e"
+                    strokeWidth="1"
+                  />
+                </svg>
+              ))}
+            <Typography variant="body2" color="text.secondary">
+              Average Rating: {obj.eachEvent.averageRating}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Reviews: {obj.eachEvent.reviews.length}
+            </Typography>
           </CardContent>
           <CardActions>
               <Button 
                 component={Link}
                 to= {{pathname: `/event/view/${obj.eachEvent.eventID}`}}
+                //state= {{eventObj: allListings}}
+                state= {obj.eachEvent}
                 size="small">
                   view
               </Button>
