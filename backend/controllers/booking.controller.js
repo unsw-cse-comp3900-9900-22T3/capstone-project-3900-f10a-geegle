@@ -124,3 +124,23 @@ export const bookEventController = async(req, res) => {
         res.status(500).send(error.message)
     }
 }
+
+export const getEventTicketsUserPurchasedController = async(req, res) => {
+    try {
+        const {tickets, statusCode, msg} = await bookingService.getEventTicketsUserPurchasedService(req, res);
+        res.status(statusCode).json({tickets, msg})
+
+    } catch (error) {
+        res.status(500).send(error.message)
+    }
+}
+
+export const cancelEventUserBookingController = async(req, res) => {
+    try {
+        const {statusCode, msg} = await bookingService.cancelEventUserBookingService(req, res);
+        res.status(statusCode).json(msg)
+
+    } catch (error) {
+        res.status(500).send(error.message)
+    }
+}
