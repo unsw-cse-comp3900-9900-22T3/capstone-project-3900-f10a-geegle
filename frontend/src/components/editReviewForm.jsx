@@ -4,6 +4,7 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
+import { Navigate, useNavigate, Link } from 'react-router-dom';
 
 const style = {
   position: 'absolute',
@@ -17,17 +18,33 @@ const style = {
   p: 4,
 };
 
-export default function EditReviewForm({editForm, setEditForm, obj, myReview}) {
+export default function EditReviewForm({editForm, setEditForm, obj}) {
   const [submitted, setSubmitted] = React.useState(false);
-  const [review, setReview] = React.useState('');
-  const [rating, setRating] = React.useState('');
+  const [review, setReview] = React.useState(obj.prevReview.review);
+  const [rating, setRating] = React.useState(obj.prevReview.rating);
+  const [ratingError, setRatingError] = React.useState(false);
+  const [formError, setFormError] = React.useState(false);
+  const handleRating = async(e) => {
+    if (parseFloat(e.target.value) > 5){
+      setRatingError(true);
+    } else {
+      setRating(e.target.value);
+      setRatingError(false);
+    }
+  }
+  // const [defRev, setDefRev] = React.useState(myReview.review);
+  // const [defRating, setDefRating] = React.useState(myReview.rating);
+  const navigate = useNavigate();
+  console.log(obj);
   // const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setEditForm(false);
+    setSubmitted(false);
+    //navigate('/events/myEvent');
   };
   const handleSubmit = async() => {
     console.log('submitted')
-    const response = await fetch(`http://localhost:3000/events/${obj.eventID}/reviews/${myReview.reviewID}`, {
+    const response = await fetch(`http://localhost:3000/events/${obj.eventID}/reviews/${obj.prevReview.reviewID}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -40,9 +57,13 @@ export default function EditReviewForm({editForm, setEditForm, obj, myReview}) {
     })
     const json = await response.json();
     if (response.ok) {
-      setSubmitted(true)
+      setSubmitted(true);
+      setFormError(false);
+      // setDefRev(review);
+      // setDefRating(rating);
     } else {
-      setSubmitted(false)
+      setSubmitted(false);
+      setFormError(true);
     }
   }
 
@@ -70,7 +91,7 @@ export default function EditReviewForm({editForm, setEditForm, obj, myReview}) {
               fullWidth
               rows={6}
               type='text'
-              defaultValue={myReview.review}
+              defaultValue={obj.prevReview.review}
               onChange={(e)=>setReview(e.target.value)}
             />
             <Typography id="modal-modal-description" sx={{ mt: 2 }}>
@@ -82,15 +103,21 @@ export default function EditReviewForm({editForm, setEditForm, obj, myReview}) {
               multiline
               fullWidth
               type='number'
-              onChange={(e)=>setRating(e.target.value)}
-              defaultValue={myReview.rating}
+              onChange={(e)=>handleRating(e)}
+              defaultValue={obj.prevReview.rating}
             />
             <Button onClick={handleSubmit}>
               Submit
             </Button>
           </form>}
+          {ratingError &&  <Typography variant="h6" component="div" color='red'>
+              Rating must be smaller than 5
+          </Typography>}
           {submitted &&  <Typography variant="h6" component="div" color='green'>
               Review Edited!
+          </Typography>}
+          {formError &&  <Typography variant="h6" component="div" color='red'>
+              Cannot Submit, check review and rating!
           </Typography>}
         </Box>
       </Modal>
