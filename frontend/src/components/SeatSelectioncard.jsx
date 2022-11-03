@@ -18,7 +18,8 @@ const SeatSelectionCard= ({
   seatingSectionAllocation,
   eventInfo,
   chosenSeats,
-  setChosenSeats
+  setChosenSeats,
+  setCurrentSelected
    }) => {
 
   const [ticketTypeSeatSections, setTicketTypeSeatSections] = useState([]); // variable that stores all the sections allocated to the ticket type
@@ -28,6 +29,8 @@ const SeatSelectionCard= ({
   console.log('index', index);
   console.log('chosenSeats',chosenSeats );
   console.log(seatingSectionAllocation);
+
+
   const handleSeatChange = async(event)=> {
     const newChosenSeats = [...chosenSeats];
     const selectedSeat = JSON.parse(event.target.value);
@@ -37,6 +40,7 @@ const SeatSelectionCard= ({
     newChosenSeats[index].seatId = selectedSeat;
     setChosenSeats(newChosenSeats);
     console.log("new chosen seats", newChosenSeats);
+    setCurrentSelected(selectedSeat);
 
   }
   const handleSectionChange = async(event) => {

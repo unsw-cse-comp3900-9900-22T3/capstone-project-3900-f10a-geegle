@@ -159,10 +159,12 @@ const PurchaseTicket= ({
     const tickets = chosenSeats.map((obj, index)=> obj.ticketType);
     console.log('ticket', tickets);
     const section = chosenSeats.map((obj, index)=> obj.section);
-    const seatId = chosenSeats.map((obj, index)=> obj.seatId); 
-    console.log('seat id', seatId);
+    let seatId = chosenSeats.map((obj, index)=> obj.seatId); 
     let jsonString = "";
-
+    if(hasSeats === false) {
+      seatId = [];
+    }
+    console.log('seat id', seatId);
     if (paymentOption === "stored") {
       jsonString = JSON.stringify({
         tickets: tickets,
@@ -294,6 +296,7 @@ const PurchaseTicket= ({
         hasSeats={hasSeats}
         quantity={quantity}
         availTicketTypes={availTicketTypes}
+        setChosenSeats={setChosenSeats}
         />
       )
     }
@@ -354,7 +357,7 @@ const PurchaseTicket= ({
           {nextOrCheckoutButton()} 
         </Box>
         {inputError === true 
-          ? (<Alert severity="error">Error, make sure quanity for {inputErrorTic} are numbers before going to next page</Alert>) 
+          ? (<Alert severity="error">Error, make sure quanity for {inputErrorTic} are numbers before going to next page, if you do not want a ticket for a ticket type, input 0</Alert>) 
           : null}
         {exceedError === true 
           ? (<Alert severity="error">Error, quantity exceeded for {ticketTypeExceeded} is below the remaining ticket</Alert>) 
@@ -363,7 +366,7 @@ const PurchaseTicket= ({
           ? (<Alert severity="error">Error, please make sure chosen seats are not the same seats for yor tickets</Alert>) 
           : null}
         {checkoutSuccess === true 
-          ? (<Alert severity="success">you have successfully purchased your tickets, look up for a confirmation email</Alert>) 
+          ? (<Alert severity="success">you have successfully purchased your tickets, look out for a confirmation email</Alert>) 
           : null}
         {checkoutError === true 
           ? (<Alert severity="error">{checkoutErrorMsg}</Alert>) 

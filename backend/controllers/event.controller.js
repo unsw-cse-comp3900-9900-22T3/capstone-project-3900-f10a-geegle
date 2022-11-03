@@ -1,6 +1,7 @@
 import { createEventsService, publishEventsService, unpublishEventsService, editEventsService, deleteEventsService, 
          getEventService, getUpcomingEventsService, getAllEventsService, getHostEventsService, getHostDetailsService, 
-         getEventsUserAttendingService, getEventGuestListService, isEventSoldOutService, getSoldOutEventsService } 
+         getEventsUserAttendingService, getEventGuestListService, isEventSoldOutService, getSoldOutEventsService,
+         getEventsSearchedService, getEventsFilteredService, getAllEventCategoriesService } 
          from "../services/event.service.js";
 
 import { getEventReviewsService, createEventReviewService, editEventReviewService, 
@@ -316,6 +317,31 @@ export const getSoldOutEventsController = async(req, res) => {
     }
 }
 
+export const getMatchingEventsController = async(req, res) => {
+    try {
+        const { searchWords, from, to, category, location, rating, priceLimit } = req.query
+        let events, statusCode, msg
+        if (searchWords) {
+            ({events, statusCode, msg} = await getEventsSearchedService(searchWords))
+        }  else {
+            ({events, statusCode, msg} = await getEventsFilteredService(from, to, category, location, rating, priceLimit))
+        }
+        
+        res.status(statusCode).json({events, msg})
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
+
+export const getAllEventCategoriesController = async(req, res) => {
+    try {
+        const {categories, statusCode, msg} = await getAllEventCategoriesService(req, res);     
+        res.status(statusCode).json({categories, msg})
+        
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
 
 // const getUpcomingEventsController = (req, res) => {
 //     const upcomingEvents = {

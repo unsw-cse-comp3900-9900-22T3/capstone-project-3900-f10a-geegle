@@ -24,7 +24,8 @@ const PaymentConfirmation= ({
   setNewYear,
   hasSeats,
   quantity,
-  availTicketTypes
+  availTicketTypes,
+  setChosenSeats
   }) => {
   const handlePaymentChange = (event) => {
     setPaymentOption(event.target.value);
@@ -61,6 +62,22 @@ const PaymentConfirmation= ({
   }
   useEffect(()=> {
     fetchCardDetails();
+    if (hasSeats === false) {
+      // initialise chosenSeats array
+      let chosenSeatsArray = [];
+    quantity.map((q, ticketTypeIdx) => {
+      for(let ticketNum=0; ticketNum< q; ticketNum++) {
+        const newSeatInfo = {
+        ticketType: availTicketTypes[ticketTypeIdx].ticketType,
+        section: '',
+        seatId: ''
+        }
+        chosenSeatsArray.push(newSeatInfo);   
+      }
+    })
+    console.log("chosen seats array",chosenSeatsArray);
+    setChosenSeats(chosenSeatsArray)
+    }
   },[])
   return (   
     <Box sx={{p:2}}>
@@ -103,22 +120,22 @@ const PaymentConfirmation= ({
                   type='text' 
               />
               <Typography id="modal-modal-title" variant="h6" component="h2">
-              Month:
+              Expiry Month:
               </Typography>
               <TextField
                   required
                   id="editMonth"
-                  placeholder=""
+                  placeholder="mm"
                   onChange={e => setNewMonth(e.target.value)}
                   type='text'  
               />
               <Typography id="modal-modal-title" variant="h6" component="h2">
-              Year:
+              Expiry Year:
               </Typography>
               <TextField
                   required
                   id="editYear"
-                  placeholder=""
+                  placeholder="yy"
                   onChange={e => setNewYear(e.target.value)}
                   type='text'  
               />
