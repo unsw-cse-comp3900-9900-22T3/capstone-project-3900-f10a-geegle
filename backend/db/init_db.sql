@@ -145,12 +145,12 @@ CREATE TABLE reviewLikes (
 );
 
 CREATE TABLE eventTicketToSeatingAllocation (
-    eventID SERIAL ON DELETE CASCADE,
+    eventID SERIAL,
     ticketType text,
     seatSection text,
     primary key (eventID, ticketType, seatSection),
     foreign key (eventID) 
-        references events (eventID)
+        references events (eventID) ON DELETE CASCADE
 );
 
 --CREATE TABLE eventTicketToSeatingAllocation (
