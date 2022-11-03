@@ -22,8 +22,9 @@ export default function EditReviewForm({editForm, setEditForm, obj, myReview}) {
   const [review, setReview] = React.useState('');
   const [rating, setRating] = React.useState('');
   // const handleOpen = () => setOpen(true);
-  const handleClose = () => setEditForm(false);
-
+  const handleClose = () => {
+    setEditForm(false);
+  };
   const handleSubmit = async() => {
     console.log('submitted')
     const response = await fetch(`http://localhost:3000/events/${obj.eventID}/reviews/${myReview.reviewID}`, {

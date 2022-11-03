@@ -68,6 +68,7 @@ const MyEvents = () => {
   }
 
   const checkReview = async(eventId) => {
+    let edited = false;
     const response = await fetch(`http://localhost:3000/events/${eventId}/reviews/leftReview`, {
       method: 'GET',
       headers: {
@@ -77,12 +78,13 @@ const MyEvents = () => {
     })
     const json = await response.json();
     if(json.reviews.length !== 0) {
-      setEdited(true);
+      edited = true;
       setMyReview(json.reviews[0])
     } else {
-      setEdited(false);
+      edited = false;
     }
     console.log('edited',json)
+    return edited;
   }
 
   const fetchAttendingEvents = async () => {
@@ -106,7 +108,7 @@ const MyEvents = () => {
       });
       const eventJson = (await eventInfoRes.json()).event;
       const allInfoArray = await getReviews(eventId);
-      await checkReview(eventId);
+      const isEdited = await checkReview(eventId);
       console.log(eventJson);
 
       allMyEvents.push({
@@ -129,7 +131,8 @@ const MyEvents = () => {
         totalTicketAmount:eventJson.totalTicketAmount,
         reviews: allInfoArray[0],
         averageRating: allInfoArray[1],
-        ratingRatio: allInfoArray[2]
+        ratingRatio: allInfoArray[2],
+        leftReview: isEdited
       })
     }
     setAttendingEvents(allMyEvents);
@@ -173,13 +176,13 @@ const MyEvents = () => {
                 size="small">
                   view
               </Button>
-              {!edited && <Button onClick={handleForm}>
+              {!obj.leftReview && <Button onClick={handleForm}>
                 Leave Review
               </Button>}
               {/* <Button onClick={handleForm}>
                 Leave Review
               </Button> */}
-              {edited && <Button onClick={handleEdit}>Edit Review</Button>}
+              {obj.leftReview && <Button onClick={handleEdit}>Edit Review</Button>}
           </CardActions>
         </Card> 
       </>
