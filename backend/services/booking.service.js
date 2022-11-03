@@ -2,6 +2,7 @@ import * as ticketdb from '../db/ticket.db.js'
 import * as venueSeatingdb from '../db/venueSeating.db.js'
 import * as eventdb from '../db/event.db.js'
 import * as ticketPurchasedb from '../db/ticketpurchase.db.js'
+import * as userdb from '../db/user.db.js'
 
 export const getEventTicketTypesService = async(req, res) => {
     try {
@@ -262,12 +263,21 @@ export const bookEventService = async(req, res) => {
     try {
         const eventID = req.params.eventID
         const userID = req.userID
-        const { tickets, seats } = req.body;
+        const { tickets, seats, creditCard } = req.body;
 
         if (seats.length != 0 && tickets.length != seats.length) {
             return { booking: null, statusCode: 400, msg: "Number of tickets and seats selected not equal"}
         }
+
         // Check credit card correct
+        if (creditCard.useStored) {
+            const cc = await userdb.getUserCreditCardbyIdDb(userID)
+            if (cc.length == 0) {
+                return { booking: null, statusCode: 400, msg: "User has no credit card saved"}
+            }
+        } else if (!checkValidCreditCard(creditCard.creditCardNum, creditCard.ccv, creditCard.expiryMonth, creditCard.expiryYear)) {
+            return { booking: null, statusCode: 400, msg: "Invalid credit card details"}
+        }
 
         // Check no. of tickets booked of each type are available
         let count = {}
@@ -342,6 +352,19 @@ export const bookEventService = async(req, res) => {
     } catch (error) {
         throw error
     }
+}
+
+const checkValidCreditCard = (cardNo, ccv, expiryMonth, expiryYear) => {
+    const regexCardNo = new RegExp('^[0-9]{16}$')
+    const regexCCV = new RegExp('^[0-9]{3}$')
+    const regexMonth = new RegExp('^[0-1][0-9]$')
+    const regexYear = new RegExp('^[0-9]{2}$')
+    
+    return (regexCardNo.test(cardNo)       && 
+            regexCCV.test(ccv)             &&
+            regexMonth.test(expiryMonth)   && 
+            parseInt(expiryMonth) <= 12     && 
+            regexYear.test(expiryYear)) 
 }
 
 export const getEventTicketsUserPurchasedService = async(req, res) => {
