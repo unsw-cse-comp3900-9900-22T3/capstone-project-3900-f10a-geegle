@@ -152,7 +152,7 @@ const MyEvents = () => {
   React.useEffect(() => {
     // fetch bookings if token is available
     fetchAttendingEvents();
-  }, [editForm]);
+  }, [editForm,openReviewForm]);
   return (
     <>
     <div>My events Page</div>
