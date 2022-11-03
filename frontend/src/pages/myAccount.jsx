@@ -110,12 +110,13 @@ const MyAccount = () => {
       setLastName(json.user.lastname);
       setEmail(json.user.email);
 
-      
-      setCreditCardNum(json.user.creditCard.creditCardNum);
-      setCCV(json.user.creditCard.ccv);
-      setMonth(json.user.creditCard.expiryMonth);
-      setYear(json.user.creditCard.expiryYear);
-      // setMyListings(json);
+      if (json.user.creditCard !== undefined) {
+        const unencryptedNum = json.user.creditCard.creditCardNum;
+        const encryptedNum = `xxxxxxxxxxxx${unencryptedNum.substr(unencryptedNum.length-4)}`;
+        setCreditCardNum(encryptedNum);
+        setMonth(json.user.creditCard.expiryMonth);
+        setYear(json.user.creditCard.expiryYear);
+      }
     }
   }
 
@@ -156,13 +157,10 @@ const MyAccount = () => {
               Credit card Number: {creditCardNum}
             </Typography>
             <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-              CCV: {ccv}
+              Expiry Month: {month}
             </Typography>
             <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-              Month: {month}
-            </Typography>
-            <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-              Year: {year}
+              Expiry Year: {year}
             </Typography></>}
           </>
           <>
@@ -193,7 +191,7 @@ const MyAccount = () => {
               aria-label="title text input"
           />
           <Typography id="modal-modal-title" variant="h6" component="h2">
-          Month:
+          Expiry Month:
           </Typography>
           <TextField
               required
@@ -204,7 +202,7 @@ const MyAccount = () => {
               aria-label="title text input"
           />
           <Typography id="modal-modal-title" variant="h6" component="h2">
-          Year:
+          Expiry Year:
           </Typography>
           <TextField
               required
