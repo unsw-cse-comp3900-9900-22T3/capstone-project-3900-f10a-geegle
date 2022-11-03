@@ -22,6 +22,8 @@ const MyEvents = () => {
   const [edited, setEdited] = React.useState(false);
   const [myReview, setMyReview] = React.useState('');
   const [editForm, setEditForm] = React.useState(false);
+  const [editFormObj, setEditFormObj] = React.useState({});
+
 
   const handleForm = () => {
     if(openReviewForm) {
@@ -31,11 +33,15 @@ const MyEvents = () => {
     }
   }
 
-  const handleEdit = () => {
+  const handleEdit = (obj) => {
+    setEditFormObj(obj);
     if(editForm) {
       setEditForm(false);
+      // setEditFormObj(obj);
     } else {
       setEditForm(true);
+      //setEditFormObj({});
+      
     }
   }
   const getReviews = async(eventId) => {
@@ -69,6 +75,7 @@ const MyEvents = () => {
 
   const checkReview = async(eventId) => {
     let edited = false;
+    let info = [edited, {}];
     const response = await fetch(`http://localhost:3000/events/${eventId}/reviews/leftReview`, {
       method: 'GET',
       headers: {
@@ -80,11 +87,12 @@ const MyEvents = () => {
     if(json.reviews.length !== 0) {
       edited = true;
       setMyReview(json.reviews[0])
+      info = [edited,json.reviews[0]]
     } else {
       edited = false;
     }
     console.log('edited',json)
-    return edited;
+    return info;
   }
 
   const fetchAttendingEvents = async () => {
@@ -108,7 +116,8 @@ const MyEvents = () => {
       });
       const eventJson = (await eventInfoRes.json()).event;
       const allInfoArray = await getReviews(eventId);
-      const isEdited = await checkReview(eventId);
+      const editedInfo = await checkReview(eventId);
+      console.log('editedInfo', editedInfo)
       console.log(eventJson);
 
       allMyEvents.push({
@@ -132,7 +141,8 @@ const MyEvents = () => {
         reviews: allInfoArray[0],
         averageRating: allInfoArray[1],
         ratingRatio: allInfoArray[2],
-        leftReview: isEdited
+        leftReview: editedInfo[0],
+        prevReview: editedInfo[1]
       })
     }
     setAttendingEvents(allMyEvents);
@@ -142,15 +152,15 @@ const MyEvents = () => {
   React.useEffect(() => {
     // fetch bookings if token is available
     fetchAttendingEvents();
-  }, [reviews.length]);
+  }, [editForm]);
   return (
     <>
     <div>My events Page</div>
     {attendingEvents.map((obj, idx) => {
       return (
-      <>
+      <div key={idx}>
         <LeaveReviewForm openReviewForm={openReviewForm} setOpenReviewForm={setOpenReviewForm} obj={obj}></LeaveReviewForm>
-        <EditReviewForm editForm={editForm} setEditForm={setEditForm} obj={obj} myReview={myReview}></EditReviewForm>
+        {editForm && <EditReviewForm editForm={editForm} setEditForm={setEditForm} obj={editFormObj}></EditReviewForm>}
         <Card sx={{ maxWidth: '100%' ,display: 'grid', gridTemplateColumns: '3fr 6fr'}}>
           <CardMedia
               component="img"
@@ -182,10 +192,10 @@ const MyEvents = () => {
               {/* <Button onClick={handleForm}>
                 Leave Review
               </Button> */}
-              {obj.leftReview && <Button onClick={handleEdit}>Edit Review</Button>}
+              {obj.leftReview && <Button onClick={()=>handleEdit(obj)}>Edit Review</Button>}
           </CardActions>
         </Card> 
-      </>
+      </div>
       )
     })}
     </>
