@@ -107,11 +107,23 @@ const isEventSoldOutDb = async(eventID) => {
 }
 
 //READ
-const getSoldOutEvents = async() => {
+const getSoldOutEventsDb = async() => {
     const result = await db.query(
         "SELECT * FROM events e WHERE e.totalTicketAmount =  " +
         "(SELECT count(*) FROM ticketpurchases tp JOIN tickets t ON tp.ticketid = t.ticketid WHERE t.eventID = e.eventID)"
     )
+    return result.rows
+}
+
+//READ
+const getMatchingEventsDb = async(searchWords) => {
+    const search = '%' + searchWords + '%'
+    const result = await db.query(
+        "SELECT * FROM events e JOIN users u ON e.hostID = u.userID " + 
+        "WHERE e.eventName ILIKE $1 OR e.eventDescription ILIKE $2 OR e.eventType ILIKE $3", 
+        [search, search, search]
+    )
+    
     return result.rows
 }
 
@@ -183,7 +195,8 @@ export {
     getEventSeatSectionTicketAllocationDb,
     isSeatedEventDb,
     isEventSoldOutDb,
-    getSoldOutEvents,
+    getSoldOutEventsDb,
+    getMatchingEventsDb,
     addEventDb,
     addEventVenueDb,
     addEventTicketTypeSeatingAllocation,
