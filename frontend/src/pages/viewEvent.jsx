@@ -188,7 +188,7 @@ const ViewEvent= () => {
                 Host : {eventInfo.hostName}
               </Typography>
             </Box>
-            <Box id="button container" style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+            <Box id="button container" style={{display: "flex", justifyContent: "center", alignItems: "center", marginLeft: "35%"}}>
               <Button
                 variant ='outlined'
                 id = 'Purchase Ticket Button'

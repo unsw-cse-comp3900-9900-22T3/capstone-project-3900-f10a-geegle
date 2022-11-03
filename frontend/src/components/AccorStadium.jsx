@@ -1,30 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import Box from '@mui/material/Box';
-import Modal from '@mui/material/Modal';
-import TextField from '@mui/material/TextField';
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import CardHeader from '@mui/material/CardHeader';
-import { FormControl } from '@mui/material';
-import { Navigate, useNavigate, Link, useParams } from 'react-router-dom';
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import { Grid } from '@mui/material';
 
-const AccorStadium = () => {
+
+const AccorStadium = ({
+  unAvailSeats,
+  availSeats,
+  currentSelected
+}) => {
   const styles = {
     gridContainer: {
-      border: "3px solid black",
+      // border: "3px solid black",
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
       alignItems: "center",
       padding: "50px",
-      gap: "100px"
+      gap: "100px",
+      
     },
     levelOne: {
       display: "grid",
@@ -56,27 +47,52 @@ const AccorStadium = () => {
       height: "50px",
     }
   }
+
+  useEffect(()=> {
+    unAvailSeats.forEach((seat)=> {
+      const el = document.getElementById(`${seat.seatid}`);
+      el.style.backgroundColor = "#f76f6d";
+    })
+
+    availSeats.forEach((seat)=> {
+      const el = document.getElementById(`${seat.seatid}`);
+      el.style.backgroundColor = "#90EE90";
+    })
+    if (currentSelected !== '') {
+      const el = document.getElementById(`${currentSelected}`);
+      el.style.backgroundColor = "#55c1f3";
+    }
+  },[unAvailSeats,availSeats, currentSelected])
+  
   return (
     <div id="grid container" style={styles.gridContainer}>
       <div id="level 1" style={styles.levelOne}>
-        <div className="seat" id="l1A1" style={styles.seat}>A1</div>
-        <div className="seat" id="l1A2" style={styles.seat}>A2</div>
-        <div className="seat" id="l1A3" style={styles.seat}>A3</div>
-        <div className="seat" id="l1A4" style={styles.seat}>A4</div>
-        <div className="seat" id="l1B1" style={styles.seat}>B1</div>
-        <div className="seat" id="l1B2" style={styles.seat}>B2</div>
-        <div className="seat" id="l1B3" style={styles.seat}>B3</div>
-        <div className="seat" id="l1B4" style={styles.seat}>B4</div>
+        <div className="label">Level 1</div>
+        <div className="label"></div>
+        <div className="label"></div>
+        <div className="label"></div>
+        <div className="seat" id="1" style={styles.seat}>A1</div>
+        <div className="seat" id="2" style={styles.seat}>A2</div>
+        <div className="seat" id="3" style={styles.seat}>A3</div>
+        <div className="seat" id="4" style={styles.seat}>A4</div>
+        <div className="seat" id="5" style={styles.seat}>B1</div>
+        <div className="seat" id="6" style={styles.seat}>B2</div>
+        <div className="seat" id="7" style={styles.seat}>B3</div>
+        <div className="seat" id="8" style={styles.seat}>B4</div>
       </div>
       <div id="level 2" style={styles.levelTwo}>
-        <div className="seat" id="l2A1" style={styles.seat}>A1</div>
-        <div className="seat" id="l2A2" style={styles.seat}>A2</div>
-        <div className="seat" id="l2B1" style={styles.seat}>B1</div>
-        <div className="seat" id="l2B2" style={styles.seat}>B2</div>
+        <div className="label">Level 2</div>
+        <div className="label"></div>
+        <div className="seat" id="9" style={styles.seat}>A1</div>
+        <div className="seat" id="10" style={styles.seat}>A2</div>
+        <div className="seat" id="11" style={styles.seat}>B1</div>
+        <div className="seat" id="12" style={styles.seat}>B2</div>
       </div>
       <div id="private suites" style={styles.privateSuites}>
-        <div className="seat" id="PA1" style={styles.seat}>A1</div>
-        <div className="seat" id="PA2" style={styles.seat}>A2</div>
+        <div className="label">private suites</div>
+        <div className="label"></div>
+        <div className="seat" id="13" style={styles.seat}>A1</div>
+        <div className="seat" id="14" style={styles.seat}>A2</div>
       </div>
     </div>
 
