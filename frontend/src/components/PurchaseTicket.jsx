@@ -157,8 +157,10 @@ const PurchaseTicket= ({
     setCheckoutSuccess(false);
     setCheckoutError(false);
     const tickets = chosenSeats.map((obj, index)=> obj.ticketType);
+    console.log('ticket', tickets);
     const section = chosenSeats.map((obj, index)=> obj.section);
     const seatId = chosenSeats.map((obj, index)=> obj.seatId); 
+    console.log('seat id', seatId);
     let jsonString = "";
 
     if (paymentOption === "stored") {
@@ -192,12 +194,12 @@ const PurchaseTicket= ({
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + localStorage.getItem('token')
+        'auth-token': localStorage.getItem('token')
       },
       body: jsonString
 
     };
-    const r = await fetch('http://localhost:5005/listings/new', requestOptions)
+    const r = await fetch(`http://localhost:3000/events/${eventInfo.eventID}/purchase`, requestOptions)
     if (r.ok ) {
       setCheckoutSuccess(true);
     } else {
