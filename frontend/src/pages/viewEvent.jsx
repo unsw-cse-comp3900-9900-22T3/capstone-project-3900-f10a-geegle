@@ -9,10 +9,13 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import CardHeader from '@mui/material/CardHeader';
 import { FormControl } from '@mui/material';
-import { Navigate, useNavigate, Link, useParams } from 'react-router-dom';
+import { Navigate, useNavigate, Link, useParams, useLocation } from 'react-router-dom';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { Grid } from '@mui/material';
+import Stack from '@mui/material/Stack';
+import { GifBoxOutlined } from '@mui/icons-material';
+import ViewReviews from './viewReviews';
 const style = {
     position: 'absolute',
     top: '50%',
@@ -26,6 +29,9 @@ const style = {
 
 const ViewEvent= () => {
   const { eventId} = useParams();
+  const state = useLocation();
+  console.log(state);
+  const eventObj = state.state;
   const [eventInfo, setEventInfo] = useState({
     capacity: '',
     endDateTime: '',
@@ -45,6 +51,8 @@ const ViewEvent= () => {
   });
   const [hostName, setHostName] = useState('');
   const [allTicketTypes, setAllTicketTypes] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [showReviews, setShowReviews] = useState(false);
   // const getHostInfo = async(eventDetails) => {
   //   const requestOptions = {
   //     method: 'GET',
@@ -64,7 +72,32 @@ const ViewEvent= () => {
   //     alert(`error: ${response.status}`)
   //   }
   // }
-    
+  
+  // const getReviews = async() => {
+  //   const response = await fetch(`http://localhost:3000/events/${eventId}/reviews`, {
+  //     method: 'GET',
+  //     headers: {
+  //       'Content-Type': 'application/json'
+  //     },
+  //   })
+  //   const json = await response.json();
+  //   const allReviews = []
+  //   console.log(json);
+  //   if (json.reviews.length !== 0) {
+  //     for (const rev of json.reviews) {
+  //       allReviews.push(rev);
+  //     }
+  //     setReviews(allReviews)
+  //   }
+  // }
+
+  const handleShowReviews = (e) => {
+    if (showReviews) {
+      setShowReviews(false);
+    } else {
+      setShowReviews(true);
+    }
+  }
   const getTicketInfo = async() => {
     const response = await fetch(`http://localhost:3000/events/${eventId}/ticketTypes`, {
       method: 'GET',
@@ -182,7 +215,7 @@ const ViewEvent= () => {
               {eventInfo.eventDescription}
             </Typography>
           </Box>
-          <div>
+          <Box>
             <Typography variant="h5"color="text.secondary" sx={{fontWeight: "bold", lineHeight: "1.2"}}>
             Ticket types and price
             </Typography>
@@ -193,7 +226,45 @@ const ViewEvent= () => {
               </Typography>
               )
             })}
-          </div>
+          </Box>
+          <Box>
+            <Stack spacing={2} direction="row">
+              <Button variant="outlined" onClick={handleShowReviews}>{`Reviews (${eventObj.reviews.length})`}</Button>
+            </Stack>
+            {Array(Math.ceil(eventObj.ratingRatio * 5))
+              .fill(0)
+              .map((_, i) => (
+                <svg
+                  key={i}
+                  height="35"
+                  width="35"
+                  aria-label="coloured star rating"
+                >
+                  <polygon
+                    points="9.9, 1.1, 3.3, 21.78, 19.8, 8.58, 0, 8.58, 16.5, 21.78"
+                    fill="#ffd800"
+                  />
+                </svg>
+              ))}
+            {Array(5 - Math.ceil(eventObj.ratingRatio * 5))
+              .fill(0)
+              .map((_, i) => (
+                <svg
+                  key={i}
+                  height="35"
+                  width="35"
+                  aria-label="uncoloured star rating"
+                >
+                  <polygon
+                    points="9.9, 1.1, 3.3, 21.78, 19.8, 8.58, 0, 8.58, 16.5, 21.78"
+                    fill="#7e7e7e"
+                    stroke="#7e7e7e"
+                    strokeWidth="1"
+                  />
+                </svg>
+              ))}
+          </Box>
+          {showReviews && <ViewReviews showReviews={showReviews} setShowReviews={setShowReviews} eventReviews={eventObj.reviews} eventId={eventId}/>}
         </Box>
       </Box>
     </>

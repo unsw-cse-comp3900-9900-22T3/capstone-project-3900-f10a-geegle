@@ -99,6 +99,13 @@ const NavBar = ({setLoggedIn}) => {
                 </div>}
               </>
               <>
+                {localStorage.getItem('token') && <div style={{display:'inline-block'}}>
+                  <Link to ='/events/myEvent' style={{color:'white'}}>
+                    My Events
+                  </Link>
+                </div>}
+              </>
+              <>
                 {localStorage.getItem('token') && <div style={{display:'inline-block'}} onClick>
                   <Link to ='/user/profile' style={{color:'white'}}>
                     My Account
