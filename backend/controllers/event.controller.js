@@ -305,12 +305,12 @@ export const getSoldOutEventsController = async(req, res) => {
 
 export const getMatchingEventsController = async(req, res) => {
     try {
-        const { searchWords, from, to, category, location, rating, priceStart, priceEnd } = req.query
+        const { searchWords, from, to, category, location, rating, priceLimit } = req.query
         let events, statusCode, msg
         if (searchWords) {
             ({events, statusCode, msg} = await getEventsSearchedService(searchWords))
         }  else {
-            ({events, statusCode, msg} = await getEventsFilteredService(from, to, category, location, rating, priceStart, priceEnd))
+            ({events, statusCode, msg} = await getEventsFilteredService(from, to, category, location, rating, priceLimit))
         }
         
         res.status(statusCode).json({events, msg})

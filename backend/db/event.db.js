@@ -127,6 +127,16 @@ const getMatchingEventsDb = async(searchWords) => {
     return result.rows
 }
 
+//READ
+const getEventsByTicketPriceLimitDb = async(priceLimit) => {
+    const result = await db.query(
+        "SELECT distinct e.eventid FROM events e join tickets t ON e.eventid = t.eventid WHERE price <= $1",
+        [priceLimit]
+    )
+
+    return result.rows
+}
+
 // CREATE
 const addEventDb = async(eventName, hostID, startDateTime, endDateTime, eventDescription, eventType,
                          eventVenue, capacity, totalTicketAmount, image1, image2, image3) => {
@@ -197,6 +207,7 @@ export {
     isEventSoldOutDb,
     getSoldOutEventsDb,
     getMatchingEventsDb,
+    getEventsByTicketPriceLimitDb,
     addEventDb,
     addEventVenueDb,
     addEventTicketTypeSeatingAllocation,
