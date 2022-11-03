@@ -57,6 +57,12 @@ const PurchaseTicket= ({
   const [inputErrorTic, setInputErrorTic] = useState("");
   const [ticketTypeExceeded, setTicketTypeExceeded] = useState("");
   const [hasSeats, setHasSeats] = useState(false);
+  const [checkoutSuccess, setCheckoutSuccess] = useState(false);
+  const [checkoutError, setCheckoutError] = useState(false);
+  const [checkoutErrorMsg, setCheckoutErrorMsg] = useState(false);
+
+
+
   // page 1 is ticket selection page
   // page 2 is seat allocation page
   // page 3 is payment and confirmation page
@@ -143,43 +149,61 @@ const PurchaseTicket= ({
 
     }
   }
-  const handleCheckout = (event, index) => {
-    // const jsonString = JSON.stringify({
-    //   title: formState.title,
-    //   address: formState.address,
-    //   price: formState.price,
-    //   thumbnail: formState.thumbnail,
-    //   metadata: {
-    //     propertyType: formState.propertyType,
-    //     bathrooms: formState.bathrooms,
-    //     bedrooms: formState.bedrooms,
-    //     beds: formState.beds,
-    //     amenities: formState.amenities,
-    //     image: [formState.image1, formState.image2, formState.image3]
-    //   }
-    // });
-    // const requestOptions = {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     Authorization: 'Bearer ' + localStorage.getItem('token')
-    //   },
-    //   body: jsonString
+  const handleCheckout = async(event, index) => {
 
-    // };
-    // const r = await fetch('http://localhost:5005/listings/new', requestOptions)
-    // if (r.status === 400) {
-    //   // setErrorInput(true);
-    // } else if (r.status === 403) {
-    //   // setErrorForb(true);
-    //   console.log('access error')
-    // } else {
-    //   console.log('listing created');
-    //   navigateTo('/listings/your');
+    // convert chosenSeats key into an array
+    // the below arrays are related by their index
+    // index represent's the particular ticket
+    setCheckoutSuccess(false);
+    setCheckoutError(false);
+    const tickets = chosenSeats.map((obj, index)=> obj.ticketType);
+    const section = chosenSeats.map((obj, index)=> obj.section);
+    const seatId = chosenSeats.map((obj, index)=> obj.seatId); 
+    let jsonString = "";
 
-    //   // const data = await r.json();
-    // }
-    return
+    if (paymentOption === "stored") {
+      jsonString = JSON.stringify({
+        tickets: tickets,
+        seats: seatId,
+        creditCard: {
+          useStored: true,
+          creditCardNum:"",
+          ccv:"",
+          expiryMonth:"",
+          expiryYear:""
+        }
+      });
+    } else {
+      // paymentOption is notStored
+      jsonString = JSON.stringify({
+        tickets: tickets,
+        seats: seatId,
+        creditCard: {
+          useStored: false,
+          creditCardNum: newCreditCardNum,
+          ccv: newCCV,
+          expiryMonth: newMonth,
+          expiryYear: newYear
+        }
+      });
+    }
+    
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + localStorage.getItem('token')
+      },
+      body: jsonString
+
+    };
+    const r = await fetch('http://localhost:5005/listings/new', requestOptions)
+    if (r.ok ) {
+      setCheckoutSuccess(true);
+    } else {
+      setCheckoutError(true);
+      setCheckoutErrorMsg(r);
+    }
   }
   const handleQuantity = (event, index) => {
     let newQty = event.target.value;
@@ -335,6 +359,12 @@ const PurchaseTicket= ({
           : null}
         {duplicateError === true 
           ? (<Alert severity="error">Error, please make sure chosen seats are not the same seats for yor tickets</Alert>) 
+          : null}
+        {checkoutSuccess === true 
+          ? (<Alert severity="success">you have successfully purchased your tickets, look up for a confirmation email</Alert>) 
+          : null}
+        {checkoutError === true 
+          ? (<Alert severity="error">{checkoutErrorMsg}</Alert>) 
           : null}
         
       </Box>
