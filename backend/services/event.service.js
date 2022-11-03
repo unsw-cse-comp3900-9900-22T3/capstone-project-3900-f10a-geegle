@@ -3,7 +3,7 @@ import {addEventDb, getAllEventsNotSoldOutDb, getAllEventsDb, getEventByIdDb, ge
         getEventsByHostIdDb, getEventVenueByNameDb, getEventVenueByIdDb, getEventGuestListByIdDb, getHostofEventDb, 
         isSeatedEventDb, addEventVenueDb, publishEventByIdDb, addEventTicketTypeSeatingAllocation,
         unpublishEventByIdDb, removeEventByIdDb, getEventsUserAttendingDb, isEventSoldOutDb, getSoldOutEventsDb,
-        getMatchingEventsDb, getEventsByTicketPriceLimitDb} 
+        getMatchingEventsDb, getEventsByTicketPriceLimitDb, getAllEventCategoriesDb} 
         from '../db/event.db.js' 
 import { getEventReviewsByEventIdDb } from '../db/review.db.js'
 import {addTicketDb} from '../db/ticket.db.js'
@@ -606,4 +606,15 @@ const eventRatingScore = async(eventID) => {
     } 
     
     return score
+}
+
+export const getAllEventCategoriesService = async() => {
+    const categoriesDb = await getAllEventCategoriesDb(); 
+
+    const categories = []
+    for (let category of categoriesDb) {
+        categories.push(category.eventtype)
+    }
+
+    return { categories: categories, statusCode: 200, msg: 'All event categories' }
 }
