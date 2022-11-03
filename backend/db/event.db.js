@@ -137,6 +137,15 @@ const getEventsByTicketPriceLimitDb = async(priceLimit) => {
     return result.rows
 }
 
+//READ
+const getAllEventCategoriesDb = async() => {
+    const result = await db.query(
+        "SELECT distinct eventType from events"
+    )
+
+    return result.rows
+}
+
 // CREATE
 const addEventDb = async(eventName, hostID, startDateTime, endDateTime, eventDescription, eventType,
                          eventVenue, capacity, totalTicketAmount, image1, image2, image3) => {
@@ -208,6 +217,7 @@ export {
     getSoldOutEventsDb,
     getMatchingEventsDb,
     getEventsByTicketPriceLimitDb,
+    getAllEventCategoriesDb,
     addEventDb,
     addEventVenueDb,
     addEventTicketTypeSeatingAllocation,
