@@ -5,7 +5,8 @@ import { createEventsService, publishEventsService, unpublishEventsService, edit
 
 import { getEventReviewsService, createEventReviewService, editEventReviewService, 
     deleteEventReviewService, addLikeToEventReviewService, removeLikeToEventReviewService,
-    createReviewReplyService, getReviewReplyService, editReviewReplyService, deleteReviewReplyService } from "../services/review.service.js"
+    createReviewReplyService, getReviewReplyService, editReviewReplyService, deleteReviewReplyService,
+    checkUserHasLeftReviewService } from "../services/review.service.js"
 
 export const createEventsController = async(req, res) => {
     try {
@@ -189,6 +190,19 @@ export const deleteEventReviewController = async(req, res) => {
     try {
         const {statusCode, msg} = await deleteEventReviewService(req, res);
         res.status(statusCode).json({msg})
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
+
+export const checkUserLeftReviewController = async(req, res) => {
+    try {
+        const {reviews, statusCode, msg} = await checkUserHasLeftReviewService(req, res);
+        if (!reviews) {
+            res.status(statusCode).json(msg)
+        } else {
+            res.status(statusCode).json({reviews, msg})
+        }
     } catch (e) {
         res.status(500).send(e.message)
     }
