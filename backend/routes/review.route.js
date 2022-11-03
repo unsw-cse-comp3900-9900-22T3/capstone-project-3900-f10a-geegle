@@ -3,12 +3,13 @@ import { verifyToken } from '../middleware/verifyToken.js';
 import { getEventReviewsController, createEventReviewController, editEventReviewController,
     deleteEventReviewController, addLikeToEventReviewController, removeLikeToEventReviewController, 
     getEventReviewReplyController, createEventReviewReplyController, editEventReviewReplyController,
-    deleteEventReviewReplyController } from '../controllers/event.controller.js';
+    deleteEventReviewReplyController, checkUserLeftReviewController } from '../controllers/event.controller.js';
 
 const reviewRouter = Router();
 
 reviewRouter.get('/:eventID/reviews', getEventReviewsController); //get all reviews for an event
 reviewRouter.post('/:eventID/reviews', verifyToken, createEventReviewController); //send a review for an event
+reviewRouter.get('/:eventID/reviews/leftReview', verifyToken, checkUserLeftReviewController) // check user has left a review
 reviewRouter.put('/:eventID/reviews/:reviewID', verifyToken, editEventReviewController); // edit a review for an event if its yours
 reviewRouter.delete('/:eventID/reviews/:reviewID', verifyToken, deleteEventReviewController) // delete a review for an event if its yours 
 reviewRouter.post('/:eventID/reviews/:reviewID/like', verifyToken, addLikeToEventReviewController); // add like to a review parent

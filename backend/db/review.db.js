@@ -9,6 +9,15 @@ const getEventReviewsByEventIdDb = async(eventID) => {
 }
 
 // READ
+const getEventReviewsByEventIdAndUserIdDb = async(eventID, userID) => {
+    const result = await db.query (
+        "SELECT * FROM reviews WHERE eventID = $1 AND userID = $2",
+        [eventID, userID]
+    )
+    return result.rows
+}
+
+// READ
 const getReviewByReviewIdDb = async(reviewID) => {
     const result = await db.query (
         "SELECT * FROM reviews WHERE reviewID = $1", [reviewID]
@@ -79,6 +88,7 @@ const deleteReviewLikeByIdDb = async(reviewID, userID) => {
 
 export {
     getEventReviewsByEventIdDb,
+    getEventReviewsByEventIdAndUserIdDb,
     getReviewByReviewIdDb,
     addReviewDb,
     editReviewByIdDb,

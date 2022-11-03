@@ -60,9 +60,8 @@ const DefaultVenueInfo = (venue) => {
           // label="Event Location"
           aria-label="Event Location"
           type="text"
-          variant="outlined"
-          value = {venueLocation}
           variant="filled"
+          value = {venueLocation}
           fullWidth
         />
       </Grid>
@@ -78,9 +77,8 @@ const DefaultVenueInfo = (venue) => {
           // label="Capacity"
           aria-label="Capacity"
           type="text"
-          variant="outlined"
-          value={venueCapacity}
           variant="filled"
+          value={venueCapacity}
           fullWidth
         />
       </Grid>

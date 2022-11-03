@@ -16,8 +16,7 @@ import { BrowserRouter as Router, Route, Link, Routes } from 'react-router-dom';
 import LoginPage from '../pages/login';
 import RegisterPage from '../pages/register';
 import { useNavigate } from 'react-router-dom';
-const pages = ['Products', 'Pricing', 'Blog'];
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+
 
 
 const NavBar = ({setLoggedIn}) => {

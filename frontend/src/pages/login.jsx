@@ -4,6 +4,7 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import { FormControl } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import Alert from '@mui/material/Alert';
 
 const style = {
     position: 'absolute',
@@ -19,17 +20,27 @@ const style = {
 const LoginPage = ({setLoggedIn}) => {
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
+    const [passwordError, setPasswordError] = React.useState(false); // check if password is correct for that email
+    const [inavlidEmailError, setInvalidEmailError] = React.useState(false); // check if email follows convention
+    const [userExistError, setUserExistError] = React.useState(false); // check if email exist in the system
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
       e.preventDefault();
-  
+
+      // set all the error to their default state
+      setPasswordError(false); // check if password is correct for that email
+      setInvalidEmailError(false); // check if email follows convention
+      setUserExistError(false); // check if email exist in the system
+
       const response = await fetch('http://localhost:3000/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ 
+          email: email.toLowerCase(), 
+          password: password }),
       });
   
       const json = await response.json();
@@ -39,13 +50,18 @@ const LoginPage = ({setLoggedIn}) => {
         localStorage.setItem('email', email);
         localStorage.setItem('userId', json.user.userID)
         // setLogin(true);
-        alert('Success, you are now logged in!');
+
+        //alert('Success, you are now logged in!');
         navigate('/');
       } else if (response.status === 401) {
-        alert('Please ensure email and/or password is entered correctly');
-      } else {
-        alert('something went wrong please try again');
-      }
+        if (json === "Invalid Email") {
+          setInvalidEmailError(true);
+        } else if (json === "Email Does Not Exist") {
+          setUserExistError(true);
+        } else if (json === "Invalid Password") {
+          setPasswordError(true);
+        }
+      } 
     };
   
   return (
@@ -86,6 +102,13 @@ const LoginPage = ({setLoggedIn}) => {
         >
           submit
         </button>
+        {inavlidEmailError === true
+          ? (<Alert severity="error">Error, email invalid, please check if email follows convention</Alert>):null}
+        {userExistError === true
+          ? (<Alert severity="error">Error, email does not exist, please register</Alert>):null}
+        {passwordError === true
+          ? (<Alert severity="error">Error, password incorrect</Alert>):null}
+        
     </FormControl>
     </Typography>
   </Box>
