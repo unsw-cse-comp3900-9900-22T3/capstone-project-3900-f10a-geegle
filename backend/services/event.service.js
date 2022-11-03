@@ -520,3 +520,45 @@ export const getEventsSearchedService = async(searchWords) => {
         throw e
     }
 }
+
+export const getEventsFilteredService = async(from, to, category, location, rating, priceStart, priceEnd) => {
+    try {
+        let eventList = await getAllEventsDb();
+        if (from) {
+            eventList = eventList.filter(event => new Date(event.startdatetime) >= new Date(from))
+        }
+
+        if (to) {
+            eventList = eventList.filter(event => new Date(event.enddatetime) <= new Date(to))
+        }
+        
+        
+        const events = []
+        for (let i = 0; i < eventList.length; i++) {
+            if (eventList[i].published) {
+                events.push({
+                    eventID: eventList[i].eventid,
+                    eventName: eventList[i].eventname,
+                    hostID: eventList[i].hostid,
+                    hostName: eventList[i].firstname + ' ' + eventList[i].lastname,
+                    startDateTime: eventList[i].startdatetime,
+                    endDateTime: eventList[i].enddatetime,
+                    eventDescription: eventList[i].eventdescription,
+                    eventType: eventList[i].eventtype,
+                    eventVenue: eventList[i].venuename,
+                    eventLocation: eventList[i].venuelocation,
+                    venueCapacity: eventList[i].maxcapacity,
+                    capacity: eventList[i].capacity,
+                    totalTicketAmount: eventList[i].totalticketamount,
+                    image1: eventList[i].image1,
+                    image2: eventList[i].image2,
+                    image3: eventList[i].image3
+                })
+            }
+        }
+        return {events: events, statusCode: 200, msg: 'Events matching search criteria'}
+
+    } catch (e) {
+        throw e
+    }
+}

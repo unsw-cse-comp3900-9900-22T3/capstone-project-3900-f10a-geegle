@@ -1,7 +1,7 @@
 import { createEventsService, publishEventsService, unpublishEventsService, editEventsService, deleteEventsService, 
          getEventService, getUpcomingEventsService, getAllEventsService, getHostEventsService, getHostDetailsService, 
          getEventsUserAttendingService, getEventGuestListService, isEventSoldOutService, getSoldOutEventsService,
-         getEventsSearchedService } 
+         getEventsSearchedService, getEventsFilteredService } 
          from "../services/event.service.js";
 
 import { getEventReviewsService, createEventReviewService, editEventReviewService, 
@@ -309,7 +309,9 @@ export const getMatchingEventsController = async(req, res) => {
         let events, statusCode, msg
         if (searchWords) {
             ({events, statusCode, msg} = await getEventsSearchedService(searchWords))
-        } 
+        }  else {
+            ({events, statusCode, msg} = await getEventsFilteredService(from, to, category, location, rating, priceStart, priceEnd))
+        }
         
         res.status(statusCode).json({events, msg})
     } catch (e) {
