@@ -1,7 +1,9 @@
+import e from 'express'
 import {addEventDb, getAllEventsNotSoldOutDb, getAllEventsDb, getEventByIdDb, getEventByIdDisplayDb,
         getEventsByHostIdDb, getEventVenueByNameDb, getEventVenueByIdDb, getEventGuestListByIdDb, getHostofEventDb, 
         isSeatedEventDb, addEventVenueDb, publishEventByIdDb, addEventTicketTypeSeatingAllocation,
-        unpublishEventByIdDb, removeEventByIdDb, getEventsUserAttendingDb, isEventSoldOutDb, getSoldOutEvents} 
+        unpublishEventByIdDb, removeEventByIdDb, getEventsUserAttendingDb, isEventSoldOutDb, getSoldOutEventsDb,
+        getMatchingEventsDb, getEventsByTicketPriceLimitDb} 
         from '../db/event.db.js' 
 import { getEventReviewsByEventIdDb } from '../db/review.db.js'
 import {addTicketDb} from '../db/ticket.db.js'
@@ -456,10 +458,9 @@ export const isEventSoldOutService = async(req, res) => {
 
 export const getSoldOutEventsService = async(req, res) => {
     try {
-        const eventList = await getSoldOutEvents()
+        const eventList = await getSoldOutEventsDb()
         
         const events = []
-        console.log(eventList[0])
         for (let i = 0; i < eventList.length; i++) {
             events.push({
                 eventID: eventList[i].eventid,
@@ -485,4 +486,124 @@ export const getSoldOutEventsService = async(req, res) => {
     } catch (e) {
         throw e
     }
+}
+
+export const getEventsSearchedService = async(searchWords) => {
+    try {
+        const eventList = await getMatchingEventsDb(searchWords)
+        
+        const events = []
+        for (let i = 0; i < eventList.length; i++) {
+            if (eventList[i].published) {
+                events.push({
+                    eventID: eventList[i].eventid,
+                    eventName: eventList[i].eventname,
+                    hostID: eventList[i].hostid,
+                    hostName: eventList[i].firstname + ' ' + eventList[i].lastname,
+                    startDateTime: eventList[i].startdatetime,
+                    endDateTime: eventList[i].enddatetime,
+                    eventDescription: eventList[i].eventdescription,
+                    eventType: eventList[i].eventtype,
+                    eventVenue: eventList[i].venuename,
+                    eventLocation: eventList[i].venuelocation,
+                    venueCapacity: eventList[i].maxcapacity,
+                    capacity: eventList[i].capacity,
+                    totalTicketAmount: eventList[i].totalticketamount,
+                    image1: eventList[i].image1,
+                    image2: eventList[i].image2,
+                    image3: eventList[i].image3
+                })
+            }
+        }
+        return {events: events, statusCode: 200, msg: 'Events matching search criteria'}
+
+    } catch (e) {
+        throw e
+    }
+}
+
+export const getEventsFilteredService = async(from, to, category, location, rating, priceLimit) => {
+    try {
+        let eventList = await getAllEventsDb();
+        if (from) {
+            eventList = eventList.filter(event => new Date(event.startdatetime) >= new Date(from))
+        }
+
+        if (to) {
+            eventList = eventList.filter(event => new Date(event.enddatetime) <= new Date(to))
+        }
+        
+        if (category) {
+            if (category instanceof Array) {
+                eventList = eventList.filter(event => {
+                    for (const cat of category) {
+                        if (event.eventtype === cat)
+                            return true
+                    }   
+                })
+            } else {
+                eventList = eventList.filter(event => event.eventtype === category)
+            }
+            
+        }
+
+        if (location) {
+            eventList = eventList.filter(event => event.venuelocation.toLowerCase().includes(location.toLowerCase()))
+        }
+
+        if (rating) {
+            const eventRatings = {}
+            for (let e of eventList) {
+                eventRatings[e.eventid] = await eventRatingScore(e.eventid)
+            }
+
+            eventList = eventList.filter(event => eventRatings[event.eventid] >= parseInt(rating))
+        }
+
+        if (priceLimit) {
+            const eventsPriceLimited = await getEventsByTicketPriceLimitDb(parseInt(priceLimit))
+            eventList = eventList.filter(el => eventsPriceLimited.some(epl => epl.eventid === el.eventid))
+        }
+
+        const events = []
+        for (let i = 0; i < eventList.length; i++) {
+            if (eventList[i].published) {
+                events.push({
+                    eventID: eventList[i].eventid,
+                    eventName: eventList[i].eventname,
+                    hostID: eventList[i].hostid,
+                    hostName: eventList[i].firstname + ' ' + eventList[i].lastname,
+                    startDateTime: eventList[i].startdatetime,
+                    endDateTime: eventList[i].enddatetime,
+                    eventDescription: eventList[i].eventdescription,
+                    eventType: eventList[i].eventtype,
+                    eventVenue: eventList[i].venuename,
+                    eventLocation: eventList[i].venuelocation,
+                    venueCapacity: eventList[i].maxcapacity,
+                    capacity: eventList[i].capacity,
+                    totalTicketAmount: eventList[i].totalticketamount,
+                    image1: eventList[i].image1,
+                    image2: eventList[i].image2,
+                    image3: eventList[i].image3
+                })
+            }
+        }
+        return {events: events, statusCode: 200, msg: 'Events matching filter criteria'}
+
+    } catch (e) {
+        throw e
+    }
+}
+
+const eventRatingScore = async(eventID) => {
+    let eventReviews = await getEventReviewsByEventIdDb(eventID);
+    let score = 0.00;
+    for (let i = 0; i < eventReviews.length; i++) {
+        score += parseFloat(eventReviews[i].rating);
+    }
+    if (eventReviews.length !== 0) {
+        score = score/eventReviews.length;
+    } 
+    
+    return score
 }
