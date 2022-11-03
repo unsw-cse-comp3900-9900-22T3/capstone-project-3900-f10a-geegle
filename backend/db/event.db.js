@@ -97,6 +97,24 @@ const isSeatedEventDb = async(eventID) => {
     return result.rows
 }
 
+//READ
+const isEventSoldOutDb = async(eventID) => {
+    const result = await db.query(
+        "SELECT * FROM events e WHERE e.eventID = $1 AND e.totalTicketAmount =  " +
+        "(SELECT count(*) FROM ticketpurchases tp JOIN tickets t ON tp.ticketid = t.ticketid WHERE t.eventID = e.eventID)", [eventID]
+    )
+    return result.rows
+}
+
+//READ
+const getSoldOutEvents = async() => {
+    const result = await db.query(
+        "SELECT * FROM events e WHERE e.totalTicketAmount =  " +
+        "(SELECT count(*) FROM ticketpurchases tp JOIN tickets t ON tp.ticketid = t.ticketid WHERE t.eventID = e.eventID)"
+    )
+    return result.rows
+}
+
 // CREATE
 const addEventDb = async(eventName, hostID, startDateTime, endDateTime, eventDescription, eventType,
                          eventVenue, capacity, totalTicketAmount, image1, image2, image3) => {
@@ -164,6 +182,8 @@ export {
     getHostofEventDb,
     getEventSeatSectionTicketAllocationDb,
     isSeatedEventDb,
+    isEventSoldOutDb,
+    getSoldOutEvents,
     addEventDb,
     addEventVenueDb,
     addEventTicketTypeSeatingAllocation,

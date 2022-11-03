@@ -1,7 +1,8 @@
 import {addEventDb, getAllEventsNotSoldOutDb, getAllEventsDb, getEventByIdDb, getEventByIdDisplayDb,
         getEventsByHostIdDb, getEventVenueByNameDb, getEventVenueByIdDb, getEventGuestListByIdDb, getHostofEventDb, 
         isSeatedEventDb, addEventVenueDb, publishEventByIdDb, addEventTicketTypeSeatingAllocation,
-        unpublishEventByIdDb, removeEventByIdDb, getEventsUserAttendingDb} from '../db/event.db.js' 
+        unpublishEventByIdDb, removeEventByIdDb, getEventsUserAttendingDb, isEventSoldOutDb, getSoldOutEvents} 
+        from '../db/event.db.js' 
 import { getEventReviewsByEventIdDb } from '../db/review.db.js'
 import {addTicketDb} from '../db/ticket.db.js'
 import { getUserByIdDb } from '../db/user.db.js'
@@ -159,22 +160,7 @@ export const unpublishEventsService = async(req, res) => {
 export const editEventsService = async(req, res) => {
     try {
         const eventID = req.params.eventID;
-        const event = await getEventByIdDb(eventID);
-        if (event.length != 1) {
-            return {events: null, statusCode : 404, msg: 'Event does not exist'}
-        }
-        if (req.userID != event[0].hostid) {
-            return {events: null, statusCode : 403, msg: 'You are not the owner of this event'}
-        }
-        
-        const unpublishedEvent = await unpublishEventByIdDb(eventID);
-
-        return {events: {
-                    eventID: unpublishedEvent.eventid,
-                    published: unpublishedEvent.published
-                },
-                statusCode : 200, 
-                msg: 'Event Unpublished'}
+        return 
 
     } catch(e) {
         throw e
@@ -252,7 +238,7 @@ export const getUpcomingEventsService = async(req, res) => {
                     eventID: eventList[i].eventid,
                     eventName: eventList[i].eventname,
                     hostID: eventList[i].hostid,
-                    hostName: eventList[0].firstname + ' ' + eventList[0].lastname,
+                    hostName: eventList[i].firstname + ' ' + eventList[i].lastname,
                     startDateTime: eventList[i].startdatetime,
                     endDateTime: eventList[i].enddatetime,
                     eventDescription: eventList[i].eventdescription,
@@ -289,7 +275,7 @@ export const getAllEventsService = async(req, res) => {
                     eventID: eventList[i].eventid,
                     eventName: eventList[i].eventname,
                     hostID: eventList[i].hostid,
-                    hostName: eventList[0].firstname + ' ' + eventList[0].lastname,
+                    hostName: eventList[i].firstname + ' ' + eventList[i].lastname,
                     startDateTime: eventList[i].startdatetime,
                     endDateTime: eventList[i].enddatetime,
                     eventDescription: eventList[i].eventdescription,
@@ -369,8 +355,7 @@ export const getEventsUserAttendingService = async(req, res) => {
                 totalTicketAmount: event[0].totalticketamount,
                 image1: event[0].image1,
                 image2: event[0].image2,
-                image3: event[0].image3,
-                published: event[0].published
+                image3: event[0].image3
                 });
         }
         
@@ -447,6 +432,55 @@ export const getHostDetailsService = async(req, res) => {
             runningTotalReviewRatings = 0;
         }
         return {events: eventSummary, hostRating: runningTotalReviewRatings, statusCode: 200, msg: 'Details found'}
+
+    } catch (e) {
+        throw e
+    }
+}
+
+export const isEventSoldOutService = async(req, res) => {
+    try {
+        const eventID = req.params.eventID;
+        const event = await isEventSoldOutDb(eventID)
+        
+        if (event.length === 0) {
+            return { soldOut: false, statusCode: 200, msg: `Event ${eventID} still available` }
+        } else {
+            return { soldOut: true, statusCode: 200, msg: `Event ${eventID} sold out` }
+        }
+
+    } catch (e) {
+        throw e
+    }
+}
+
+export const getSoldOutEventsService = async(req, res) => {
+    try {
+        const eventList = await getSoldOutEvents()
+        
+        const events = []
+        console.log(eventList[0])
+        for (let i = 0; i < eventList.length; i++) {
+            events.push({
+                eventID: eventList[i].eventid,
+                eventName: eventList[i].eventname,
+                hostID: eventList[i].hostid,
+                hostName: eventList[i].firstname + ' ' + eventList[i].lastname,
+                startDateTime: eventList[i].startdatetime,
+                endDateTime: eventList[i].enddatetime,
+                eventDescription: eventList[i].eventdescription,
+                eventType: eventList[i].eventtype,
+                eventVenue: eventList[i].venuename,
+                eventLocation: eventList[i].venuelocation,
+                venueCapacity: eventList[i].maxcapacity,
+                capacity: eventList[i].capacity,
+                totalTicketAmount: eventList[i].totalticketamount,
+                image1: eventList[i].image1,
+                image2: eventList[i].image2,
+                image3: eventList[i].image3
+            })
+        }
+        return {events: events, statusCode: 200, msg: 'Sold out events'}
 
     } catch (e) {
         throw e

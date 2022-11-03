@@ -1,5 +1,6 @@
 import { addReviewDb, editReviewByIdDb, getEventReviewsByEventIdDb, getReviewByReviewIdDb, 
-    getReviewLikeAmountDb, getReviewLikeDb, deleteReviewByIdDb, addReviewLikeDb, deleteReviewLikeByIdDb } from '../db/review.db.js'
+     getReviewLikeAmountDb, getReviewLikeDb, deleteReviewByIdDb, addReviewLikeDb, deleteReviewLikeByIdDb,
+     getEventReviewsByEventIdAndUserIdDb } from '../db/review.db.js'
 import { getUserByIdDb } from '../db/user.db.js'
 import { getEventByIdDb } from '../db/event.db.js'
 import { addReplyDb, editReplyByIdDb, getReplyAmountByReviewIDDb, getReplyByReplyIdDb, getReplyByReviewIdDb,
@@ -134,6 +135,45 @@ export const deleteEventReviewService = async(req, res) => {
         return {statusCode : 200, msg: 'Review Deleted'}
 
     } catch (e) {
+        throw e
+    }
+}
+
+export const checkUserHasLeftReviewService = async(req, res) => {
+    try {
+        const eventID = req.params.eventID;
+        const event = await getEventByIdDb(eventID);
+
+        if (event.length == 0) {
+            return {reviews: null, statusCode: 400, msg: 'Event does not exist'};
+        }
+
+        const userReview = await getEventReviewsByEventIdAndUserIdDb(eventID, req.userID);
+        let reviewList = []
+        if (userReview == 0) {
+            return {reviews: reviewList, statusCode: 200, msg: 'User has not added a review'};
+        }
+
+        let username = await getUserByIdDb(req.userID);
+        let likes = await getReviewLikeAmountDb(userReview[0].reviewid);
+        let currentUserReviewLike = await getReviewLikeDb(userReview[0].reviewid, req.userID);
+        let currentUserLiked = (currentUserReviewLike.length >= 1);
+        let numReplies = await getReplyAmountByReviewIDDb(userReview[0].reviewid);
+        reviewList.push({
+            reviewID: userReview[0].reviewid,
+            review: userReview[0].review,
+            rating: userReview[0].rating,
+            postedOn: userReview[0].postedon,
+            user: username.firstname + " " + username.lastname,
+            userID: userReview[0].userid,
+            numLikes: parseInt(likes),
+            numReplies: parseInt(numReplies),
+            userLiked: currentUserLiked
+        });
+
+        return {reviews: reviewList, statusCode: 200, msg: 'Review retrieved'};
+
+    } catch(e) {
         throw e
     }
 }

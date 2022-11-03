@@ -1,19 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Grid,
-  TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Card,
-  Typography,
-  Button,
-  Checkbox,
-  Stack,
-  Paper,
-} from '@mui/material';
+import { Grid, TextField, FormControl, InputLabel, Select, MenuItem, Card, Typography, Button, Checkbox, Stack, Paper, Alert } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 //import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -62,6 +49,12 @@ function CreateEventsForm() {
     seatSections: []
   });
   const [allTicketTypes, setAllTicketTypes] = useState([ticketInfo]);
+  // error check variables 
+  const [endTimeError, setEndTimeError] = useState(false); // End time before start time error
+  const [negCapacityError, setNegCapacityError] = useState(false); // capacity < 0
+  const [startTimeError, setStartTimeError] = useState(false); // start time is before the current time 
+  const [insufCapacityError, setInsufCapacityError] = useState(false); // venue capacity < total tickets
+
   const [ticketInput, setTicketInput] = useState(1);
   const navigate = useNavigate();
   console.log(ticketInfo);
@@ -129,19 +122,20 @@ function CreateEventsForm() {
       //allNewTicketTypes[index].seatSection.remove(event.target.value);
     }
     setAllTicketTypes(allNewTicketTypes);
-    console.log(allNewTicketTypes);
+    console.log('allNewTicketTypes',allNewTicketTypes);
     
   }
   const handleAddTicket = (index) => {
     //setAllTicketTypes(prev => [...prev, ticketInfo]);
 
     // resetting the fields in ticketInfo
-    const newTicketInfo = { ...ticketInfo };
-    newTicketInfo.ticketType = '';
-    newTicketInfo.amount = '';
-    newTicketInfo.ticketPrice = '';
-    newTicketInfo.seatSections = [];
-    // setTicketInfo(newTicketInfo);
+    const newTicketInfo = {  
+      ticketType: '',
+      ticketAmount:'',
+      price:'',
+      seatSections: []
+    }
+    setTicketInfo(newTicketInfo);
     setAllTicketTypes((prev) => [...prev, newTicketInfo]);
     console.log(allTicketTypes);
   };
@@ -162,6 +156,11 @@ function CreateEventsForm() {
   const handleSubmit = async () => {
     // const resultStart = start.map(item => item.toLocaleDateString());
     // const resultEnd = end.map(item => item.toLocaleDateString());
+    // setting errors back to default
+    setEndTimeError(false); // End time before start time error
+    setNegCapacityError(false); // capacity < 0
+    setStartTimeError(false); // start time is before the current time 
+    setInsufCapacityError(false); // venue capacity < total tickets
     console.log(thumbnail);
     console.log(localStorage.getItem('token'));
     console.log(allTicketTypes);
@@ -218,11 +217,20 @@ function CreateEventsForm() {
     if (r.ok) {
       console.log(json);
       navigate('/');
-    } else {
-      // alert the error code and the
-      console.log(`error ${r}, ${json}`);
-    }
-  };
+    } else if (r.status === 400) {
+      // alert the error code and the 
+      if (json === "Invalid Starting and Finishing Times" ) {
+        setEndTimeError(true)
+      } else if (json === "Invalid Capacity" ) {
+        setNegCapacityError(true);
+      } else if (json === "Invalid Event Date") {
+        setStartTimeError(true);
+      } else if (json === "Capacity not sufficient") {
+        setInsufCapacityError(true);
+      }
+    } 
+
+  }
 
   const styles = {
     Paper: {
@@ -344,10 +352,15 @@ function CreateEventsForm() {
             </Grid> */}
             <DefaultVenueInfo venue={venue}/>
             <Grid item xs={12}>
+              <Typography variant="h6" component="div">
+                Event Capacity:
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
               <TextField
-                id="Capacity"
-                label="Capacity"
-                aria-label="Capacity"
+                id="Event Capacity"
+                label="Event Capacity"
+                aria-label="Event Capacity"
                 type="text"
                 variant="outlined"
                 onChange={(e) => setCapacity(e.target.value)}
@@ -393,10 +406,15 @@ function CreateEventsForm() {
                   />
                 </Grid>
                 <Grid item xs={12}>
+                  <Typography variant="h6" component="div">
+                    Event Capacity:
+                  </Typography>
+                </Grid>
+                <Grid item xs={12}>
                   <TextField
-                    id="Capacity"
+                    id="Event Capacity"
                     label="Event Capacity"
-                    aria-label="Capacity"
+                    aria-label="Event Capacity"
                     type="text"
                     variant="outlined"
                     onChange={(e) => setCapacity(e.target.value)}
@@ -508,6 +526,16 @@ function CreateEventsForm() {
               {' '}
               Submit
             </Button>
+          </Grid>
+          <Grid item xs = {12}>
+            {endTimeError === true
+            ? (<Alert severity="error">Error, the End time before start time error</Alert>):null}
+            {negCapacityError === true
+            ? (<Alert severity="error">Error, the event capacity cannot be smaller than 0</Alert>):null}
+            {startTimeError=== true
+            ? (<Alert severity="error">Error, the event start time cannot be before the current time</Alert>):null}
+            {insufCapacityError=== true
+            ? (<Alert severity="error">Error, venue capacity is smaller than the tickets available</Alert>):null}
           </Grid>
         </Grid>
       </form>

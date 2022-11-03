@@ -1,11 +1,12 @@
 import { createEventsService, publishEventsService, unpublishEventsService, editEventsService, deleteEventsService, 
          getEventService, getUpcomingEventsService, getAllEventsService, getHostEventsService, getHostDetailsService, 
-         getEventsUserAttendingService, getEventGuestListService } 
+         getEventsUserAttendingService, getEventGuestListService, isEventSoldOutService, getSoldOutEventsService } 
          from "../services/event.service.js";
 
 import { getEventReviewsService, createEventReviewService, editEventReviewService, 
     deleteEventReviewService, addLikeToEventReviewService, removeLikeToEventReviewService,
-    createReviewReplyService, getReviewReplyService, editReviewReplyService, deleteReviewReplyService } from "../services/review.service.js"
+    createReviewReplyService, getReviewReplyService, editReviewReplyService, deleteReviewReplyService,
+    checkUserHasLeftReviewService } from "../services/review.service.js"
 
 export const createEventsController = async(req, res) => {
     try {
@@ -194,6 +195,19 @@ export const deleteEventReviewController = async(req, res) => {
     }
 }
 
+export const checkUserLeftReviewController = async(req, res) => {
+    try {
+        const {reviews, statusCode, msg} = await checkUserHasLeftReviewService(req, res);
+        if (!reviews) {
+            res.status(statusCode).json(msg)
+        } else {
+            res.status(statusCode).json({reviews, msg})
+        }
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
+
 export const createEventReviewReplyController = async(req, res) => {
     try {
         const {replies, statusCode, msg} = await createReviewReplyService(req, res);
@@ -282,6 +296,25 @@ export const getEventGuestListController = async(req, res) => {
     }
 }
 
+export const isEventSoldOutController = async(req, res) => {
+    try {
+        const {soldOut, statusCode, msg} = await isEventSoldOutService(req, res);     
+        res.status(statusCode).json({soldOut, msg})
+        
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
+
+export const getSoldOutEventsController = async(req, res) => {
+    try {
+        const {events, statusCode, msg} = await getSoldOutEventsService(req, res);     
+        res.status(statusCode).json({events, msg})
+        
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
 
 
 // const getUpcomingEventsController = (req, res) => {

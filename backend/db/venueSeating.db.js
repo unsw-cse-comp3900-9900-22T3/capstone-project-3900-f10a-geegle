@@ -88,6 +88,11 @@ const isVenueSeatingAvailableDb = async(venueID) => {
     return result.rows[0]
 }
 
+// UPDATE
+const unassignSeatFromTicketDb = async(ticketID) => {
+    await db.query("UPDATE tickets SET seatID = NULL WHERE ticketID = $1", [ticketID])
+}
+
 export {
     getVenueSeatsByEventIdDb,
     getVenueAvailableSeatsByEventIdDb,
@@ -97,5 +102,6 @@ export {
     getSeatOccupantDb,
     getVenueSeatSectionsByVenueNameDb,
     isSeatInSeatSectionAllocatedToTicketTypeDb,
-    isVenueSeatingAvailableDb
+    isVenueSeatingAvailableDb,
+    unassignSeatFromTicketDb
 }

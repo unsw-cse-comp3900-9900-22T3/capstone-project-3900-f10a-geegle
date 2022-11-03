@@ -2,9 +2,7 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
-import Radio from '@mui/material/Radio';
-import RadioGroup from '@mui/material/RadioGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
+import Alert from '@mui/material/Alert';
 import { FormControl } from '@mui/material';
 
 const style = {
@@ -24,6 +22,11 @@ const RegisterForm = () => {
     const [lastNameVar, setLastName] = React.useState('');
     const [passwordVar, setPassword] = React.useState('');
     const [confPasswordVar, setConfPassword] = React.useState('');
+    const [passwordError, setPasswordError] = React.useState(false); // check if password meets the minimum requirements
+    const [emailError, setEmailError] = React.useState(false);
+    const [confirmPwError, setConfirmPwError] = React.useState(false);
+    const [userExistError, setUserExistError] = React.useState(false);
+    const [registerSuccess, setRegisterSuccess] = React.useState(false);
     // const [payment, setPayment] = React.useState('');
     // const [card, setCard] = React.useState(false);
     // const [paypal, setPaypal] = React.useState(false);
@@ -41,12 +44,19 @@ const RegisterForm = () => {
   //   };
 
     const handleSubmit = async (e) => {
+      // reset all errors to default state 
+      setPasswordError(false);
+      setEmailError(false);
+      setUserExistError(false);
+      setRegisterSuccess(false);
+      setConfirmPwError(false);
+
       e.preventDefault();
-      console.log('here')
+      
       const jsonString = JSON.stringify({
-          firstName: firstNameVar,
-          lastName: lastNameVar,
-          email: emailVar,
+          firstName: firstNameVar.toLowerCase(),
+          lastName: lastNameVar.toLowerCase(),
+          email: emailVar.toLowerCase(),
           password: passwordVar,
       });
 
@@ -55,21 +65,39 @@ const RegisterForm = () => {
         headers: { 'Content-Type': 'application/json'},
         body: jsonString
       };
-      const res = await fetch('http://localhost:3000/auth/register', requestOptions);
 
-      const out = await res.json();
-      if (res.ok) {
-        // localStorage.setItem('token', out.token);
-        console.log(res);
-        alert('Registered, please login');
-      } else if (res === 401) {
-        console.log(res);
-        alert('input error, check email or password');
+      if (passwordVar === confPasswordVar) {
+        const res = await fetch('http://localhost:3000/auth/register', requestOptions);
+
+        const out = await res.json();
+        console.log('res',res);
+        console.log('out',out);
+        if (res.ok) {
+          // localStorage.setItem('token', out.token);
+          //setPasswordError(false);
+          //setEmailError(false);
+          //setRegisterError(false);
+          setRegisterSuccess(true);
+        } else if (res.status === 401) {
+          if (out === "Invalid Password") {
+            setPasswordError(true);
+            //setRegisterSuccess(false);
+          } else if (out === "Invalid Email") {
+            setEmailError(true);
+            //setRegisterSuccess(false);
+          } else if(out === "User Already Exists") {
+            setUserExistError(true);
+            //setRegisterSuccess(false);
+          }
+        }
       } else {
-        console.log(res);
-        alert('authorization or connection error');
+        setConfirmPwError(true);
       }
+      
+  
     }
+
+    
   return (
     <Box sx={style}>
     <Typography id="modal-modal-title" variant="h6" component="h2">
@@ -172,6 +200,32 @@ const RegisterForm = () => {
         >
           submit
         </button>
+        {
+          passwordError === true
+            ? (<Alert aria-label="password minimum requirements error" id='password minimum requirements error' severity="error">Password needs to be at least 8 characters in length</Alert>)
+            : null
+        }
+        {
+          emailError === true
+            ? (<Alert aria-label="invalid email error" id='invalid email error' severity="error">Invalid email, please check if your email is correct</Alert>)
+            : null
+        }
+        {
+          userExistError === true
+            ? (<Alert aria-label="user already exist error" id='user already exist error' severity="error">Email already exist, please login</Alert>)
+            : null
+        }
+        {
+          registerSuccess === true
+            ? (<Alert aria-label="Registered Successfully" id='register success alert' severity="success">you have registered successfully, please login</Alert>)
+            : null
+        }
+        {
+          confirmPwError === true
+            ? (<Alert aria-label="passwords does not match error" id='confirmation password error alert' severity="error">your password does not match with confirmed password, please check your password</Alert>)
+            : null
+        }
+        
       </FormControl>
     </Typography>
   </Box>
