@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import { CardActions } from '@mui/material';
+import { CardActions, FormControl, TextField } from '@mui/material';
 import CardContent from '@mui/material/CardContent';
 import Card from '@mui/material/Card';
 
@@ -13,6 +13,7 @@ const style = {
   left: '50%',
   transform: 'translate(-50%, -50%)',
   width: 400,
+  height: '40vw',
   bgcolor: 'background.paper',
   border: '2px solid #000',
   boxShadow: 24,
@@ -24,6 +25,7 @@ const style = {
 function ChildModal({reviewId, eventId}) {
   const [open, setOpen] = React.useState(false);
   const [replies, setReplies] = React.useState([]);
+  const [newReply, setNewReply] = React.useState("");
   const handleOpen = () => {
     setOpen(true);
   };
@@ -31,6 +33,25 @@ function ChildModal({reviewId, eventId}) {
     setOpen(false);
   };
 
+  const handleSendReply = async() => {
+    const jsonString = JSON.stringify({
+      reply: newReply
+      }
+    );
+    const response = await fetch(`http://localhost:3000/events/${eventId}/reviews/${reviewId}/reply`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'auth-token': localStorage.getItem('token')
+      },
+      body: jsonString
+    })
+    
+    if (response.ok) {
+      fetchReplies();
+      setNewReply("");
+    }
+  }
   const fetchReplies = async() => {
     const response = await fetch(`http://localhost:3000/events/${eventId}/reviews/${reviewId}/reply`, {
       method: 'GET',
@@ -67,22 +88,45 @@ function ChildModal({reviewId, eventId}) {
           <Typography gutterBottom variant="h5" component="div">
             Replies 
           </Typography>
-          {replies.map((reply,idx) => {
-            return (
-              <Card sx={{ maxWidth: '100%' }} key={idx}>
-                <CardContent>
-                  <Typography variant="body2" color="text.secondary">
-                    Reply: {idx + 1}, Posted On:{reply.repliedOn.substring(0, 10)}, User:{reply.user}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    User says: {reply.reply}
-                  </Typography>
-                </CardContent>
-                <CardActions>
-                </CardActions>
-              </Card>
-            );
-          })}
+          <Box id="replies container" sx={{width:'90%', height: '70%', overflow: 'auto'}}>
+            {replies.map((reply,idx) => {
+              return (
+                <Card sx={{ maxWidth: '100%' }} key={idx}>
+                  <CardContent>
+                    <Typography variant="body2" color="text.secondary">
+                      Reply: {idx + 1}, Posted On:{reply.repliedOn.substring(0, 10)}, User:{reply.user}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      User says: {reply.reply}
+                    </Typography>
+                  </CardContent>
+                  <CardActions>
+                  </CardActions>
+                </Card>
+              );
+            })}
+          </Box>
+          <Box id="reply form">
+            <FormControl fullWidth>
+              <TextField
+                  id="reply form"
+                  label="Send a Reply"
+                  aria-label="Send a Reply"
+                  type="text"
+                  variant="outlined"
+                  onChange={(e) => setNewReply(e.target.value)}
+                  value={newReply}
+                  fullWidth
+
+                />
+                <Button 
+                  variant="contained"
+                  onClick={() => handleSendReply() }>
+                  Send Reply
+              </Button>
+            </FormControl>
+          </Box>
+          
           
           {/* <h2 id="parent-modal-title">Text in a modal</h2>
           <p id="parent-modal-description">
