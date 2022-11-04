@@ -11,33 +11,19 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import CardHeader from '@mui/material/CardHeader';
 import { FormControl } from '@mui/material';
-import { Navigate, useNavigate, Link, useParams } from 'react-router-dom';
+import { Navigate, useNavigate, Link, useParams, useLocation } from 'react-router-dom';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { Grid } from '@mui/material';
+import Stack from '@mui/material/Stack';
+import { GifBoxOutlined } from '@mui/icons-material';
+import ViewReviews from './viewReviews';
 import PurchaseTicket from '../components/PurchaseTicket';
-// responsive prop for carousel 
-const responsive = {
-  superLargeDesktop: {
-    // the naming can be any, depends on you.
-    breakpoint: { max: 4000, min: 3000 },
-    items: 1
-  },
-  desktop: {
-    breakpoint: { max: 3000, min: 1024 },
-    items: 1
-  },
-  tablet: {
-    breakpoint: { max: 1024, min: 464 },
-    items: 1
-  },
-  mobile: {
-    breakpoint: { max: 464, min: 0 },
-    items: 1
-  }
-};
 const ViewEvent= () => {
   const { eventId} = useParams();
+  const state = useLocation();
+  const eventObj = state.state;
+  console.log(eventObj);
   const [eventInfo, setEventInfo] = useState({
     capacity: '',
     endDateTime: '',
@@ -63,6 +49,109 @@ const ViewEvent= () => {
   const [imageArray, setImageArray] = useState([]);
   const [ticketModal, setTicketModal] = useState(false); //opening and closing the purchasing ticket modal 
   const [allTicketTypes, setAllTicketTypes] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [showReviews, setShowReviews] = useState(false);
+  const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    boxShadow: 24,
+    p: 4,
+  };
+  // responsive prop for carousel 
+  const responsive = {
+    superLargeDesktop: {
+      // the naming can be any, depends on you.
+      breakpoint: { max: 4000, min: 3000 },
+      items: 1
+    },
+    desktop: {
+      breakpoint: { max: 3000, min: 1024 },
+      items: 1
+    },
+    tablet: {
+      breakpoint: { max: 1024, min: 464 },
+      items: 1
+    },
+    mobile: {
+      breakpoint: { max: 464, min: 0 },
+      items: 1
+    }
+  };
+
+  const styles = {
+    BoxContainer: {
+      display: 'flex',
+      // alignItems: 'center',
+      // justifyContent: 'center',
+      flexDirection: 'column',
+      padding: '3vw',
+      margin: '1vw 5vw 5vw 5vw'
+    },
+    ImageContainer: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      // padding: '3vw',
+      // margin: '9vw'
+    },
+    detailSec: {
+      margin: '0',
+      fontFamily: "Helvetica",
+      fontSize: "1rem",
+      letterSpacing: "0.00938em",
+      color: "rgba(0, 0, 0, 0.6)",
+      fontWeight: "bold"
+    }
+  }
+  // const getHostInfo = async(eventDetails) => {
+  //   const requestOptions = {
+  //     method: 'GET',
+  //     headers: {
+  //       'auth-token': localStorage.getItem('token'),
+  //     },
+  //   }
+  //   const response = await fetch(`http://localhost:3000/user/profile/${eventDetails.hostID}`, requestOptions
+  //   )
+  //   if (response.ok) {
+  //     const json = (await response.json()).user;
+  //     console.log(json);
+  //     const firstName = json.firstName;
+  //     const lastName = json.lastname;
+  //     setHostName(`${firstName} ${lastName}`);
+  //   } else {
+  //     alert(`error: ${response.status}`)
+  //   }
+  // }
+  
+  // const getReviews = async() => {
+  //   const response = await fetch(`http://localhost:3000/events/${eventId}/reviews`, {
+  //     method: 'GET',
+  //     headers: {
+  //       'Content-Type': 'application/json'
+  //     },
+  //   })
+  //   const json = await response.json();
+  //   const allReviews = []
+  //   console.log(json);
+  //   if (json.reviews.length !== 0) {
+  //     for (const rev of json.reviews) {
+  //       allReviews.push(rev);
+  //     }
+  //     setReviews(allReviews)
+  //   }
+  // }
+
+  const handleShowReviews = (e) => {
+    if (showReviews) {
+      setShowReviews(false);
+    } else {
+      setShowReviews(true);
+    }
+  }
   const dateOptions = {
     weekday: 'long', 
     year: 'numeric', 
@@ -133,32 +222,6 @@ const ViewEvent= () => {
     
   },[]);
 
-  const styles = {
-    BoxContainer: {
-      display: 'flex',
-      // alignItems: 'center',
-      // justifyContent: 'center',
-      flexDirection: 'column',
-      padding: '3vw',
-      margin: '1vw 5vw 5vw 5vw'
-    },
-    ImageContainer: {
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      // padding: '3vw',
-      // margin: '9vw'
-    },
-    detailSec: {
-      margin: '0',
-      fontFamily: "Helvetica",
-      fontSize: "1rem",
-      letterSpacing: "0.00938em",
-      color: "rgba(0, 0, 0, 0.6)",
-      fontWeight: "bold"
-    }
-
-  }
   return (
     <>
       <Box sx={styles.BoxContainer}>
@@ -188,7 +251,7 @@ const ViewEvent= () => {
                 Host : {eventInfo.hostName}
               </Typography>
             </Box>
-            <Box id="button container" style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+            <Box id="button container" style={{display: "flex", justifyContent: "center", alignItems: "center", marginLeft: "35%"}}>
               <Button
                 variant ='outlined'
                 id = 'Purchase Ticket Button'
@@ -224,7 +287,7 @@ const ViewEvent= () => {
               {eventInfo.eventDescription}
             </Typography>
           </Box>
-          <div>
+          <Box>
             <Typography variant="h5"color="text.secondary" sx={{fontWeight: "bold", lineHeight: "1.2"}}>
             Ticket types and price
             </Typography>
@@ -235,11 +298,48 @@ const ViewEvent= () => {
               </Typography>
               )
             })}
-          </div>
+          </Box>
+          <Box>
+            <Stack spacing={2} direction="row">
+              <Button variant="outlined" onClick={handleShowReviews}>{`Reviews (${eventObj.reviews.length})`}</Button>
+            </Stack>
+            {Array(Math.ceil(eventObj.ratingRatio * 5))
+              .fill(0)
+              .map((_, i) => (
+                <svg
+                  key={i}
+                  height="35"
+                  width="35"
+                  aria-label="coloured star rating"
+                >
+                  <polygon
+                    points="9.9, 1.1, 3.3, 21.78, 19.8, 8.58, 0, 8.58, 16.5, 21.78"
+                    fill="#ffd800"
+                  />
+                </svg>
+              ))}
+            {Array(5 - Math.ceil(eventObj.ratingRatio * 5))
+              .fill(0)
+              .map((_, i) => (
+                <svg
+                  key={i}
+                  height="35"
+                  width="35"
+                  aria-label="uncoloured star rating"
+                >
+                  <polygon
+                    points="9.9, 1.1, 3.3, 21.78, 19.8, 8.58, 0, 8.58, 16.5, 21.78"
+                    fill="#7e7e7e"
+                    stroke="#7e7e7e"
+                    strokeWidth="1"
+                  />
+                </svg>
+              ))}
+          </Box>
+          {showReviews && <ViewReviews showReviews={showReviews} setShowReviews={setShowReviews} eventReviews={eventObj.reviews} eventId={eventId}/>}
         </Box>
       </Box>
     </>
-    
   );
 };
-export default ViewEvent ;
+export default ViewEvent;
