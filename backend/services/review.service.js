@@ -38,7 +38,8 @@ export const createEventReviewService = async(req, res) => {
             user: user.firstname + " " + user.lastname,
             numLikes: 0,
             numReplies: 0,
-            userLiked: false
+            userLiked: false,
+            userEdited: newReview.edited
         },
         statusCode : 201, 
         msg: 'Review Published'}
@@ -72,7 +73,8 @@ export const getEventReviewsService = async(req, res) => {
                 userID: eventReviews[i].userid,
                 numLikes: parseInt(likes),
                 numReplies: parseInt(numReplies),
-                userLiked: currentUserLiked
+                userLiked: currentUserLiked,
+                userEdited: eventReviews[i].edited
             });
         }
         return {reviews: reviewList, statusCode: 200, msg: 'Reviews found'}
@@ -110,7 +112,8 @@ export const editEventReviewService = async(req, res) => {
             user: user.firstname + " " + user.lastname,
             numLikes: parseInt(likes),
             numReplies: parseInt(numReplies),
-            userLiked: currentUserLiked
+            userLiked: currentUserLiked,
+            userEdited: newReview.edited
         },
         statusCode : 200, 
         msg: 'Review Updated'}
@@ -168,7 +171,8 @@ export const checkUserHasLeftReviewService = async(req, res) => {
             userID: userReview[0].userid,
             numLikes: parseInt(likes),
             numReplies: parseInt(numReplies),
-            userLiked: currentUserLiked
+            userLiked: currentUserLiked,
+            userEdited: userReview[0].edited
         });
 
         return {reviews: reviewList, statusCode: 200, msg: 'Review retrieved'};

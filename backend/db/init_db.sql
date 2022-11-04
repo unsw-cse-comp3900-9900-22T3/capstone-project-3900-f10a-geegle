@@ -115,6 +115,7 @@ CREATE TABLE reviews (
     rating integer NOT NULL,
     review text,
     postedOn timestamptz NOT NULL,
+    edited boolean DEFAULT FALSE,
     foreign key (eventID)
         references events (eventID) ON DELETE CASCADE,
     foreign key (userID)
