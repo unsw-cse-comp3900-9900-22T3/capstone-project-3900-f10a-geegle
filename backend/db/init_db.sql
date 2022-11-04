@@ -81,7 +81,8 @@ CREATE TABLE tickets(
 );
 
 CREATE TABLE creditCardDetails(
-    creditCardNum char(16) check (creditCardNum ~ '[0-9]{16}')  PRIMARY KEY,
+    creditCardID SERIAL PRIMARY KEY,
+    creditCardNum char(16) check (creditCardNum ~ '[0-9]{16}'),
     ccv char(3) NOT NULL check (ccv ~ '[0-9]{3}'),
     expiryMonth char(2) check (expiryMonth ~ '[0-9]{2}') NOT NULL,
     expiryYear char(2) check (expiryYear ~ '[0-9]{2}') NOT NULL,

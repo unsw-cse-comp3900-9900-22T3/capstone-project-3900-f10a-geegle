@@ -87,8 +87,8 @@ const updateUserCreditCardByIdDb = async(cardNumber, ccv, expiryMonth, expiryYea
 // INSERT
 const addUserCreditCardDb = async(cardNumber, ccv, expiryMonth, expiryYear, Id) => {
     const result = await db.query(
-        "INSERT INTO creditCardDetails (creditCardNum, ccv, expiryMonth, expiryYear, userID) " +
-        "VALUES ($1, $2, $3, $4, $5) RETURNING *", 
+        "INSERT INTO creditCardDetails (creditCardID, creditCardNum, ccv, expiryMonth, expiryYear, userID) " +
+        "VALUES (DEFAULT, $1, $2, $3, $4, $5) RETURNING *", 
         [cardNumber, ccv, expiryMonth, expiryYear, Id])
     return result.rows[0]
 }

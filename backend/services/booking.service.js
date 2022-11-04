@@ -266,14 +266,14 @@ export const bookEventService = async(req, res) => {
         const userID = req.userID
         const { tickets, seats, creditCard } = req.body;
 
-        if (seats.length != 0 && tickets.length != seats.length) {
+        if (seats.length !== 0 && tickets.length !== seats.length) {
             return { booking: null, statusCode: 400, msg: "Number of tickets and seats selected not equal"}
         }
 
         // Check credit card correct
         if (creditCard.useStored) {
             const cc = await userdb.getUserCreditCardbyIdDb(userID)
-            if (cc.length == 0) {
+            if (cc.length === 0) {
                 return { booking: null, statusCode: 400, msg: "User has no credit card saved"}
             }
         } else if (!checkValidCreditCard(creditCard.creditCardNum, creditCard.ccv, creditCard.expiryMonth, creditCard.expiryYear)) {
@@ -296,13 +296,13 @@ export const bookEventService = async(req, res) => {
         // Check seat not taken + ticketType can sit in that seat section
         for (let i = 0; i < seats.length; i++) {
             let seatFromDB = await venueSeatingdb.getSeatOccupantDb(eventID, seats[i])
-            if (seatFromDB.length != 0) {
+            if (seatFromDB.length !== 0) {
                 return { booking: null, statusCode: 400, msg: `Seat '${seats[i]}' already taken`}
             }
             
             const allowed = await venueSeatingdb.isSeatInSeatSectionAllocatedToTicketTypeDb(eventID, seats[i], tickets[i])
             
-            if (allowed.length == 0) {
+            if (allowed.length === 0) {
                 return { booking: null, statusCode: 400, msg: `Seat '${seats[i]}' cannot be chosen for ticket type: '${tickets[i]}'`}
             }
         }
@@ -324,12 +324,12 @@ export const bookEventService = async(req, res) => {
         const ticketPurchases = []
         for (let i = 0; i < tickets.length; i++) {
             let ticketResult = await ticketdb.getAvailableTicketsByTicketTypeDb(eventID, tickets[i])
-            if (ticketResult.length == 0) {
+            if (ticketResult.length === 0) {
                 continue
             } 
 
             ticketResult = ticketResult[0]
-            if (seats.length != 0) {
+            if (seats.length !== 0) {
                 // implement this
                 ticketResult = await ticketdb.assignSeatToTicketDb(ticketResult.ticketid, seats[i])
             }
