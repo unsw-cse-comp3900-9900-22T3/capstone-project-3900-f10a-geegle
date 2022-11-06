@@ -51,7 +51,7 @@ export const createEventReviewService = async(req, res) => {
 export const getEventReviewsService = async(req, res) => {
     try {
         const eventReviews = await getEventReviewsByEventIdDb(req.params.eventID);
-
+        const { userID } = req.body;
         const events = await getEventByIdDb(req.params.eventID);
         if (events.length == 0) {
             return {reviews: null, statusCode: 400, msg: 'Event does not exist'}
@@ -61,10 +61,13 @@ export const getEventReviewsService = async(req, res) => {
         for (let i = 0; i < eventReviews.length; i++) {
             let username = await getUserByIdDb(eventReviews[i].userid);
             let likes = await getReviewLikeAmountDb(eventReviews[i].reviewid);
-            let currentUserReviewLike = await getReviewLikeDb(eventReviews[i].reviewid, req.userID);
+            
             let currentUserLiked = false;
-            if (currentUserReviewLike.length >= 1) {
-                currentUserLiked = true;
+            if (userID != -1) {
+                let currentUserReviewLike = await getReviewLikeDb(eventReviews[i].reviewid, userID);
+                if (currentUserReviewLike.length >= 1) {
+                    currentUserLiked = true;
+                }
             }
             let numReplies = await getReplyAmountByReviewIDDb(eventReviews[i].reviewid);
             reviewList.push({
