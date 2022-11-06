@@ -345,7 +345,7 @@ export const bookEventService = async(req, res) => {
                                     ticketPurchaseTime: ticketPurchase.ticketpurchasetime })
         }
 
-
+        /*
         // Send email confirmation
         var CLIENT_ID = 
         "300746065947-uhtf3322436tvsv1c0gkq9oaho7a9o35.apps.googleusercontent.com"
@@ -375,17 +375,17 @@ export const bookEventService = async(req, res) => {
                 'Dear Ticker Holder, ' + 
                 'Thank you for purchasing a ticket to ' + eventID + 
                 'Your seat number is: ' + ticketPurchases[0].seatID
-            /*html: 
+            html: 
             'Dear Ticket Holder,' +
             '#{{eventName}} - Cancelled' +
             'All purchased tickets will receive a full refund.'
             'Tickets will be automatically refunded in full (including refundable ticket purchase, if relevant) to the original payment method used for purchase and patrons do not need to take any action.' +
             'Patrons should allow approximately 30 business days for the refund to appear in their account. Please do not contact Ticketek regarding your refund.' +
-            'Regards, Ticketek Team'*/
+            'Regards, Ticketek Team'
             };
         
         const result = await transporter.sendMail(mailOptions)
-        console.log(result)
+        console.log(result)*/
 
 
 

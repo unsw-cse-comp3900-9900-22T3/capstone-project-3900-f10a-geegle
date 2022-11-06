@@ -9,6 +9,7 @@ import { getEventReviewsByEventIdDb } from '../db/review.db.js'
 import {addTicketDb} from '../db/ticket.db.js'
 import { getUserByIdDb } from '../db/user.db.js'
 import { isVenueSeatingAvailableDb } from '../db/venueSeating.db.js'
+import { getTicketPurchaseByUserIdDb } from '../db/ticketpurchase.db.js'
 
 
 /*  Request
@@ -307,6 +308,8 @@ export const getHostEventsService = async(req, res) => {
         
         let upcomingEventList = [];
         for (let i = 0; i < eventList.length; i++) {
+            const seating = await isSeatedEventDb(eventList[i].eventid)
+            
             upcomingEventList.push({
                 eventID: eventList[i].eventid,
                 eventName: eventList[i].eventname,
@@ -318,6 +321,7 @@ export const getHostEventsService = async(req, res) => {
                 eventVenue: eventList[i].venuename,
                 eventLocation: eventList[i].venuelocation,
                 venueCapacity: eventList[i].maxcapacity,
+                seatedEvent: seating.length > 0 ? true : false,
                 capacity: eventList[i].capacity,
                 totalTicketAmount: eventList[i].totalticketamount,
                 published: eventList[i].published,
@@ -379,7 +383,23 @@ export const getEventGuestListService = async(req, res) => {
         
         let guestList = [];
         for (let guest of guests) {
-            guestList.push({name: guest.firstname + ' ' + guest.lastname, email: guest.email})
+            const info = {}
+            info.name = guest.firstname + ' ' + guest.lastname
+            info.email = guest.email
+            info.tickets = []
+            const tickets = await getTicketPurchaseByUserIdDb(eventID, guest.userid)
+            
+            for (const ticket of tickets) {
+                const seating = await isSeatedEventDb(ticket.eventid)
+                info.tickets.push({
+                    ticketID: ticket.ticketid,
+                    ticketType: ticket.tickettype,
+                    price: ticket.price,
+                    seat: seating.length > 0 ? 
+                        {seatID: ticket.seatid, seatSection: ticket.seatsection, seatRow: ticket.seatrow, seatNo: ticket.seatno } : null
+                })
+            }
+            guestList.push(info)
         }
         // console.log(guestList)
         return {guests: guestList, statusCode: 200, msg: 'Guest list'}

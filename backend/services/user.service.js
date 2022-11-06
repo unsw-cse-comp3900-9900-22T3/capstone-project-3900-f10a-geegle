@@ -1,4 +1,6 @@
 import * as userDb from '../db/user.db.js'
+import * as ticketpurchaseDb from '../db/ticketpurchase.db.js'
+import { isSeatedEventDb } from '../db/event.db.js'
 import bcrypt from 'bcrypt'
 
 const getUserProfileService = async (req, res) => {
@@ -8,6 +10,7 @@ const getUserProfileService = async (req, res) => {
 
     try {
         const user = await userDb.getUserByIdDb(req.params.userID)
+        const tickets = await ticketpurchaseDb.getUserTicketsdDb(req.params.userID)
         const getUser = {
                             user: {
                                 firstName: user.firstname,
@@ -17,6 +20,23 @@ const getUserProfileService = async (req, res) => {
                             statusCode: 200,
                             msg: 'User profile details sent'
                         }
+        
+        getUser.user.tickets = []
+        for (const ticket of tickets) {
+            const seating = await isSeatedEventDb(ticket.eventid)
+            getUser.user.tickets.push({
+                ticketID: ticket.ticketid,
+                ticketType: ticket.tickettype,
+                price: ticket.price,
+                seat: seating.length > 0 ? 
+                        {seatID: ticket.seatid, seatSection: ticket.seatsection, seatRow: ticket.seatrow, seatNo: ticket.seatno } : null,
+                eventName: ticket.eventname,
+                venueName: ticket.venuename,
+                eventLocation: ticket.venuelocation,
+                eventStartDateTime: ticket.eventstartdatetime
+            })
+        }
+        
         const userCreditCard = await userDb.getUserCreditCardbyIdDb(req.params.userID)
         if (userCreditCard.length == 1) {
             getUser.user.creditCard = {

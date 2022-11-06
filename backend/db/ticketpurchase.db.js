@@ -10,8 +10,18 @@ const getTicketPurchaseByTicketIdDb = async(ticketId) => {
 // READ
 const getTicketPurchaseByUserIdDb = async(eventID, userID) => {
     const result = await db.query (
-        "SELECT * FROM ticketPurchases tp JOIN tickets t on tp.ticketid = t.ticketid WHERE t.eventID = $1 AND tp.userID = $2", 
+        "SELECT * FROM ticketPurchases tp JOIN tickets t on tp.ticketid = t.ticketid JOIN seats s on t.seatID = s.seatid " +
+        "WHERE t.eventID = $1 AND tp.userID = $2", 
         [eventID, userID])
+    return result.rows
+}
+
+// READ
+const getUserTicketsdDb = async(userID) => {
+    const result = await db.query (
+        "SELECT * FROM ticketPurchases tp JOIN tickets t on tp.ticketid = t.ticketid JOIN events e on t.eventid = e.eventid " +
+        "JOIN seats s on t.ticketid = s.seatid JOIN venues v on s.venueid = v.venueid WHERE tp.userID = $1", 
+        [userID])
     return result.rows
 }
 
@@ -36,6 +46,7 @@ const removeTicketPurchaseByTicketIdDb = async(ticketId) => {
 export {
     getTicketPurchaseByTicketIdDb,
     getTicketPurchaseByUserIdDb,
+    getUserTicketsdDb,
     addTicketPurchaseDb,
     removeTicketPurchaseByTicketIdDb
 }
