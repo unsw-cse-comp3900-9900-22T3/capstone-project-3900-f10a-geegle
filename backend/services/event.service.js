@@ -307,6 +307,7 @@ export const getHostEventsService = async(req, res) => {
         
         let upcomingEventList = [];
         for (let i = 0; i < eventList.length; i++) {
+            const seating = await isSeatedEventDb(req.params.eventID)
             upcomingEventList.push({
                 eventID: eventList[i].eventid,
                 eventName: eventList[i].eventname,
@@ -318,6 +319,7 @@ export const getHostEventsService = async(req, res) => {
                 eventVenue: eventList[i].venuename,
                 eventLocation: eventList[i].venuelocation,
                 venueCapacity: eventList[i].maxcapacity,
+                seatedEvent: seating.length > 0 ? true : false,
                 capacity: eventList[i].capacity,
                 totalTicketAmount: eventList[i].totalticketamount,
                 published: eventList[i].published,
