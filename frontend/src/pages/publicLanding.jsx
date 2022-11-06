@@ -37,13 +37,36 @@ const PublicLanding = () => {
     //console.log(newAlignment);
   };
   const getReviews = async(eventId) => {
-    const response = await fetch(`http://localhost:3000/events/${eventId}/reviews`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-    })
-    const json = await response.json();
+    // let userID = -1;
+    // if (!localStorage.getItem('userId')) {
+    //   userID = -1;
+    // } else {
+    //   userID = parseInt(localStorage.getItem('userId'))
+    // }
+    // console.log("here", userID);
+    let json = {}
+
+    if (localStorage.getItem('token')) { 
+      const response = await fetch(`http://localhost:3000/events/${eventId}/reviews/user`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'auth-token': localStorage.getItem('token'),
+        },
+        // body: JSON.stringify({userID:userID }),
+      })
+      let json = await response.json();
+    } else {
+      const response = await fetch(`http://localhost:3000/events/${eventId}/reviews`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        // body: JSON.stringify({userID:userID }),
+      })
+      let json = await response.json();
+    }
+
     const allReviews = []
     let totalRating = 0
     let ratingRatio = 0
