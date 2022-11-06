@@ -9,6 +9,9 @@ import userRouter from './routes/user.route.js';
 db.query('select * from users', (err, res) => {
     console.log(res.rows)
 });
+db.query('select * from reviewLikes', (err, res) => {
+    console.log(res.rows)
+});
 
 const app = express();
 const PORT = 3000;
