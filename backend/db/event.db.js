@@ -75,7 +75,7 @@ const getHostofEventDb = async(eventID) => {
 // READ
 const getEventGuestListByIdDb = async(eventID) => {
     const result = await db.query(
-        "SELECT u.firstname, u.lastname, u.email from ticketPurchases tp " +
+        "SELECT distinct u.userid, u.firstname, u.lastname, u.email from ticketPurchases tp " +
         "JOIN tickets t ON tp.ticketid = t.ticketid " +
         "JOIN users u ON tp.userid = u.userid WHERE t.eventid = $1", [eventID])
     return result.rows
