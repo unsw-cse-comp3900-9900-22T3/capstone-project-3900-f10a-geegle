@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography';
 import CardHeader from '@mui/material/CardHeader';
 import { FormControl } from '@mui/material';
 import { Navigate, useNavigate } from 'react-router-dom';
-
+import ViewCustomers from '../components/ViewCustomers';
 const style = {
     position: 'absolute',
     top: '50%',
@@ -24,7 +24,13 @@ const style = {
 
 const HostEventsPage = () => {
   const [myListings, setMyListings] = React.useState([]);
-  // const [publishedListings, setPublishedListings] = React.useState([]);
+  const [customerModal, setCustomerModal] = React.useState(false);
+  const [clickedEventInfo, setClickedEventInfo] = React.useState({});
+
+  const handleViewCustomers = (eventInfo) => {
+    setCustomerModal(true);
+    setClickedEventInfo({...eventInfo});
+  }
 
   const handlePublish = async(obj, idx) => {
     const response = await fetch(`http://localhost:3000/events/${obj.eachEvent.eventID}/publish`, {
@@ -128,12 +134,17 @@ const HostEventsPage = () => {
         </CardContent>
         <CardActions>
             <Button size="small">view</Button>
+            {obj.eachEvent.published && <Button size="small" onClick={()=>handleViewCustomers(obj.eachEvent)}>Customers</Button>}
             {obj.eachEvent.published && <Button size="small" onClick={e=>handleUnpublish(obj, idx)}>Cancel</Button>}
             {!obj.eachEvent.published && <Button size="small" onClick={e=>handlePublish(obj, idx)}>publish</Button>}
         </CardActions>
       </Card> 
       )
     })}
+    {customerModal === true ? (<ViewCustomers 
+      customerModal={customerModal}
+      clickedEventInfo = {clickedEventInfo}
+      setCustomerModal = {setCustomerModal}/>) : null}
     </>
   );
 };
