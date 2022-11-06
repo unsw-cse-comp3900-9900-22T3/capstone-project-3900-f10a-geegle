@@ -9,7 +9,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import CardHeader from '@mui/material/CardHeader';
 import { FormControl } from '@mui/material';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate, Link } from 'react-router-dom';
 import ViewCustomers from '../components/ViewCustomers';
 const style = {
     position: 'absolute',
@@ -93,6 +93,7 @@ const HostEventsPage = () => {
             published: eve.published,
             startDateTime: eve.startDateTime,
             totalTicketAmount:eve.totalTicketAmount,
+            seatedEvent:eve.seatedEvent
           }
         })
       }
@@ -133,7 +134,8 @@ const HostEventsPage = () => {
           </Typography>
         </CardContent>
         <CardActions>
-            <Button size="small">view</Button>
+            <Button size="small"
+              >view</Button>
             {obj.eachEvent.published && <Button size="small" onClick={()=>handleViewCustomers(obj.eachEvent)}>Customers</Button>}
             {obj.eachEvent.published && <Button size="small" onClick={e=>handleUnpublish(obj, idx)}>Cancel</Button>}
             {!obj.eachEvent.published && <Button size="small" onClick={e=>handlePublish(obj, idx)}>publish</Button>}
