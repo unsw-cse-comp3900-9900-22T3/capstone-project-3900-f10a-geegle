@@ -31,6 +31,7 @@ const PublicLanding = () => {
   const [ratingRatioHook, setRatingRatio] = React.useState(0);
   const [toggleState, setToggleState] = React.useState('All Events');
   const [allEventReviews, setAllEventReviews] = React.useState(['']);
+  
 
   const handleChange = (event, newAlignment) => {
     setToggleState(newAlignment);

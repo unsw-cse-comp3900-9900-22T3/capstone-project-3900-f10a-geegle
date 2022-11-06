@@ -6,6 +6,7 @@ import Typography from '@mui/material/Typography';
 import { CardActions, FormControl, TextField } from '@mui/material';
 import CardContent from '@mui/material/CardContent';
 import Card from '@mui/material/Card';
+import { Navigate, useNavigate, Link, useParams, useLocation } from 'react-router-dom';
 
 const style = {
   position: 'absolute',
@@ -26,6 +27,7 @@ function ChildModal({reviewId, eventId}) {
   const [open, setOpen] = React.useState(false);
   const [replies, setReplies] = React.useState([]);
   const [newReply, setNewReply] = React.useState("");
+  
   const handleOpen = () => {
     setOpen(true);
   };
@@ -147,6 +149,63 @@ export default function ViewReviews({showReviews, setShowReviews, eventReviews, 
   // const handleClose = () => {
   //   setOpen(false);                                              
   // };
+  //const { eventId} = useParams();
+  const [reviews, setReviews] = React.useState(eventReviews);
+  //const [object, setObject] = React.useState({});
+
+  const updateLikes = async(eventId) => {
+    const response = await fetch(`http://localhost:3000/events/${eventId}/reviews/`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    })
+    const json = await response.json();
+    const allReplies = []
+    console.log(json);
+    if (json.replies.length !== 0) {
+      for (const rep of json.replies) {
+        allReplies.push(rep);
+      }
+      //setReplies(allReplies)
+    }
+  }
+
+  const likeReview = async(reviewId, eventId) => {
+    const response = await fetch(`http://localhost:3000/events/${eventId}/reviews/${reviewId}/like`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'auth-token': localStorage.getItem('token')
+      },
+    })
+    if (response.ok) {
+      console.log(reviews, 'reviews')
+      const jsonReviewLiked = await (response.json());
+      console.log(jsonReviewLiked.reviews, 'json review liked')
+      let oldReviews = reviews;
+      const editedReview = jsonReviewLiked.reviews;
+      oldReviews = oldReviews.map(r=>r.reviewID !== editedReview.reviewID ? r: editedReview);
+      setReviews(oldReviews)
+
+    }
+    
+
+  }
+
+  const unlikeReview = async(reviewId, eventId) => {
+    const response = await fetch(`http://localhost:3000/events/${eventId}/reviews/${reviewId}/unlike`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'auth-token': localStorage.getItem('token')
+      },
+    })
+    if (response.ok) {
+      const json = await response.json();
+    } 
+    
+  }
 
   return (
     <div>
@@ -161,7 +220,8 @@ export default function ViewReviews({showReviews, setShowReviews, eventReviews, 
           <Typography gutterBottom variant="h5" component="div">
             Reviews
           </Typography>
-          {eventReviews.map((review,idx) => {
+          {reviews.map((review,idx) => {
+            //setObject(review);
             return (
               <Card sx={{ maxWidth: '100%' }} key={idx}>
                 <CardContent>
@@ -176,7 +236,8 @@ export default function ViewReviews({showReviews, setShowReviews, eventReviews, 
                   </Typography>
                 </CardContent>
                 <CardActions>
-                  <Button variant="text">Like {review.numLikes}</Button>
+                  {!review.userLiked && <Button onClick={()=>likeReview(review.reviewID,eventId)} variant="text">Like {review.numLikes}</Button>}
+                  {review.userLiked && <Button onClick={()=>unlikeReview(review.reviewID,eventId)}variant="text">unLike {review.numLikes}</Button>}
                   <ChildModal reviewId={review.reviewID} eventId={eventId}/>
                 </CardActions>
               </Card>
