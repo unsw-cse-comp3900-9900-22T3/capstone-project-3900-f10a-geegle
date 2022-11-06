@@ -51,7 +51,6 @@ export const createEventReviewService = async(req, res) => {
 export const getEventReviewsService = async(req, res) => {
     try {
         const eventReviews = await getEventReviewsByEventIdDb(req.params.eventID);
-        const { userID } = req.body;
         const events = await getEventByIdDb(req.params.eventID);
         if (events.length == 0) {
             return {reviews: null, statusCode: 400, msg: 'Event does not exist'}
@@ -63,8 +62,8 @@ export const getEventReviewsService = async(req, res) => {
             let likes = await getReviewLikeAmountDb(eventReviews[i].reviewid);
             
             let currentUserLiked = false;
-            if (userID != -1) {
-                let currentUserReviewLike = await getReviewLikeDb(eventReviews[i].reviewid, userID);
+            if (typeof req.userID !== 'undefined') {
+                let currentUserReviewLike = await getReviewLikeDb(eventReviews[i].reviewid, req.userID);
                 if (currentUserReviewLike.length >= 1) {
                     currentUserLiked = true;
                 }

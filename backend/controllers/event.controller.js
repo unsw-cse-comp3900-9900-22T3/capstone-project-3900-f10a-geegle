@@ -174,6 +174,19 @@ export const getEventReviewsController = async(req, res) => {
     }
 }
 
+export const getEventReviewsUserController = async(req, res) => {
+    try {
+        const {reviews, statusCode, msg} = await getEventReviewsService(req, res);
+        if (!reviews) {
+            res.status(statusCode).json(msg)
+        } else {
+            res.status(statusCode).json({reviews, msg})
+        }
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
+
 export const editEventReviewController = async(req, res) => {
     try {
         const {reviews, statusCode, msg} = await editEventReviewService(req, res);
