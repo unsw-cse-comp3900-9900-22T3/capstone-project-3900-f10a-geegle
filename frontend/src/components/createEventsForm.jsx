@@ -85,7 +85,7 @@ function CreateEventsForm() {
   const handleAmount = (index, event) => {
     const newTicketInfo = { ...ticketInfo };
     const allNewTicketTypes = [...allTicketTypes];
-    newTicketInfo.ticketAmount = event.target.value;
+    newTicketInfo.ticketAmount = parseInt(event.target.value);
     allNewTicketTypes[index] = newTicketInfo;
     setTicketInfo(newTicketInfo);
     setAllTicketTypes(allNewTicketTypes);
