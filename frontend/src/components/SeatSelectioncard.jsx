@@ -84,7 +84,6 @@ const SeatSelectionCard= ({
     console.log("seating section allocation",seatingSectionAllocation);
     const sections = Object.keys(seatingSectionAllocation);
     for (const s of sections) {
-      console.log("s",s);
       if ((seatingSectionAllocation[`${s}`]).includes(ticketType)) {
         sectionsForTicket.push(s)
       }
@@ -130,9 +129,18 @@ const SeatSelectionCard= ({
             >
               {seatsFromChosenSection.map((seat,seatIdx) => {
                 console.log("seat",seat);
-                return (
-                  <MenuItem key={seatIdx} value={seat.seatid}>Row:{seat.seatRow} Seat Number: {seat.seatNo}</MenuItem>
-                )
+                if(seat.seatRow !== null) {
+                  return (
+                    <MenuItem key={seatIdx} value={seat.seatid}>Row:{seat.seatRow} Seat Number: {seat.seatNo}</MenuItem>
+                  )
+                } else {
+                  return (
+                    <MenuItem key={seatIdx} value={seat.seatid}>Seat Number: {seat.seatNo}</MenuItem>
+                  )
+                }
+                // return (
+                //   <MenuItem key={seatIdx} value={seat.seatid}>Row:{seat.seatRow} Seat Number: {seat.seatNo}</MenuItem>
+                // )
               })}
             </Select>
             

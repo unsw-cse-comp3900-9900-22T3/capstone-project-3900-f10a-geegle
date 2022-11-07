@@ -139,7 +139,7 @@ const PurchaseTicket= ({
       )
       if (duplicate === true) {
         setDuplicateError(true);
-        setCurrentPage(2)
+        setCurrentPage(2);
       } else {
         setDuplicateError(false);
         // no error, allow user to move to the next page

@@ -45,11 +45,19 @@ const MyEvents = () => {
     }
   }
   const getReviews = async(eventId) => {
+    // let userID = -1;
+    // if (!localStorage.getItem('userId')) {
+    //   userID = -1;
+    // } else {
+    //   userID = parseInt(localStorage.getItem('userId'))
+    // }
+    // console.log("here", userID);
     const response = await fetch(`http://localhost:3000/events/${eventId}/reviews`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
       },
+      // body: JSON.stringify({userID:userID }),
     })
     const json = await response.json();
     const allReviews = []

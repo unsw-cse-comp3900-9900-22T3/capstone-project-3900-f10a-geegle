@@ -10,7 +10,7 @@ const getTicketPurchaseByTicketIdDb = async(ticketId) => {
 // READ
 const getTicketPurchaseByUserIdDb = async(eventID, userID) => {
     const result = await db.query (
-        "SELECT * FROM ticketPurchases tp JOIN tickets t on tp.ticketid = t.ticketid JOIN seats s on t.seatID = s.seatid " +
+        "SELECT * FROM ticketPurchases tp JOIN tickets t on tp.ticketid = t.ticketid LEFT JOIN seats s on t.seatID = s.seatid " +
         "WHERE t.eventID = $1 AND tp.userID = $2", 
         [eventID, userID])
     return result.rows
