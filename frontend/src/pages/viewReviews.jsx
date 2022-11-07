@@ -21,6 +21,7 @@ const style = {
   pt: 2,
   px: 4,
   pb: 3,
+  overflow:'scroll'
 };
 
 function ChildModal({reviewId, eventId}) {
@@ -151,25 +152,26 @@ export default function ViewReviews({showReviews, setShowReviews, eventReviews, 
   // };
   //const { eventId} = useParams();
   const [reviews, setReviews] = React.useState(eventReviews);
+  const [loginErr, setloginErr] = React.useState(false);
   //const [object, setObject] = React.useState({});
 
-  const updateLikes = async(eventId) => {
-    const response = await fetch(`http://localhost:3000/events/${eventId}/reviews/`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-    })
-    const json = await response.json();
-    const allReplies = []
-    console.log(json);
-    if (json.replies.length !== 0) {
-      for (const rep of json.replies) {
-        allReplies.push(rep);
-      }
-      //setReplies(allReplies)
-    }
-  }
+  // const updateLikes = async(eventId) => {
+  //   const response = await fetch(`http://localhost:3000/events/${eventId}/reviews/`, {
+  //     method: 'GET',
+  //     headers: {
+  //       'Content-Type': 'application/json'
+  //     },
+  //   })
+  //   const json = await response.json();
+  //   const allReplies = []
+  //   console.log(json);
+  //   if (json.replies.length !== 0) {
+  //     for (const rep of json.replies) {
+  //       allReplies.push(rep);
+  //     }
+  //     //setReplies(allReplies)
+  //   }
+  // }
 
   const likeReview = async(reviewId, eventId) => {
     const response = await fetch(`http://localhost:3000/events/${eventId}/reviews/${reviewId}/like`, {
@@ -180,31 +182,66 @@ export default function ViewReviews({showReviews, setShowReviews, eventReviews, 
       },
     })
     if (response.ok) {
+      setloginErr(false);
       console.log(reviews, 'reviews')
       const jsonReviewLiked = await (response.json());
-      console.log(jsonReviewLiked.reviews, 'json review liked')
-      let oldReviews = reviews;
-      const editedReview = jsonReviewLiked.reviews;
-      oldReviews = oldReviews.map(r=>r.reviewID !== editedReview.reviewID ? r: editedReview);
-      setReviews(oldReviews)
+      console.log('jsonReviewLiked', jsonReviewLiked);
+      await fetchReviews(eventId);
+    } else if (response.status === 401){
+      console.log('here');
+      setloginErr(true);
 
     }
-    
+  }
+  const fetchReviews = async(eventId) => {
+    let json = []
+
+      if (localStorage.getItem('token')) { 
+        const response = await fetch(`http://localhost:3000/events/${eventId}/reviews/user`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'auth-token': localStorage.getItem('token'),
+          },
+          // body: JSON.stringify({userID:userID }),
+        })
+        if (response.ok) {
+          json = await response.json();
+        }
+      } else {
+        const response = await fetch(`http://localhost:3000/events/${eventId}/reviews`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          // body: JSON.stringify({userID:userID }),
+        })
+        if (response.ok){
+          json = await response.json();
+        }
+      }
+      setReviews(json.reviews);
 
   }
 
   const unlikeReview = async(reviewId, eventId) => {
     const response = await fetch(`http://localhost:3000/events/${eventId}/reviews/${reviewId}/unlike`, {
-      method: 'POST',
+      method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
         'auth-token': localStorage.getItem('token')
       },
     })
     if (response.ok) {
-      const json = await response.json();
-    } 
-    
+      setloginErr(false);
+      // const json = await response.json();
+      // console.log(reviews, 'reviews')
+      const jsonReviewUnLiked = await (response.json());
+      console.log('jsonReviewUnliked', jsonReviewUnLiked);
+      await fetchReviews(eventId);
+    } else if (response.status === 401){
+      setloginErr(true);
+    }
   }
 
   return (
@@ -220,6 +257,9 @@ export default function ViewReviews({showReviews, setShowReviews, eventReviews, 
           <Typography gutterBottom variant="h5" component="div">
             Reviews
           </Typography>
+          {loginErr && <Typography variant="body2" color="red">
+            Please Log in to Like/Unlike
+          </Typography>}
           {reviews.map((review,idx) => {
             //setObject(review);
             return (
