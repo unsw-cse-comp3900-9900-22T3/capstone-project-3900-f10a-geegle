@@ -166,7 +166,7 @@ const ViewEvent= () => {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'auth-token': localStorage.getItem('token'),
+        // 'auth-token': localStorage.getItem('token'),
       },
     })
     const json = await response.json();

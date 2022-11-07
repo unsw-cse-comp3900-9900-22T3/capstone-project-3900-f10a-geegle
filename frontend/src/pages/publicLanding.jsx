@@ -31,6 +31,7 @@ const PublicLanding = () => {
   const [ratingRatioHook, setRatingRatio] = React.useState(0);
   const [toggleState, setToggleState] = React.useState('All Events');
   const [allEventReviews, setAllEventReviews] = React.useState(['']);
+  
 
   const handleChange = (event, newAlignment) => {
     setToggleState(newAlignment);
@@ -44,7 +45,7 @@ const PublicLanding = () => {
     //   userID = parseInt(localStorage.getItem('userId'))
     // }
     // console.log("here", userID);
-    let json = {}
+    let json = []
 
     if (localStorage.getItem('token')) { 
       const response = await fetch(`http://localhost:3000/events/${eventId}/reviews/user`, {
@@ -55,7 +56,7 @@ const PublicLanding = () => {
         },
         // body: JSON.stringify({userID:userID }),
       })
-      let json = await response.json();
+      json = await response.json();
     } else {
       const response = await fetch(`http://localhost:3000/events/${eventId}/reviews`, {
         method: 'GET',
@@ -64,7 +65,7 @@ const PublicLanding = () => {
         },
         // body: JSON.stringify({userID:userID }),
       })
-      let json = await response.json();
+      json = await response.json();
     }
 
     const allReviews = []
