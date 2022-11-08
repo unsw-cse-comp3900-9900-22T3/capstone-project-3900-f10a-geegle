@@ -54,6 +54,13 @@ const getAvailableTicketsCountByTicketTypeDb = async(eventId, ticketType) => {
     return result.rows[0]
 }
 
+// READ
+const getTicketPriceByTicketType = async(ticketType, eventId)  => {
+    const result = await db.query (
+        "SELECT * FROM tickets WHERE eventId = $1 and tickettype = $2", [eventId, ticketType])
+    return result.rows[0]
+}
+
 // CREATE
 const addTicketDb = async(ticketType, price, eventID) => {
     const result = await db.query (
@@ -95,6 +102,7 @@ export {
     getAvailableTicketTypeGroupByEventIdDb,
     getAvailableTicketsByTicketTypeDb,
     getAvailableTicketsCountByTicketTypeDb,
+    getTicketPriceByTicketType, 
     addTicketDb,
     removeTicketByIdDb,
     assignSeatToTicketDb,

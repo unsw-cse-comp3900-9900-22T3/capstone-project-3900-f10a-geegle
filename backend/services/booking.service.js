@@ -321,6 +321,7 @@ export const bookEventService = async(req, res) => {
                 - Add to ticketPurchases table
                 
         */
+        let printSeats = ""
         const ticketPurchases = []
         for (let i = 0; i < tickets.length; i++) {
             let ticketResult = await ticketdb.getAvailableTicketsByTicketTypeDb(eventID, tickets[i])
@@ -332,6 +333,8 @@ export const bookEventService = async(req, res) => {
             if (seats.length !== 0) {
                 // implement this
                 ticketResult = await ticketdb.assignSeatToTicketDb(ticketResult.ticketid, seats[i])
+                const seatInfo = await venueSeatingdb.getSeatBySeatId(seats[i])
+                printSeats += `Section: ${seatInfo[0].seatsection} Row:${seatInfo[0].seatrow} Number: ${seatInfo[0].seatno} <br>`
             }
 
             const ticketPurchase = await ticketdb.addTicketPurchaseDb(ticketResult.ticketid, userID, new Date())
@@ -343,17 +346,33 @@ export const bookEventService = async(req, res) => {
                                     seatID: ticketResult.seatid,
                                     userID: ticketPurchase.userid,
                                     ticketPurchaseTime: ticketPurchase.ticketpurchasetime })
+            
+        }
+        
+
+        // Get email info
+        const user = await userdb.getUserByIdDb(userID)
+        const event = await eventdb.getEventByIdDisplayDb(eventID)
+
+        let printTickets = ""
+
+        for (const ticket in count) {
+            const price = await ticketdb.getTicketPriceByTicketType(ticket, eventID)
+            printTickets +=
+            `<tr style= "vertical-align:top">
+            <td>${count[ticket]}x </td>
+            <td>${ticket} <br> <p style="color:DimGray;"><i> AUD ${price.price} per ticket </i></p> </td>
+            <td>${parseInt(price.price) * count[ticket]}</td>
+            </tr>`
         }
 
-        /*
-        // Send email confirmation
+        // Send email
         var CLIENT_ID = 
         "300746065947-uhtf3322436tvsv1c0gkq9oaho7a9o35.apps.googleusercontent.com"
         var CLIENT_SECRET = 
             "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"
 
-        
-
+    
         var transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -362,33 +381,59 @@ export const bookEventService = async(req, res) => {
             clientId: CLIENT_ID,
             clientSecret: CLIENT_SECRET,
             accessToken: 
-                "ya29.a0Aa4xrXMHRf3NtdjH_QD5NE0U_YLRkpYz95TzZqOfvAT3GFnKu4KkSo0w6yzkBZURoLWbpik0oZ0Y4cJuhDdqtMGSglqK1kT35FHMmSpYn7fZHty6scZTFBX-q71QA7HurBWSCmmmhU2dQ0ozaQC6ZLA1Dz0faCgYKAcQSARASFQEjDvL9kSvUVRO-0qYRsp3bWZEx3Q0163"
+                "ya29.a0AeTM1icCdLpbkqaWXg3DUMzkEQq6aMzDIOG-EiEp4aOG7BVgRoPXShe2EvfjtUsvgaM0a06nt-G7WeGNp4MERzkvRyLp4t151_NM2RbSCjjhVVNYH-FW8lYyMqrxL1jxUKAQ8MRwAm4Cji-Q2y_aC8HyU1JraCgYKAXISARASFQHWtWOmvlunP7_eAZg5LlKmo8YU8w0163"
         }
         }); 
 
 
         var mailOptions = {
             from: 'eventful.geegle@gmail.com',
-            to: 'catpotter18@gmail.com', //email_list,
-            subject: 'Event tickets booked: ' + eventID,
-            text: 
-                'Dear Ticker Holder, ' + 
-                'Thank you for purchasing a ticket to ' + eventID + 
-                'Your seat number is: ' + ticketPurchases[0].seatID
+            to: user.email,
+            subject: 'Event tickets booked: ' + event[0].eventname,
             html: 
-            'Dear Ticket Holder,' +
-            '#{{eventName}} - Cancelled' +
-            'All purchased tickets will receive a full refund.'
-            'Tickets will be automatically refunded in full (including refundable ticket purchase, if relevant) to the original payment method used for purchase and patrons do not need to take any action.' +
-            'Patrons should allow approximately 30 business days for the refund to appear in their account. Please do not contact Ticketek regarding your refund.' +
-            'Regards, Ticketek Team'
+
+            `<body>
+
+            <font face = "arial">
+
+            <p style="background-color:rgb(118, 43, 255);"><br></p>
+
+            <center> <img  src="../utils/logo.png" alt="Eventful logo"> </center>
+
+            <p>Dear ${user.firstname}, <br><br> Thank you for your purchase to ${event[0].eventname}. Please find a summary of your order below: <br> <br> <hr> <br> </p>
+
+            <div>
+            <center> 
+            <img  src="https://d35kvm5iuwjt9t.cloudfront.net/dbimages/sfx277987.jpg" alt="Flowers in Chania" width="460" height="345">
+            <h1> ${event[0].eventname} </h1>
+            <p> ${event[0].venuename} <br> ${event[0].startdatetime} - ${event[0].enddatetime}  <br> Seating Information: ${printSeats} </p>
+            </center>
+            <div>
+
+            <h2> <hr> <br> Order Summary </h2>
+
+            <table style="width:100%; background-color:rgb(244, 239, 255)" >
+
+            ${printTickets}
+           
+            </table>
+
+            <br><hr><br>
+
+            <p> Locate your tickets in your Eventful account online. Your tickets will be emailed to you or available for print. </p>
+
+            <br>
+
+            <center>
+            <p style="background-color:rgb(118, 43, 255);color:WhiteSmoke;"><br> Copyright © 2022 Eventful, All rights reserved.<br> <b>Contact us:</b><br> 02 1234 1234 <br> eventful.geegle@gmail.com <br> PO Box 123 Sydney, NSW, 2000  <br> <br> </p></center>
+
+            </font>
+
+            </body>`
+           
             };
-        
-        const result = await transporter.sendMail(mailOptions)
-        console.log(result)*/
 
-
-
+        await transporter.sendMail(mailOptions)
 
         return { booking: ticketPurchases, statusCode: 200, msg: `Tickets purchased to Event ${eventID}`}
 
