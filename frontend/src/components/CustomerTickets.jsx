@@ -29,10 +29,10 @@ const CustomerTickets = ({
     boxShadow: 24,
     p: 4,
   };
-  console.log('in function');
+  // console.log('in function');
   console.log('customer ticket info',  customerTicketInfo);
+  console.log('eventInfo',  eventInfo);
   return (
-    
     <Modal
       hideBackdrop
       open={viewTicketModal}
@@ -44,7 +44,7 @@ const CustomerTickets = ({
         <Typography variant="h5" color="text.secondary">
           Tickets purchased by {customerTicketInfo.name} for {eventInfo.eventName}
         </Typography>
-        <Grid container spacing={1}>
+        <Grid container spacing={3}>
           <Grid item xs={3}>
             <Typography variant="h6" color="text.secondary" style={{fontWeight:'bold'}}>
               Ticket Type
@@ -55,57 +55,93 @@ const CustomerTickets = ({
               Price
             </Typography>
           </Grid>
-          <Grid item xs={3}>
-            <Typography variant="h6" color="text.secondary" style={{fontWeight:'bold'}}>
-              Seat Section
-            </Typography>
-          </Grid>
-          <Grid item xs={3}>
-            <Typography variant="h6" color="text.secondary" style={{fontWeight:'bold'}}>
-              Seat 
-            </Typography>
-          </Grid>
-        </Grid>
-        < Grid container spacing={1} style={{overflow:'auto', height: '80%'}}>
-          {(customerTicketInfo.tickets).map((c, index) => {
-            return (
-              <Grid container spacing = {1} style={{padding:'8px'}} key ={index}>
-                <Grid item xs={3}>
-                  <Typography variant="h6" color="text.secondary">
-                    {c.ticketType}
-                  </Typography>
-                </Grid>
-                <Grid item xs={3}>
-                  <Typography variant="h6" color="text.secondary">
-                    ${c.price}
-                  </Typography>
-                </Grid>
-                <Grid item xs={3}>
-                  <Typography variant="h6" color="text.secondary">
-                    {c.seat.seatSection}
-                  </Typography>
-                </Grid>
-                <Grid item xs={3}>
-                  {(()=> {
-                    if(c.seat.seatRow !== null) {
-                      return (
-                        <Typography variant="h6" color="text.secondary">
-                          Row {c.seat.seatRow}, seat No. {c.seat.seatNo}
-                        </Typography>
-                      )
-                    } else {
-                      return (
-                        <Typography variant="h6" color="text.secondary">
-                          seat No. {c.seat.seatNo}
-                        </Typography>
-                      )
-                    }
-                  })()}
-                </Grid>
+          {eventInfo.seatedEvent === true ? (
+            <>
+              <Grid item xs={3}>
+                <Typography variant="h6" color="text.secondary" style={{fontWeight:'bold'}}>
+                  Seat Section
+                </Typography>
               </Grid>
-            )
-          })}
+              <Grid item xs={3}>
+                <Typography variant="h6" color="text.secondary" style={{fontWeight:'bold'}}>
+                  Seat 
+                </Typography>
+              </Grid>
+            </>
+          ): null}
+          
         </Grid>
+         {eventInfo.seatedEvent === true ? (
+          <Box style={{overflow:'auto', height: '80%'}}>
+            < Grid container spacing={1}>
+              {(customerTicketInfo.tickets).map((c, index) => {
+                console.log('c', c);
+                const SeatComponent = (()=> {
+                  //console.log("in function function");
+                  if(c.seat.seatRow !== null) {
+                    return (
+                      <Typography variant="h6" color="text.secondary">
+                        Row {c.seat.seatRow}, seat No. {c.seat.seatNo}
+                      </Typography>
+                    )
+                  } else {
+                    return (
+                      <Typography variant="h6" color="text.secondary">
+                        seat No. {c.seat.seatNo}
+                      </Typography>
+                    )
+                  }  
+                })
+                //console.log(seatComponent)
+                return (
+                  <Grid container spacing = {1} style={{padding:'8px'}} key ={index}>
+                    <Grid item xs={3}>
+                      <Typography variant="h6" color="text.secondary">
+                        {c.ticketType}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={3}>
+                      <Typography variant="h6" color="text.secondary">
+                        ${c.price}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={3}>
+                      <Typography variant="h6" color="text.secondary">
+                        {c.seat.seatSection}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={3}>
+                      <SeatComponent/>
+                    </Grid>
+                  </Grid>
+                )
+              })}
+            </Grid>
+          </Box>
+          
+         ) : (
+          <Box style={{overflow:'auto', height: '80%'}}>
+            < Grid container spacing={1}>
+              {(customerTicketInfo.tickets).map((c, index) => {
+                //console.log(seatComponent)
+                return (
+                  <Grid container spacing = {1} style={{padding:'8px'}} key ={index}>
+                    <Grid item xs={3}>
+                      <Typography variant="h6" color="text.secondary">
+                        {c.ticketType}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={3}>
+                      <Typography variant="h6" color="text.secondary">
+                        ${c.price}
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                )
+              })}
+            </Grid>
+          </Box>
+         )}
         <Button 
             variant="text"
             onClick= {()=>setViewTicketModal(false)}
