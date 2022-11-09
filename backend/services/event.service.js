@@ -10,6 +10,7 @@ import {addTicketDb} from '../db/ticket.db.js'
 import { getUserByIdDb } from '../db/user.db.js'
 import { isVenueSeatingAvailableDb } from '../db/venueSeating.db.js'
 import { getTicketPurchaseByUserIdDb } from '../db/ticketpurchase.db.js'
+import nodemailer from 'nodemailer'
 
 
 /*  Request
@@ -147,6 +148,49 @@ export const unpublishEventsService = async(req, res) => {
             return {events: null, statusCode : 400, msg: 'Event is already unpublished'}
         }
         const unpublishedEvent = await unpublishEventByIdDb(eventID);
+
+        // Getting guest list details to send event cancellation email
+        const guests = await getEventGuestListByIdDb(eventID)
+
+        // Send email
+        var CLIENT_ID = 
+        "300746065947-uhtf3322436tvsv1c0gkq9oaho7a9o35.apps.googleusercontent.com"
+        var CLIENT_SECRET = 
+            "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"
+    
+        var transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            type: "OAuth2",
+            user: 'eventful.geegle@gmail.com',
+            clientId: CLIENT_ID,
+            clientSecret: CLIENT_SECRET,
+            accessToken: 
+                "ya29.a0AeTM1icCdLpbkqaWXg3DUMzkEQq6aMzDIOG-EiEp4aOG7BVgRoPXShe2EvfjtUsvgaM0a06nt-G7WeGNp4MERzkvRyLp4t151_NM2RbSCjjhVVNYH-FW8lYyMqrxL1jxUKAQ8MRwAm4Cji-Q2y_aC8HyU1JraCgYKAXISARASFQHWtWOmvlunP7_eAZg5LlKmo8YU8w0163"
+        }
+        }); 
+        
+        for (let guest of guests) {
+            var mailOptions = {
+                from: 'eventful.geegle@gmail.com',
+                to: guest.email,
+                subject: 'Event Cancellation: ' + event[0].eventname,
+                html: 
+
+                `<body>
+                <font face = "arial">
+                <p style="background-color:rgb(118, 43, 255);"><br></p>
+                <center> <img  src="https://cdn.evbstatic.com/s3-build/824432-rc2022-11-07_16.04-c8310df/django/images/logos/eb_orange_on_white_1200x630.png" alt="Flowers in Chania" width="460" height="345"> </center>
+                <p>Dear ${guest.firstname}, <br><br> We regret to inform you that ${event[0].eventname} has been cancelled. </b> <br> <br> Tickets will be automatically refunded in full (including refundable ticket purchase, if relevant) to the original payment method used for purchase and patrons do not need to take any action. <br> <br> Patrons should allow approximately 30 business days for the refund to appear in their account. <br> <br> Kind regards, <br><br> The Eventful Team <br><br><br><br><br></p>
+                <center>
+                <p style="background-color:rgb(118, 43, 255);color:WhiteSmoke;"><br> Copyright © 2022 Eventful, All rights reserved.<br> <b>Contact us:</b><br> 02 1234 1234 <br> eventful.geegle@gmail.com <br> PO Box 123 Sydney, NSW, 2000  <br> <br> </p></center>
+                </font>
+                </body>
+                `
+                };
+
+            await transporter.sendMail(mailOptions)
+        }
 
         return {events: {
                     eventID: unpublishedEvent.eventid,

@@ -265,6 +265,54 @@ export const createReviewReplyService = async(req, res) => {
 
         const newReply = await addReplyDb(reviewID, req.userID, reply, new Date(Date.now()));
         const username = await getUserByIdDb(newReply.userid);
+
+        const eventID = req.params.eventID
+        const userID = req.userID
+
+        // Get details of the customer who left the original review
+        const reviewUser = await userdb.getUserByIdDb(review[0].userid)
+        const event = await eventdb.getEventByIdDisplayDb(review[0].eventid)
+
+        // Send email
+        var CLIENT_ID = 
+        "300746065947-uhtf3322436tvsv1c0gkq9oaho7a9o35.apps.googleusercontent.com"
+        var CLIENT_SECRET = 
+            "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"
+
+    
+        var transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            type: "OAuth2",
+            user: 'eventful.geegle@gmail.com',
+            clientId: CLIENT_ID,
+            clientSecret: CLIENT_SECRET,
+            accessToken: 
+                "ya29.a0AeTM1icCdLpbkqaWXg3DUMzkEQq6aMzDIOG-EiEp4aOG7BVgRoPXShe2EvfjtUsvgaM0a06nt-G7WeGNp4MERzkvRyLp4t151_NM2RbSCjjhVVNYH-FW8lYyMqrxL1jxUKAQ8MRwAm4Cji-Q2y_aC8HyU1JraCgYKAXISARASFQHWtWOmvlunP7_eAZg5LlKmo8YU8w0163"
+        }
+        }); 
+        
+
+        var mailOptions = {
+            from: 'eventful.geegle@gmail.com',
+            to: reviewUser.email,
+            subject: 'Ticket Refund: ' + event[0].eventname,
+            html: 
+
+            `<body>
+            <font face = "arial">
+            <p style="background-color:rgb(118, 43, 255);"><br></p>
+            <center> <img  src="https://cdn.evbstatic.com/s3-build/824432-rc2022-11-07_16.04-c8310df/django/images/logos/eb_orange_on_white_1200x630.png" alt="Flowers in Chania" width="460" height="345"> </center>
+            <p>Dear ${reviewUser.firstname}, <br><br> ${username.firstname} has replied to your review: <blockquote> <i>"${reply}"</i> </blockquote> <br><br><br><br><br></p>
+            <center>
+            <p style="background-color:rgb(118, 43, 255);color:WhiteSmoke;"><br> Copyright © 2022 Eventful, All rights reserved.<br> <b>Contact us:</b><br> 02 1234 1234 <br> eventful.geegle@gmail.com <br> PO Box 123 Sydney, NSW, 2000  <br> <br> </p></center>
+            </font>
+            </body>`
+           
+            };
+
+        await transporter.sendMail(mailOptions)
+
         return {replies: {
             replyID: newReply.replyid,
             reviewID: newReply.reviewid,
