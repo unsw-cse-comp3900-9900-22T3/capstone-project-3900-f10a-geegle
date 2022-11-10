@@ -1,13 +1,13 @@
 import { Router } from 'express';
 import { verifyToken } from '../middleware/verifyToken.js';
-import * as emailController from '../controllers/email.controller'
+import * as emailController from '../controllers/email.controller.js'
 
 const emailRouter = Router();
 
-emailRouter.put('/:eventID/emailPurchase', verifyToken, emailController.sendEmailBookEventController)
-emailRouter.put('/emailCancelBooking/:ticketID', verifyToken, emailController.sendEmailCancelEventUserBookingController)
-emailRouter.put('/:eventID/emailCancelEvent', verifyToken, emailController.sendEmailUnpublishEventsController)
-emailRouter.put('/:eventID/emailEventAnnouncement', verifyToken, emailController.sendEmailEventAnnouncementController)
-emailRouter.put('/:eventID/reviews/:reviewID/emailReply', verifyToken, emailController.sendEmailCreateEventReviewReplyController); 
+emailRouter.post('/:eventID/emailPurchase', verifyToken, emailController.bookEventController)
+emailRouter.post('/emailCancelBooking/:ticketID', verifyToken, emailController.cancelEventUserBookingController)
+emailRouter.post('/:eventID/emailUnpublish', verifyToken, emailController.unpublishEventsController)
+emailRouter.post('/:eventID/emailEventAnnouncement', verifyToken, emailController.sendEventAnnouncementController)
+emailRouter.post('/:eventID/reviews/:reviewID/emailReply', verifyToken, emailController.notifyReviewReplyController); 
 
 export default emailRouter;

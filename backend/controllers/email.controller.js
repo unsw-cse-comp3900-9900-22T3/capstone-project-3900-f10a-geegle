@@ -1,55 +1,46 @@
-import * as emailService from '../services/email.service'
+import * as emailService from '../services/email.service.js'
 
-export const sendEmailBookEventController = async(req, res) => {
+export const bookEventController = async(req, res) => {
     try {
-        const {booking, statusCode, msg} = await bookingService.bookEventService(req, res);
-
-        if (!booking) {
-            res.status(statusCode).json(msg)
-        } else {
-            res.status(statusCode).json({booking, msg})
-        }
-
+        await emailService.bookEventService(req, res);
+        res.status(200).json("Email sent!")
     } catch (error) {
         res.status(500).send(error.message)
     }
 }
 
-export const sendEmailCancelEventUserBookingController = async(req, res) => {
+export const cancelEventUserBookingController = async(req, res) => {
     try {
-        const {statusCode, msg} = await bookingService.cancelEventUserBookingService(req, res);
-        res.status(statusCode).json(msg)
-
+        await emailService.cancelUserBookingService(req, res);
+        res.status(200).json("Email sent!")
     } catch (error) {
         res.status(500).send(error.message)
     }
 }
 
-export const sendEmailUnpublishEventsController = async(req, res) => {
+export const unpublishEventsController = async(req, res) => {
     try {
-        const {events, statusCode, msg} = await unpublishEventsService(req, res);
-
-        if (!events) {
-            res.status(statusCode).json(msg)
-        } else {
-            res.status(statusCode).json({events, msg})
-        }
+        await emailService.unpublishEventsService(req, res);
+        res.status(200).json("Email sent!")
     } catch (e) {
         res.status(500).send(e.message)
     }
 }
 
-export const sendEmailCreateEventReviewController = async(req, res) => {
+export const notifyReviewReplyController = async(req, res) => {
     try {
-        const {reviews, statusCode, msg} = await createEventReviewService(req, res);
-        if (!reviews) {
-            res.status(statusCode).json(msg)
-        } else {
-            res.status(statusCode).json({reviews, msg})
-        }
+        await emailService.notifyReviewReplyService(req, res);
+        res.status(200).json("Email sent!")
     } catch (e) {
         res.status(500).send(e.message)
     }
 }
 
-
+export const sendEventAnnouncementController = async(req, res) => {
+    try {
+        await emailService.sendEventAnnouncementService(req, res);
+        res.status(200).json("Email sent!")
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}

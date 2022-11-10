@@ -10,7 +10,6 @@ import {addTicketDb} from '../db/ticket.db.js'
 import { getUserByIdDb } from '../db/user.db.js'
 import { isVenueSeatingAvailableDb } from '../db/venueSeating.db.js'
 import { getTicketPurchaseByUserIdDb } from '../db/ticketpurchase.db.js'
-import nodemailer from 'nodemailer'
 
 
 /*  Request

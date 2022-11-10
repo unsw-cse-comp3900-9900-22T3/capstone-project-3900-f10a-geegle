@@ -5,7 +5,6 @@ import { getUserByIdDb } from '../db/user.db.js'
 import { getEventByIdDb } from '../db/event.db.js'
 import { addReplyDb, editReplyByIdDb, getReplyAmountByReviewIDDb, getReplyByReplyIdDb, getReplyByReviewIdDb,
     deleteReplyByIdDb } from '../db/reply.db.js'
-import nodemailer from 'nodemailer'
 
 export const createEventReviewService = async(req, res) => {
     try {    
