@@ -115,7 +115,7 @@ const CustomiseEmail = ({
           <TextField
             disabled
             id="email recievers"
-            value= {`All Attendees ${customers.length}`}  
+            value= {`All Attendees (${customers.length})`}  
             variant="filled"
             />
           <Typography variant="h5" color="text.secondary" style ={{marginTop: '8px'}}>
