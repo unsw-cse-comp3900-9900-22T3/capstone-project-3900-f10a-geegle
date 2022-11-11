@@ -247,7 +247,7 @@ const ViewEvent= () => {
               <Typography variant="h2" color="text.secondary">
                 {eventInfo.eventName}
               </Typography>
-              <Typography component = "div" variant="h5" color="text.secondary">
+              <Typography component={Link} to= {{pathname: `/host/${eventInfo.hostID}/profile`}} state={eventInfo.eventID} variant="h5" color="text.secondary">
                 Host : {eventInfo.hostName}
               </Typography>
             </Box>
