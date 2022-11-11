@@ -411,9 +411,9 @@ export const getEventGuestListService = async(req, res) => {
 export const getHostDetailsService = async(req, res) => {
     try {
 
-        const host = getUserByIdDb(req.params.hostID);
+        const host = await getUserByIdDb(req.params.hostID);
         if (host.length == 0) {
-            return {events: null, hostRating: null, statusCode : 404, msg: 'Host does not exist'}
+            return {events: null, hostRating: null, hostName: null, statusCode : 404, msg: 'Host does not exist'}
         }
         const eventsByHost = await getEventsByHostIdDb(req.params.hostID);
 
@@ -452,7 +452,9 @@ export const getHostDetailsService = async(req, res) => {
         } else {
             runningTotalReviewRatings = 0;
         }
-        return {events: eventSummary, hostRating: runningTotalReviewRatings, hostName: host.firstname + " " + host.lastname, statusCode: 200, msg: 'Details found'}
+        let name = host.firstname + " " + host.lastname
+
+        return {events: eventSummary, hostRating: runningTotalReviewRatings, hostName: name, statusCode: 200, msg: 'Details found'}
 
     } catch (e) {
         throw e
