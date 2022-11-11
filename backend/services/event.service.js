@@ -452,7 +452,7 @@ export const getHostDetailsService = async(req, res) => {
         } else {
             runningTotalReviewRatings = 0;
         }
-        return {events: eventSummary, hostRating: runningTotalReviewRatings, statusCode: 200, msg: 'Details found'}
+        return {events: eventSummary, hostRating: runningTotalReviewRatings, hostName: host.firstname + " " + host.lastname, statusCode: 200, msg: 'Details found'}
 
     } catch (e) {
         throw e
