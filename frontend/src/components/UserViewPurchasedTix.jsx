@@ -40,6 +40,7 @@ const UserViewPurchasedTix = ({
     })
     
     const purchased = (await response.json()).tickets;
+    console.log(purchased);
     setPurchasedTixs(purchased);
   }
     
@@ -91,17 +92,16 @@ const UserViewPurchasedTix = ({
             < Grid container spacing={1}>
               {(purchasedTixs).map((ticket, index) => {
                 const SeatComponent = (()=> {
-                  //console.log("in function function");
-                  if(ticket.seat.seatRow !== null) {
+                  if(ticket.seatRow !== null) {
                     return (
                       <Typography variant="h6" color="text.secondary">
-                        Row {ticket.seat.seatRow}, seat No. {ticket.seat.seatNo}
+                        Row {ticket.seatRow}, seat No. {ticket.seatNo}
                       </Typography>
                     )
                   } else {
                     return (
                       <Typography variant="h6" color="text.secondary">
-                        seat No. {ticket.seat.seatNo}
+                        seat No. {ticket.seatNo}
                       </Typography>
                     )
                   }  
@@ -120,7 +120,7 @@ const UserViewPurchasedTix = ({
                     </Grid>
                     <Grid item xs={2}>
                       <Typography variant="h6" color="text.secondary">
-                        {ticket.seat.seatSection}
+                        {ticket.seatSection}
                       </Typography>
                     </Grid>
                     <Grid item xs={3}>
