@@ -6,7 +6,8 @@ import { getEventController, getUpcomingEventsController, getAllEventsController
          from '../controllers/event.controller.js'
 import { verifyToken } from '../middleware/verifyToken.js';
 import bookingRouter from './booking.route.js';
-import reviewRouter from './review.route.js'
+import reviewRouter from './review.route.js';
+import emailRouter from './email.route.js';
 
 const eventRouter = Router();
 
@@ -20,7 +21,7 @@ eventRouter.get('/:eventID/info', getEventController);
 eventRouter.get('/upcoming', getUpcomingEventsController);
 eventRouter.get('/all', getAllEventsController);
 eventRouter.get('/host', verifyToken, getHostEventsController);
-eventRouter.get('/host/details', getHostDetailsController);
+eventRouter.get('/host/details/:hostID', getHostDetailsController);
 eventRouter.get('/attending', verifyToken, getEventsUserAttendingController);
 eventRouter.get('/:eventID/guest', verifyToken, getEventGuestListController);
 eventRouter.get('/:eventID/isSoldOut', isEventSoldOutController);
@@ -30,5 +31,6 @@ eventRouter.get('/categories', getAllEventCategoriesController);
 
 eventRouter.use(bookingRouter)
 eventRouter.use(reviewRouter)
+eventRouter.use(emailRouter)
 
 export default eventRouter;

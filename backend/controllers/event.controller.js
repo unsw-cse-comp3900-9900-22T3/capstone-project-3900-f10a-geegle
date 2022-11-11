@@ -127,11 +127,11 @@ export const getHostEventsController = async(req, res) => {
 
 export const getHostDetailsController = async(req, res) => {
     try {
-        const {events, hostRating, statusCode, msg} = await getHostDetailsService(req, res);
+        const {events, hostRating, hostName, statusCode, msg} = await getHostDetailsService(req, res);
         if (!events) {
-            res.status(statusCode).json(msg)
+            res.status(statusCode).json({hostName, msg})
         } else {
-            res.status(statusCode).json({events, hostRating, msg})
+            res.status(statusCode).json({events, hostRating, hostName, msg})
         }
     } catch (e) {
         res.status(500).send(e.message)
