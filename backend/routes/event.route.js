@@ -20,7 +20,7 @@ eventRouter.get('/:eventID/info', getEventController);
 eventRouter.get('/upcoming', getUpcomingEventsController);
 eventRouter.get('/all', getAllEventsController);
 eventRouter.get('/host', verifyToken, getHostEventsController);
-eventRouter.get('/host/details', getHostDetailsController);
+eventRouter.get('/host/details/:hostID', getHostDetailsController);
 eventRouter.get('/attending', verifyToken, getEventsUserAttendingController);
 eventRouter.get('/:eventID/guest', verifyToken, getEventGuestListController);
 eventRouter.get('/:eventID/isSoldOut', isEventSoldOutController);
