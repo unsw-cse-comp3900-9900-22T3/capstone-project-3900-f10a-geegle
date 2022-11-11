@@ -11,10 +11,9 @@ import { Grid } from '@mui/material';
  * @param {*} param0 
  * @returns 
  */
-const CustomerTickets = ({
-  customerTicketInfo, 
-  setViewTicketModal,
-  viewTicketModal,
+const UserViewPurchasedTix = ({ 
+  puchasedModal,
+  setPuchasedModal,
   eventInfo
 }) => {
   const style = {
@@ -29,20 +28,35 @@ const CustomerTickets = ({
     boxShadow: 24,
     p: 4,
   };
-  // console.log('in function');
-  console.log('customer ticket info',  customerTicketInfo);
-  console.log('eventInfo',  eventInfo);
+  const [purchasedTixs, setPurchasedTixs] = useState([]);
+
+  const getPurchasedTixs = async() => {
+    const response = await fetch(`http://localhost:3000/events/${eventInfo.eventID}/ticketsPurchased`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'auth-token': localStorage.getItem('token'),
+      },
+    })
+    
+    const purchased = (await response.json()).tickets;
+    setPurchasedTixs(purchased);
+  }
+    
+  useEffect(()=> {
+    getPurchasedTixs();
+  },[])
   return (
     <Modal
       hideBackdrop
-      open={viewTicketModal}
-      onClose={()=>setViewTicketModal(false)}
-      aria-labelledby="view customer tickets"
-      aria-describedby="view customer tickets"
+      open={puchasedModal}
+      onClose={()=>setPuchasedModal(false)}
+      aria-labelledby="view purchased tickets"
+      aria-describedby="view purchased tickets"
     >
       <Box sx={style}>
         <Typography variant="h5" color="text.secondary">
-          Tickets purchased by {customerTicketInfo.name} for {eventInfo.eventName}
+          Your Purchased Tickets for {eventInfo.eventName}
         </Typography>
         <Grid container spacing={3}>
           <Grid item xs={3}>
@@ -50,14 +64,14 @@ const CustomerTickets = ({
               Ticket Type
             </Typography>
           </Grid>
-          <Grid item xs={3}>
+          <Grid item xs={2}>
             <Typography variant="h6" color="text.secondary" style={{fontWeight:'bold'}}>
               Price
             </Typography>
           </Grid>
           {eventInfo.seatedEvent === true ? (
             <>
-              <Grid item xs={3}>
+              <Grid item xs={2}>
                 <Typography variant="h6" color="text.secondary" style={{fontWeight:'bold'}}>
                   Seat Section
                 </Typography>
@@ -69,49 +83,55 @@ const CustomerTickets = ({
               </Grid>
             </>
           ): null}
-          
+          <Grid item xs={2}>
+          </Grid>
         </Grid>
          {eventInfo.seatedEvent === true ? (
           <Box style={{overflow:'auto', height: '80%'}}>
             < Grid container spacing={1}>
-              {(customerTicketInfo.tickets).map((c, index) => {
-                //console.log('c', c);
+              {(purchasedTixs).map((ticket, index) => {
                 const SeatComponent = (()=> {
                   //console.log("in function function");
-                  if(c.seat.seatRow !== null) {
+                  if(ticket.seat.seatRow !== null) {
                     return (
                       <Typography variant="h6" color="text.secondary">
-                        Row {c.seat.seatRow}, seat No. {c.seat.seatNo}
+                        Row {ticket.seat.seatRow}, seat No. {ticket.seat.seatNo}
                       </Typography>
                     )
                   } else {
                     return (
                       <Typography variant="h6" color="text.secondary">
-                        seat No. {c.seat.seatNo}
+                        seat No. {ticket.seat.seatNo}
                       </Typography>
                     )
                   }  
                 })
-                //console.log(seatComponent)
                 return (
                   <Grid container spacing = {1} style={{padding:'8px'}} key ={index}>
                     <Grid item xs={3}>
                       <Typography variant="h6" color="text.secondary">
-                        {c.ticketType}
+                        {ticket.ticketType}
                       </Typography>
                     </Grid>
-                    <Grid item xs={3}>
+                    <Grid item xs={2}>
                       <Typography variant="h6" color="text.secondary">
-                        ${c.price}
+                        ${ticket.price}
                       </Typography>
                     </Grid>
-                    <Grid item xs={3}>
+                    <Grid item xs={2}>
                       <Typography variant="h6" color="text.secondary">
-                        {c.seat.seatSection}
+                        {ticket.seat.seatSection}
                       </Typography>
                     </Grid>
                     <Grid item xs={3}>
                       <SeatComponent/>
+                    </Grid>
+                    <Grid item xs={2}>
+                      <Button 
+                        variant="contained"
+                      >
+                          Refund
+                      </Button>
                     </Grid>
                   </Grid>
                 )
@@ -122,19 +142,26 @@ const CustomerTickets = ({
          ) : (
           <Box style={{overflow:'auto', height: '80%'}}>
             < Grid container spacing={1}>
-              {(customerTicketInfo.tickets).map((c, index) => {
+              {purchasedTixs.map((ticket, index) => {
                 //console.log(seatComponent)
                 return (
                   <Grid container spacing = {1} style={{padding:'8px'}} key ={index}>
                     <Grid item xs={3}>
                       <Typography variant="h6" color="text.secondary">
-                        {c.ticketType}
+                        {ticket.ticketType}
                       </Typography>
                     </Grid>
                     <Grid item xs={3}>
                       <Typography variant="h6" color="text.secondary">
-                        ${c.price}
+                        ${ticket.price}
                       </Typography>
+                    </Grid>
+                    <Grid item xs={2}>
+                      <Button 
+                        variant="contained"
+                      >
+                          Refund
+                      </Button>
                     </Grid>
                   </Grid>
                 )
@@ -144,7 +171,7 @@ const CustomerTickets = ({
          )}
         <Button 
             variant="text"
-            onClick= {()=>setViewTicketModal(false)}
+            onClick= {()=>setPuchasedModal(false)}
             >
               Close
         </Button>
@@ -153,4 +180,4 @@ const CustomerTickets = ({
     </Modal>
   )
 }
-export default CustomerTickets;
+export default UserViewPurchasedTix;
