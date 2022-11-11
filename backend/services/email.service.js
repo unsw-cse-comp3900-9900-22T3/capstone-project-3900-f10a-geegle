@@ -99,7 +99,7 @@ export const bookEventService = async(req, res) => {
             }, 
             {   // encoded string as an attachment
                 filename: 'eventImage.png',
-                content: event[0].image3.split("base64,")[1],
+                content: event[0].image1.split("base64,")[1],
                 encoding: 'base64',
                 cid: 'eventImage'
             }
