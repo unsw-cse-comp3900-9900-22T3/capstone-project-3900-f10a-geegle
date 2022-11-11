@@ -375,7 +375,7 @@ export const getEventTicketsUserPurchasedService = async(req, res) => {
         for (const ticket of tickets) {
             ticket['ticketID'] = ticket['ticketid']
             delete ticket['ticketid']
-            ticket['ticketType '] = ticket['tickettype ']
+            ticket['ticketType'] = ticket['tickettype']
             delete ticket['tickettype']
             ticket['eventID'] = ticket['eventid']
             delete ticket['eventid']
