@@ -72,7 +72,7 @@ export const bookEventService = async(req, res) => {
             <p>Dear ${user.firstname}, <br><br> Thank you for your purchase to ${event[0].eventname}. Please find a summary of your order below: <br> <br> <hr> <br> </p>
             <div>
             <center> 
-            <img  src="https://d35kvm5iuwjt9t.cloudfront.net/dbimages/sfx277987.jpg" alt="Flowers in Chania" width="460" height="345">
+            <img  src="cid:eventImage">
             <h1> ${event[0].eventname} </h1>
             <p> ${event[0].venuename} <br> ${event[0].startdatetime} - ${event[0].enddatetime}  <br> Seating Information: <br>${printSeats} </p>
             </center>
@@ -96,7 +96,14 @@ export const bookEventService = async(req, res) => {
                 filename: 'logo.png',
                 path: __dirname + '/logo.png',
                 cid: 'logo'
-            }]
+            }, 
+            {   // encoded string as an attachment
+                filename: 'eventImage.png',
+                content: event[0].image3.split("base64,")[1],
+                encoding: 'base64',
+                cid: 'eventImage'
+            }
+            ]
            
         };
 
@@ -192,7 +199,7 @@ export const sendEventAnnouncementService = async(req, res) => {
     try {
         const eventID = req.params.eventID
         const userID = req.userID
-        const { announcement } = req.body;
+        const { subject, announcement } = req.body;
 
         const user = await userdb.getUserByIdDb(userID)
         const event = await eventdb.getEventByIdDisplayDb(eventID)
@@ -202,7 +209,7 @@ export const sendEventAnnouncementService = async(req, res) => {
             var mailOptions = {
                 from: 'eventful.geegle@gmail.com',
                 to: guest.email,
-                subject: 'Event Announcement: ' + event[0].eventname,
+                subject: 'Event Announcement: ' + subject,
                 html: 
 
                 `<body>
