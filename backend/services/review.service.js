@@ -265,6 +265,10 @@ export const createReviewReplyService = async(req, res) => {
 
         const newReply = await addReplyDb(reviewID, req.userID, reply, new Date(Date.now()));
         const username = await getUserByIdDb(newReply.userid);
+
+        const eventID = req.params.eventID
+        const userID = req.userID
+
         return {replies: {
             replyID: newReply.replyid,
             reviewID: newReply.reviewid,

@@ -343,52 +343,8 @@ export const bookEventService = async(req, res) => {
                                     seatID: ticketResult.seatid,
                                     userID: ticketPurchase.userid,
                                     ticketPurchaseTime: ticketPurchase.ticketpurchasetime })
+            
         }
-
-        /*
-        // Send email confirmation
-        var CLIENT_ID = 
-        "300746065947-uhtf3322436tvsv1c0gkq9oaho7a9o35.apps.googleusercontent.com"
-        var CLIENT_SECRET = 
-            "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"
-
-        
-
-        var transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            type: "OAuth2",
-            user: 'eventful.geegle@gmail.com',
-            clientId: CLIENT_ID,
-            clientSecret: CLIENT_SECRET,
-            accessToken: 
-                "ya29.a0Aa4xrXMHRf3NtdjH_QD5NE0U_YLRkpYz95TzZqOfvAT3GFnKu4KkSo0w6yzkBZURoLWbpik0oZ0Y4cJuhDdqtMGSglqK1kT35FHMmSpYn7fZHty6scZTFBX-q71QA7HurBWSCmmmhU2dQ0ozaQC6ZLA1Dz0faCgYKAcQSARASFQEjDvL9kSvUVRO-0qYRsp3bWZEx3Q0163"
-        }
-        }); 
-
-
-        var mailOptions = {
-            from: 'eventful.geegle@gmail.com',
-            to: 'catpotter18@gmail.com', //email_list,
-            subject: 'Event tickets booked: ' + eventID,
-            text: 
-                'Dear Ticker Holder, ' + 
-                'Thank you for purchasing a ticket to ' + eventID + 
-                'Your seat number is: ' + ticketPurchases[0].seatID
-            html: 
-            'Dear Ticket Holder,' +
-            '#{{eventName}} - Cancelled' +
-            'All purchased tickets will receive a full refund.'
-            'Tickets will be automatically refunded in full (including refundable ticket purchase, if relevant) to the original payment method used for purchase and patrons do not need to take any action.' +
-            'Patrons should allow approximately 30 business days for the refund to appear in their account. Please do not contact Ticketek regarding your refund.' +
-            'Regards, Ticketek Team'
-            };
-        
-        const result = await transporter.sendMail(mailOptions)
-        console.log(result)*/
-
-
-
 
         return { booking: ticketPurchases, statusCode: 200, msg: `Tickets purchased to Event ${eventID}`}
 
@@ -445,8 +401,10 @@ export const getEventTicketsUserPurchasedService = async(req, res) => {
 
 export const cancelEventUserBookingService = async(req, res) => {
     try {
+        
         await venueSeatingdb.unassignSeatFromTicketDb(req.params.ticketID)
         await ticketPurchasedb.removeTicketPurchaseByTicketIdDb(req.params.ticketID)
+
         return {statusCode: 200, msg: `Ticket ${req.params.ticketID} has been cancelled`}
 
     } catch (error) {
