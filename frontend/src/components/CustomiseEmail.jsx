@@ -79,7 +79,8 @@ const CustomiseEmail = ({
   const handleSend = async() => {
     setEmailSuccess(false);
     const jsonString = JSON.stringify({
-      announcement: emailContent
+      announcement: emailContent,
+      subject: subject
     });
     const response = await fetch(`http://localhost:3000/events/${eventInfo.eventID}/emailEventAnnouncement`, {
       method: 'POST',
