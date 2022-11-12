@@ -261,7 +261,6 @@ const PublicLanding = () => {
             <Button 
               component={Link}
               to= {{pathname: `/event/view/${obj.eachEvent.eventID}`}}
-              //state= {{state: obj.eachEvent}}
               state= {obj.eachEvent}
               size="small">
                 view

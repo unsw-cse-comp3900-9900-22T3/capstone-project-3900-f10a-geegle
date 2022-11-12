@@ -10,6 +10,7 @@ import MyAccount from './pages/myAccount';
 import PublicLanding from './pages/publicLanding';
 import ViewEvent from './pages/viewEvent';
 import MyEvents from './pages/myEvents';
+import UserViewPurchasedTix from './components/UserViewPurchasedTix';
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   return (
@@ -27,6 +28,7 @@ function App() {
           <Route exact path={`/event/view/:eventId`} element={<ViewEvent/>}></Route>
           <Route exact path={`/events/myEvent`} element={<MyEvents/>}></Route>
           <Route exact path={`/user/profile`} element={<MyAccount/>}></Route>
+          <Route exact path={`/events/user/tickets/:eventId`} element={<UserViewPurchasedTix/>}></Route>
         </Routes>
       </Router>
     </>

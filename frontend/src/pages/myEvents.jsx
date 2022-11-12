@@ -62,7 +62,7 @@ const MyEvents = () => {
           'Content-Type': 'application/json',
           'auth-token': localStorage.getItem('token'),
         },
-        // body: JSON.stringify({userID:userID }),
+       
       })
       json = await response.json();
     } else {
@@ -213,10 +213,16 @@ const MyEvents = () => {
                   view
               </Button>
               <Button 
+                component={Link}
+                to= {{pathname: `/events/user/tickets/${obj.eventID}`}}
+               >
+                  view your order
+              </Button>
+              {/* <Button 
                 onClick = {()=>setPuchasedModal(true)}
                >
-                 view your order
-              </Button>
+                 
+              </Button> */}
               {!obj.leftReview && <Button onClick={handleForm}>
                 Leave Review
               </Button>}
@@ -225,12 +231,7 @@ const MyEvents = () => {
               </Button> */}
               {obj.leftReview && <Button onClick={()=>handleEdit(obj)}>Edit Review</Button>}
           </CardActions>
-          {puchasedModal === true ? (
-          <UserViewPurchasedTix 
-          puchasedModal = {puchasedModal}
-          setPuchasedModal = {setPuchasedModal }
-          eventInfo = {obj} />
-          ): null}
+         
         </Card> 
       </div>
       )

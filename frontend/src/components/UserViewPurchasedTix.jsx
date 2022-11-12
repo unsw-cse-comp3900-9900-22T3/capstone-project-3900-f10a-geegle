@@ -4,14 +4,15 @@ import Modal from '@mui/material/Modal';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { Grid } from '@mui/material';
-
+import { useParams, useNavigate } from 'react-router-dom';
 
 const EmailSuccessModal = ({
   setConfirmRefundPrompt,
   refundSuccess,
   setRefundSuccess,
   getPurchasedTixs,
-  setPurchasedTixs
+  setPurchasedTixs,
+  closeConfirmModal
 }) => {
   const style = {
     position: 'absolute',
@@ -23,12 +24,19 @@ const EmailSuccessModal = ({
     bgcolor: 'background.paper',
     border: '2px solid #000',
     boxShadow: 24,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    gap: '16px',
+    alignItems: 'center',
     p: 4,
   };
-  useEffect(()=> {
-    setConfirmRefundPrompt(false);
+  const handleClose = () => {
+    closeConfirmModal();
+    setRefundSuccess(false);
     getPurchasedTixs();
-  })
+  }
+  
   return (
     <Modal
     hideBackdrop
@@ -37,12 +45,14 @@ const EmailSuccessModal = ({
     aria-labelledby="confirm refund success modal"
   >
     <Box sx={style}>
-      <Typography variant="h6" style={{color: 'green'}}>
+      <Typography variant="h5" style={{color: 'green'}}>
         You have successfully refunded your ticket, you will recieve a confirmation email shortly
       </Typography>
       <Button 
           variant="text"
-          onClick = {()=>setRefundSuccess(false)}
+          size="large"
+          style={{fontSize:'1.07rem'}}
+          onClick = {()=>handleClose()}
           >
             Close
       </Button>
@@ -71,9 +81,11 @@ const ConfirmRefundModal = ({
     boxShadow: 24,
     p: 4,
   };
-  // const email refund confirmation
-  // const submitRefund
+  
   const [refundSuccess, setRefundSuccess] = useState(false);
+  const closeConfirmModal = () => {
+    setConfirmRefundPrompt(false);
+  }
   const submitRefund = async() => {
     const response = await fetch(`http://localhost:3000/events/cancelBooking/${ticketInfo.ticketID}`, {
       method: 'DELETE',
@@ -131,6 +143,7 @@ const ConfirmRefundModal = ({
             setRefundSuccess = {setRefundSuccess}
             getPurchasedTixs = {getPurchasedTixs}
             setPurchasedTixs = {setPurchasedTixs}
+            closeConfirmModal = {closeConfirmModal}
             />
         ): null}
         </Box>
@@ -145,11 +158,8 @@ const ConfirmRefundModal = ({
  * @param {*} param0 
  * @returns 
  */
-const UserViewPurchasedTix = ({ 
-  puchasedModal,
-  setPuchasedModal,
-  eventInfo
-}) => {
+const UserViewPurchasedTix = (
+ ) => {
   const style = {
     position: 'absolute',
     top: '50%',
@@ -165,9 +175,45 @@ const UserViewPurchasedTix = ({
   const [purchasedTixs, setPurchasedTixs] = useState([]);
   const [confirmRefundPrompt, setConfirmRefundPrompt] = useState(false);
   const [ticketInfo, setTicketInfo] = useState({});
-
+  const [purchasedModal, setPurchasedModal] = useState(true);
+  const [eventInfo, setEventInfo] = useState({});
+  const { eventId} = useParams();
+  const [lateRefundError, setLateRefundError] = useState(false)
+  const navigate = useNavigate();
+  const getEventInfo = async() => {
+    const response = await fetch(`http://localhost:3000/events/${eventId}/info`, {
+      method: 'GET'
+    })
+    const eventJson = (await response.json()).event;
+    const eventDetails = {
+      venueCapacity: eventJson.venueCapacity,
+      capacity: eventJson.capacity,
+      endDateTime: eventJson.endDateTime,
+      eventDescription: eventJson.eventDescription,
+      eventID: eventJson.eventID,
+      eventLocation: eventJson.eventLocation,
+      eventName: eventJson.eventName,
+      eventType: eventJson.eventType,
+      eventVenue: eventJson.eventVenue,
+      eventVenueId: eventJson.eventVenueId,
+      hostEmail: eventJson.hostEmail,
+      seatedEvent: eventJson.seatedEvent,
+      hostID: eventJson.hostID,
+      hostName: eventJson.hostName,
+      image1: eventJson.image1,
+      image2: eventJson.image2,
+      image3: eventJson.image3,
+      published: eventJson.published,
+      startDateTime: eventJson.startDateTime,
+      totalTicketAmount:eventJson.totalTicketAmount,
+    }
+    console.log(eventDetails);
+    
+    setEventInfo({...eventDetails});
+      
+  }
   const getPurchasedTixs = async() => {
-    const response = await fetch(`http://localhost:3000/events/${eventInfo.eventID}/ticketsPurchased`, {
+    const response = await fetch(`http://localhost:3000/events/${eventId}/ticketsPurchased`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -182,20 +228,27 @@ const UserViewPurchasedTix = ({
     }
     
   }
-  const handleRefundPrompt = (ticket) => {
+  const handleRefundPrompt = (ticket,) => {
+    //if (new Date() < new Date(eventInfo.startDateTime) - 7)
+    setLateRefundError(false);
     setTicketInfo({...ticket});
     setConfirmRefundPrompt(true);
   }
+
+  const closeTicketView = () => {
+    setPurchasedModal(false);
+    navigate(`/events/myEvent`);
+  }
   useEffect(()=> {
+    getEventInfo();
     getPurchasedTixs();
   },[])
   return (
     <Modal
       hideBackdrop
-      open={puchasedModal}
-      onClose={()=>setPuchasedModal(false)}
+      open={purchasedModal}
+      onClose={closeTicketView}
       aria-labelledby="view purchased tickets"
-      aria-describedby="view purchased tickets"
     >
       <Box sx={style}>
         <Typography variant="h5" color="text.secondary">
@@ -315,7 +368,7 @@ const UserViewPurchasedTix = ({
          )}
         <Button 
             variant="text"
-            onClick= {()=>setPuchasedModal(false)}
+            onClick= {()=>closeTicketView()}
             >
               Close
         </Button>
