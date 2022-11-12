@@ -11,7 +11,9 @@ const SuccessModal = ({
   setEmailModal,
   emailSuccess,
   setEmailSuccess,
-  eventInfo
+  eventInfo,
+  closeEmailModal
+
 }) => {
   const style = {
     position: 'absolute',
@@ -23,12 +25,18 @@ const SuccessModal = ({
     bgcolor: 'background.paper',
     border: '2px solid #000',
     boxShadow: 24,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    gap: '16px',
+    alignItems: 'center',
     p: 4,
   };
-  useEffect(()=> {
-    setEmailModal(false);
-  }, [])
-  
+
+  const handleSuccessClose = () => {
+    setEmailSuccess(false);
+    closeEmailModal();
+  }
 
   return (
     <Modal
@@ -38,22 +46,26 @@ const SuccessModal = ({
       aria-labelledby="confirm email success modal"
     >
       <Box sx={style}>
-        <Typography variant="h6" style={{color: 'green'}}>
-          You have successfully sent an email to all attendees for event: {eventInfo.eventName}
+        <Typography variant="h5" style={{color: 'green'}}>
+          You have successfully sent an email to all attendees for "{eventInfo.eventName}""
         </Typography>
         <Button 
             variant="text"
-            onClick = {()=>setEmailSuccess(false)}
+            size="large"
+            style={{fontSize:'1.07rem'}}
+            onClick = {()=>handleSuccessClose()}
             >
               Close
         </Button>
       </Box>
     </Modal>
+    
   )
 }
 
 /**
- * Function that renders modal to view ticket purchases of a customer
+ * Function that that renders a pop up that allows customers to type an
+ * announcement that will be sent via email
  */
 const CustomiseEmail = ({
   setEmailModal,
@@ -76,11 +88,14 @@ const CustomiseEmail = ({
   const [subject, setSubject] = useState("");
   const [emailContent, setEmailContent] = useState("");
   const [emailSuccess, setEmailSuccess] = useState(false);
+  const closeEmailModal = () => {
+    setEmailModal(false);
+  }
   const handleSend = async() => {
-    setEmailSuccess(false);
     const jsonString = JSON.stringify({
-      announcement: emailContent,
-      subject: subject
+      subject: subject,
+      announcement: emailContent
+      
     });
     const response = await fetch(`http://localhost:3000/events/${eventInfo.eventID}/emailEventAnnouncement`, {
       method: 'POST',
@@ -91,10 +106,9 @@ const CustomiseEmail = ({
       body: jsonString
 
     })
-    
+
     if (response.ok) {
-      console.log('response', response);
-      emailSuccess(true);
+      setEmailSuccess(true);
     }
   }
 
@@ -104,6 +118,7 @@ const CustomiseEmail = ({
       open={emailModal}
       onClose={()=>setEmailModal(false)}
       aria-labelledby="Customise Email"
+      closeAfterTransition
     >
       <Box sx={style}>
         <Typography variant="h6" color="text.secondary">
@@ -138,12 +153,7 @@ const CustomiseEmail = ({
             style ={{marginTop: '20px'}}
             
             />
-            {/* <textarea
-            id="message input"
-            onChange = {(e)=>setEmailContent(e.target.value)}
-            InputProps={{ sx: { height: '12rem'} }}
-            style ={{marginTop: '20px'}} */}
-            {/* />  */}
+        
           <Button 
             variant="contained"
             style ={{width: '2rem', alignSelf: 'center', marginTop: '20px'}}
@@ -161,11 +171,12 @@ const CustomiseEmail = ({
         </Button>
         {emailSuccess=== true ? (
           <SuccessModal
-          setEmailModal = {setEmailModal}
-          emailSuccess = {emailSuccess}
-          setEmailSuccess = {setEmailSuccess}
-          eventInfo = {eventInfo} />
-        ): null}
+            setEmailModal = {setEmailModal}
+            emailSuccess = {emailSuccess}
+            setEmailSuccess = {setEmailSuccess}
+            eventInfo = {eventInfo}
+            closeEmailModal = {closeEmailModal} />
+          ): null}
         
       </Box>
     </Modal>
