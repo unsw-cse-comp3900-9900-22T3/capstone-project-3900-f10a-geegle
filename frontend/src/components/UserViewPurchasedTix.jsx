@@ -6,13 +6,58 @@ import Typography from '@mui/material/Typography';
 import { Grid } from '@mui/material';
 
 
-
+const EmailSuccessModal = ({
+  setConfirmRefundPrompt,
+  refundSuccess,
+  setRefundSuccess,
+  getPurchasedTixs,
+  setPurchasedTixs
+}) => {
+  const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '50vw',
+    height: '40vh',
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+  };
+  useEffect(()=> {
+    setConfirmRefundPrompt(false);
+    getPurchasedTixs();
+  })
+  return (
+    <Modal
+    hideBackdrop
+    open={refundSuccess}
+    onClose={()=>setRefundSuccess(false)}
+    aria-labelledby="confirm refund success modal"
+  >
+    <Box sx={style}>
+      <Typography variant="h6" style={{color: 'green'}}>
+        You have successfully refunded your ticket, you will recieve a confirmation email shortly
+      </Typography>
+      <Button 
+          variant="text"
+          onClick = {()=>setRefundSuccess(false)}
+          >
+            Close
+      </Button>
+    </Box>
+  </Modal>
+)
+}
 
 const ConfirmRefundModal = ({
   confirmRefundPrompt,
   setConfirmRefundPrompt,
   ticketInfo,
-  eventInfo
+  eventInfo,
+  getPurchasedTixs,
+  setPurchasedTixs
 }) => {
   const style = {
     position: 'absolute',
@@ -28,7 +73,27 @@ const ConfirmRefundModal = ({
   };
   // const email refund confirmation
   // const submitRefund
-  
+  const [refundSuccess, setRefundSuccess] = useState(false);
+  const submitRefund = async() => {
+    const response = await fetch(`http://localhost:3000/events/cancelBooking/${ticketInfo.ticketID}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'auth-token': localStorage.getItem('token'),
+      },
+    })
+    
+    if (response.ok) {
+      const responseEmail = await fetch(`http://localhost:3000/events/emailCancelBooking/${ticketInfo.ticketID}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'auth-token': localStorage.getItem('token'),
+        },
+      })
+    }
+    setRefundSuccess(true);
+  }
   return (
     <Modal
       hideBackdrop
@@ -46,6 +111,7 @@ const ConfirmRefundModal = ({
                 style={{marginRight: "15px",width: "8rem", fontSize: "1.3rem", backgroundColor: "green"}}
                 variant="contained"
                 size="large"
+                onClick = {()=>submitRefund()}
                 >
                   Yes
             </Button>
@@ -58,6 +124,15 @@ const ConfirmRefundModal = ({
                   No
             </Button>
           </Box>
+          {refundSuccess === true ? (
+          <EmailSuccessModal
+            setConfirmRefundPrompt = {setConfirmRefundPrompt}
+            refundSuccess = {refundSuccess}
+            setRefundSuccess = {setRefundSuccess}
+            getPurchasedTixs = {getPurchasedTixs}
+            setPurchasedTixs = {setPurchasedTixs}
+            />
+        ): null}
         </Box>
       </Box>
     </Modal>
@@ -100,9 +175,12 @@ const UserViewPurchasedTix = ({
       },
     })
     
-    const purchased = (await response.json()).tickets;
-    console.log(purchased);
-    setPurchasedTixs(purchased);
+    if (response.ok) {
+      const purchased = (await response.json()).tickets;
+      console.log(purchased);
+      setPurchasedTixs(purchased);
+    }
+    
   }
   const handleRefundPrompt = (ticket) => {
     setTicketInfo({...ticket});
@@ -110,7 +188,7 @@ const UserViewPurchasedTix = ({
   }
   useEffect(()=> {
     getPurchasedTixs();
-  },[puchasedModal])
+  },[])
   return (
     <Modal
       hideBackdrop
@@ -246,7 +324,9 @@ const UserViewPurchasedTix = ({
           confirmRefundPrompt = {confirmRefundPrompt}
           setConfirmRefundPrompt = {setConfirmRefundPrompt}
           ticketInfo = {ticketInfo}
-          eventInfo= {eventInfo} />
+          eventInfo= {eventInfo} 
+          getPurchasedTixs = {getPurchasedTixs}
+          setPurchasedTixs = {setPurchasedTixs}/>
         ): null}
       </Box>
     </Modal>
