@@ -1,12 +1,13 @@
 import { getAllEventsDb } from "../db/event.db.js";
 
 export async function testAlgo() {
-    updateAllEventSimilarity();
+    // aim to move events out of this
+    const events = await getAllEventsDb();
+    updateAllEventSimilarity(events);
 }
 
-async function updateAllEventSimilarity() {
-    const events = await getAllEventsDb();
-    let event_keywords = await extractKeywordsFromEvents(events);
+async function updateAllEventSimilarity(events) {
+    let event_keywords = extractKeywordsFromEvents(events);
     console.log(event_keywords);
     // Insert all words into hashmap so no duplicates
     // Counts total occurence of each word across all text
@@ -41,9 +42,11 @@ async function updateAllEventSimilarity() {
         let tfidf_map = populateWordMap(all_word_occ);
         let tfidf_arr = []
         for (let word in word_freq_by_event[i]) {
-            let tf = (word_freq_by_event[i][word]/event_keywords[i].length);
-            // log(1 + ) idf weighting to remove idf = 0 values
-            let idf = Math.log(1 + (events.length/word_freq_by_doc[word]));
+            // Augmented frequency to prevent bias towards longer documents
+            let tf = (0.5 + 0.5*(word_freq_by_event[i][word]/event_keywords[i].length));
+            // Smoothing on idf values applied - 1 added to denominator and idf val
+            let idf = Math.log(events.length/(word_freq_by_doc[word]+ 1)) + 1;
+            // let idf = Math.log(events.length/word_freq_by_doc[word]);
             tfidf_map[word] = tf * idf;
             tfidf_arr.push(tfidf_map[word].toFixed(4));
         }
@@ -74,21 +77,21 @@ function extractKeywordsFromEvents(events) {
 
 // Converts a string of text to an array of lowercase words
 function convertTextToArray(text) {
-    const arrStrings = text.match(/\b(\w+)'?(\w+)?\b/g);
-    const lowerStrings = [];
-    arrStrings.forEach(word => {
-        lowerStrings.push(word.toLowerCase());
+    const arr_strings = text.match(/\b(\w+)'?(\w+)?\b/g);
+    const lower_strings = [];
+    arr_strings.forEach(word => {
+        lower_strings.push(word.toLowerCase());
     })
-    return lowerStrings
+    return lower_strings
 }
 
 // Populates an empty map with all words from another map with zeros
-function populateWordMap(existingMap) {
-    let newMap = {};
-    for (let word in existingMap) {
-        newMap[word] = 0;
+function populateWordMap(existing_map) {
+    let new_map = {};
+    for (let word in existing_map) {
+        new_map[word] = 0;
     }
-    return newMap;
+    return new_map;
 }
 
 // Incriments document map for each word that was in a specific event map
@@ -101,25 +104,25 @@ function incrimentDocMapFromEventMap(doc_freq_map, event_freq_map) {
 }
 
 // Determines the dot product between 2 vectors
-function dotProduct(vecA, vecB){
+function dotProduct(vecA, vecB) {
     let product = 0;
-    for(let i=0;i<vecA.length;i++){
+    for(let i = 0; i < vecA.length; i++){
         product += vecA[i] * vecB[i];
     }
     return product;
 }
 
 // Determines the magnitude of a single vector
-function magnitude(vec){
+function magnitude(vec) {
     let sum = 0;
-    for (let i = 0;i<vec.length;i++){
+    for (let i = 0; i < vec.length; i++){
         sum += vec[i] * vec[i];
     }
     return Math.sqrt(sum);
 }
 
 // Determines the cosine similarity between two vectors
-function cosineSimilarity(vecA,vecB){
-    return dotProduct(vecA,vecB)/ (magnitude(vecA) * magnitude(vecB));
+function cosineSimilarity(vecA, vecB) {
+    return dotProduct(vecA, vecB)/ (magnitude(vecA) * magnitude(vecB));
 }
 
