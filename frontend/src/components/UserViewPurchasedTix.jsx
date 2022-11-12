@@ -5,6 +5,65 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { Grid } from '@mui/material';
 
+
+
+
+const ConfirmRefundModal = ({
+  confirmRefundPrompt,
+  setConfirmRefundPrompt,
+  ticketInfo,
+  eventInfo
+}) => {
+  const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '50vw',
+    height: '40vh',
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+  };
+  // const email refund confirmation
+  // const submitRefund
+  
+  return (
+    <Modal
+      hideBackdrop
+      open={confirmRefundPrompt}
+      onClose={()=>setConfirmRefundPrompt(false)}
+      aria-labelledby="confirm email success modal"
+    >
+      <Box sx={style}>
+        <Box id="content container" style={{width: "50vw", height: '40vh', display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", gap:"3rem"}}>
+          <Typography variant="h4">
+            Are you sure you want to refund your ticket?
+          </Typography>
+          <Box id= "buttons">
+            <Button 
+                style={{marginRight: "15px",width: "8rem", fontSize: "1.3rem", backgroundColor: "green"}}
+                variant="contained"
+                size="large"
+                >
+                  Yes
+            </Button>
+            <Button 
+                style={{width: "8rem", fontSize: "1.3rem"}}
+                variant="contained"
+                onClick = {()=>setConfirmRefundPrompt(false)}
+                size="large"
+                >
+                  No
+            </Button>
+          </Box>
+        </Box>
+      </Box>
+    </Modal>
+  )
+}
+
 /**
  * Function that renders modal to view ticket purchases of a customer
  * for a specifield event
@@ -29,6 +88,8 @@ const UserViewPurchasedTix = ({
     p: 4,
   };
   const [purchasedTixs, setPurchasedTixs] = useState([]);
+  const [confirmRefundPrompt, setConfirmRefundPrompt] = useState(false);
+  const [ticketInfo, setTicketInfo] = useState({});
 
   const getPurchasedTixs = async() => {
     const response = await fetch(`http://localhost:3000/events/${eventInfo.eventID}/ticketsPurchased`, {
@@ -43,10 +104,13 @@ const UserViewPurchasedTix = ({
     console.log(purchased);
     setPurchasedTixs(purchased);
   }
-    
+  const handleRefundPrompt = (ticket) => {
+    setTicketInfo({...ticket});
+    setConfirmRefundPrompt(true);
+  }
   useEffect(()=> {
     getPurchasedTixs();
-  },[])
+  },[puchasedModal])
   return (
     <Modal
       hideBackdrop
@@ -129,6 +193,7 @@ const UserViewPurchasedTix = ({
                     <Grid item xs={2}>
                       <Button 
                         variant="contained"
+                        onClick = {()=>handleRefundPrompt(ticket)}
                       >
                           Refund
                       </Button>
@@ -159,6 +224,7 @@ const UserViewPurchasedTix = ({
                     <Grid item xs={2}>
                       <Button 
                         variant="contained"
+                        onClick ={()=>handleRefundPrompt(ticket)}
                       >
                           Refund
                       </Button>
@@ -175,7 +241,13 @@ const UserViewPurchasedTix = ({
             >
               Close
         </Button>
-        
+        { confirmRefundPrompt === true ? (
+          <ConfirmRefundModal
+          confirmRefundPrompt = {confirmRefundPrompt}
+          setConfirmRefundPrompt = {setConfirmRefundPrompt}
+          ticketInfo = {ticketInfo}
+          eventInfo= {eventInfo} />
+        ): null}
       </Box>
     </Modal>
   )
