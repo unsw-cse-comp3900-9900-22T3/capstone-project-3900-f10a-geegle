@@ -5,7 +5,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { Grid } from '@mui/material';
 import CustomerTickets from '../components/CustomerTickets';
-
+import CustomiseEmail from '../components/CustomiseEmail';
 
 const ViewCustomers= ({
   customerModal, 
@@ -24,12 +24,12 @@ const ViewCustomers= ({
       boxShadow: 24,
       p: 4,
     };
-  // console.log(clickedEventInfo);
+ 
   const [customers, setCustomers] = useState([]);
   const [viewTicketModal, setViewTicketModal] = useState(false);
+  const [emailModal, setEmailModal] = useState(false);
   const [clickedCustomer, setClickedCustomer] = useState({});
   const fetchCustomers = async() => {
-    // console.log('event id', clickedEventInfo.eventID);
     const response = await fetch(`http://localhost:3000/events/${clickedEventInfo.eventID}/guest`, {
       method: 'GET',
       headers: {
@@ -44,13 +44,6 @@ const ViewCustomers= ({
   const handleViewCustomerTickets = (customerTicketInfo) => {
     setViewTicketModal(true);
     setClickedCustomer(customerTicketInfo);
-    // return (
-    //   <CustomerTickets 
-    //   customerTicketInfo = {customerTicketInfo}
-    //   setViewTicketModal = {setViewTicketModal}
-    //   viewTicketModal = {true}
-    //   eventInfo = {clickedEventInfo} />
-    // )
 
   }
   useEffect(()=> {
@@ -124,6 +117,7 @@ const ViewCustomers= ({
           <Button 
             variant="contained"
             style={{textAlign:'center'}}
+            onClick = {()=> setEmailModal(true)}
             >
             Send email to all attendees
           </Button>
@@ -140,6 +134,13 @@ const ViewCustomers= ({
           setViewTicketModal = {setViewTicketModal}
           viewTicketModal = {viewTicketModal}
           eventInfo = {clickedEventInfo} />
+        ): null}
+        {emailModal === true ? (
+          <CustomiseEmail
+          setEmailModal = {setEmailModal}
+          emailModal = {emailModal}
+          eventInfo= {clickedEventInfo}
+          customers = {customers} />
         ): null}
       </Box>
     </Modal>
