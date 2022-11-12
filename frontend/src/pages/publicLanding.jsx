@@ -12,6 +12,23 @@ import { FormControl } from '@mui/material';
 import { Navigate, useNavigate, Link } from 'react-router-dom';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import SearchFilter from '../components/searchFilter';
+// button styles
+// const SearchButton = styled(Button)({
+//   color: 'darkslategray',
+//   backgroundColor: 'aliceblue',
+//   padding: 8,
+//   borderRadius: 4,
+//   width: '15%',
+// });
+
+// const UnFilterButton = styled(Button)({
+//   color: 'darkslategray',
+//   backgroundColor: 'aliceblue',
+//   padding: 8,
+//   borderRadius: 4,
+//   width: '15%',
+// });
 const style = {
     position: 'absolute',
     top: '50%',
@@ -38,13 +55,6 @@ const PublicLanding = () => {
     //console.log(newAlignment);
   };
   const getReviews = async(eventId) => {
-    // let userID = -1;
-    // if (!localStorage.getItem('userId')) {
-    //   userID = -1;
-    // } else {
-    //   userID = parseInt(localStorage.getItem('userId'))
-    // }
-    // console.log("here", userID);
     let json = []
 
     if (localStorage.getItem('token')) { 
@@ -182,6 +192,7 @@ const PublicLanding = () => {
   
   return (
     <>  
+    {/* <SearchFilter></SearchFilter> */}
     <div>
       <ToggleButtonGroup
         color="primary"
