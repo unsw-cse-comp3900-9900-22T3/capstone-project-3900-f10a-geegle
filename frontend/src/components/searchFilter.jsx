@@ -13,7 +13,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
@@ -39,31 +39,48 @@ const style = {
   p: 4,
 };
 
-const SearchFilter = () => {
-  const [open, setOpen] = React.useState(true);
+const SearchFilter = ({openSearch, setOpenSearch, setFilter, setFilteredListings}) => {
+  //const [open, setOpen] = React.useState(true);
   const [openStartDate, setOpenStartDate] = React.useState(false);
   const[openEndDate, setOpenEndDate] = React.useState(false);
   const [openEventCat, setOpenEventCat] = React.useState(false);
   const [openEventLoc, setOpenEventLoc] = React.useState(false);
   const [openEventRating, setOpenEventRating] = React.useState(false);
   const [openEventCost, setOpenEventCost] = React.useState(false);
-  const [startDate, setStartDate] = React.useState(new Date().toISOString().substring(0, 11));
-  const [endDate, setEndDate] = React.useState(new Date().toISOString().substring(0, 11));
+  const [startDate, setStartDate] = React.useState(new Date().toISOString());
+  const [endDate, setEndDate] = React.useState(new Date().toISOString());
   const [eventType, setEventType] = React.useState('');
+  const [keyword, setKeyword] = React.useState('');
+  const [searchString,setSearchString] = React.useState([false,false,false,false]);
   const navigate = useNavigate();
   const handleClose = () => {
     navigate('/');
     //navigate(`/event/view/${eventId}`);
-    setOpen(false);
+    setOpenSearch(false);
   };
   const handleStartOpen = (event) => {
     setOpenStartDate(event);
+    let updatedList = [...searchString]
+    // if (event){
+      updatedList[1] = event;
+    // }
+    setSearchString(updatedList);
   };
   const handleEndOpen = (event) => {
     setOpenEndDate(event);
+    let updatedList = [...searchString]
+    // if (event){
+      updatedList[2] = event;
+    // }
+    setSearchString(updatedList);
   };
   const handleEventCatOpen = (event) => {
     setOpenEventCat(event);
+    let updatedList = [...searchString]
+    // if (event){
+      updatedList[3] = event;
+    // }
+    setSearchString(updatedList);
   };
   const handleEventRatingOpen =(event) => {
     setOpenEventRating(event);
@@ -71,21 +88,87 @@ const SearchFilter = () => {
   const handleEventCostOpen =(event) => {
     setOpenEventCost(event);
   }
-
   const handleEventLocOpen =(event) => {
     setOpenEventLoc(event);
   }
 
+  // check if a string is only spaces https://bobbyhadz.com/blog/javascript-check-if-string-contains-only-spaces
+  const onlySpaces=(str) => {
+    return str.trim().length === 0;
+  }
+
+  const handleKeyword = (e) => {
+    console.log('here');
+    console.log('keyword', keyword);
+    setKeyword(e.target.value);
+    let updatedList = [...searchString];
+    if(!onlySpaces(e.target.value)) {
+      updatedList[0] = true;
+    } else {
+      updatedList[0] = false;
+    }
+    setSearchString(updatedList);
+  }
+
+  const handleSubmit = async(e) => {
+    e.preventDefault();
+    console.log('submitted!');
+    // add an if statement to check if fields are filled in
+    let combinedStr = '';
+    let concatStr = '';
+    console.log(searchString);
+    searchString.forEach((elem, idx) => {
+      if(elem) {
+        switch(idx) {
+          case 0:
+            concatStr=`searchWords=${keyword.replace(/ /g, '%20')}`;
+            break;
+          case 1:
+            concatStr=`from=${startDate}`;
+            break;
+          case 2:
+            concatStr=`to=${endDate}`;
+            break;
+          case 3:
+            concatStr=`category=${eventType.replace(/ /g, '%')}`;
+            break;
+        }
+        combinedStr=combinedStr+concatStr+'&'
+      }
+    })
+    // check last character is it's and &
+    if (combinedStr.length !== 0) {
+      console.log('here')
+      combinedStr=combinedStr.slice(0, -1);
+    }
+    console.log(combinedStr);
+    // calling api
+    const response = await fetch(`http://localhost:3000/events/find?${combinedStr}`, {
+      method: 'GET'
+    })
+    const json = await response.json();
+    if (response.ok) {
+      console.log('result', json);
+      handleClose();
+      setFilter(true);
+      setFilteredListings(...json.events);
+    }
+  }
+  
+
+  console.log(startDate);
+  console.log(endDate);
+  console.log(eventType);
   return (
     <>
       <Modal
-        open={open}
+        open={openSearch}
         onClose={handleClose}
         aria-labelledby="host-profile-modal"
         aria-describedby="host rating and reviews"
         arial-modal={true}
       >
-        <form>
+        <form onSubmit={(e)=>handleSubmit(e)}>
           <Box sx={style}>
             <Paper
               component="form"
@@ -99,6 +182,7 @@ const SearchFilter = () => {
                 sx={{ ml: 1, flex: 1 }}
                 placeholder="event name, description or type"
                 inputProps={{ 'aria-label': 'search with keyword' }}
+                onChange={(e)=>handleKeyword(e)}
               />
             </Paper>
             <Typography variant="h6" component="div">
@@ -113,30 +197,36 @@ const SearchFilter = () => {
               <FormControlLabel control={<Checkbox onChange={(e) => handleEventCostOpen(e.target.checked)}/>} label="Cost" />
             </Box>
             {openStartDate && 
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <Stack spacing={3}>
-                  <DesktopDatePicker
-                    label="Start Date"
-                    inputFormat="MM/DD/YYYY"
-                    value={startDate}
-                    onChange={(e)=>setStartDate(e)}
-                    renderInput={(params) => <TextField {...params} />}
-                  />
-                </Stack>
-              </LocalizationProvider>
+              <Grid item xs={12}>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <Stack spacing={3}>
+                    <DateTimePicker
+                      label="start date and time"
+                      id="startPicker"
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.toISOString())}
+                      // style={{ width: '35%' }}
+                      renderInput={(params) => <TextField {...params} />}
+                    />
+                  </Stack>
+                </LocalizationProvider>
+              </Grid>
             }
             {openEndDate && 
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <Stack spacing={3}>
-                  <DesktopDatePicker
-                    label="Start Date"
-                    inputFormat="MM/DD/YYYY"
-                    value={endDate}
-                    onChange={(e)=>setEndDate(e)}
-                    renderInput={(params) => <TextField {...params} />}
-                  />
-                </Stack>
-              </LocalizationProvider>
+              <Grid item xs={12}>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <Stack spacing={3}>
+                    <DateTimePicker
+                        label="End date and time"
+                        id="endPicker"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.toISOString())}
+                        // style={{ width: '35%' }}
+                        renderInput={(params) => <TextField {...params} />}
+                      />
+                  </Stack>
+                </LocalizationProvider>
+              </Grid>
             }
             {openEventCat && 
               <Grid item xs={12}>
@@ -161,7 +251,7 @@ const SearchFilter = () => {
               </Grid>
             }
 
-            <Button>Submit</Button>
+            <Button type="submit" value="submit" onClick={(e)=>handleSubmit(e)}>Submit</Button>
           </Box>
         </form>
       </Modal>

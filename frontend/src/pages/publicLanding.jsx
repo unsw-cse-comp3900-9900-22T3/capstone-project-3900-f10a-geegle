@@ -13,22 +13,26 @@ import { Navigate, useNavigate, Link } from 'react-router-dom';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import SearchFilter from '../components/searchFilter';
+import { styled } from '@mui/system';
+import Grid from '@mui/material/Grid';
 // button styles
-// const SearchButton = styled(Button)({
-//   color: 'darkslategray',
-//   backgroundColor: 'aliceblue',
-//   padding: 8,
-//   borderRadius: 4,
-//   width: '15%',
-// });
+const SearchButton = styled(Button)({
+  color: 'darkslategray',
+  backgroundColor: 'aliceblue',
+  padding: 8,
+  borderRadius: 4,
+  width: '15%',
+  height: '15%',
+  margin: '1%'
+});
 
-// const UnFilterButton = styled(Button)({
-//   color: 'darkslategray',
-//   backgroundColor: 'aliceblue',
-//   padding: 8,
-//   borderRadius: 4,
-//   width: '15%',
-// });
+const UnFilterButton = styled(Button)({
+  color: 'darkslategray',
+  backgroundColor: 'aliceblue',
+  padding: 8,
+  borderRadius: 4,
+  width: '15%',
+});
 const style = {
     position: 'absolute',
     top: '50%',
@@ -48,7 +52,9 @@ const PublicLanding = () => {
   const [ratingRatioHook, setRatingRatio] = React.useState(0);
   const [toggleState, setToggleState] = React.useState('All Events');
   const [allEventReviews, setAllEventReviews] = React.useState(['']);
-  
+  const [openSearch, setOpenSearch] = React.useState(false);
+  const [filter, setFilter] = React.useState(false);
+  const [filteredListings, setFilteredListings] = React.useState([]);
 
   const handleChange = (event, newAlignment) => {
     setToggleState(newAlignment);
@@ -191,20 +197,25 @@ const PublicLanding = () => {
   }, []);
   
   return (
-    <>  
-    {/* <SearchFilter></SearchFilter> */}
-    <div>
-      <ToggleButtonGroup
-        color="primary"
-        value={toggleState}
-        exclusive
-        onChange={handleChange}
-        aria-label="Platform"
-      >
-        <ToggleButton value="All Events">All Events</ToggleButton>
-        <ToggleButton value="Upcoming Events">Upcoming Events</ToggleButton>
-      </ToggleButtonGroup>
-    </div>
+    <>
+    <Grid item xs={12}>
+      <SearchButton onClick={()=>setOpenSearch(true)}>Search/Filter</SearchButton>
+    </Grid>
+    {openSearch && <SearchFilter openSearch={openSearch} setOpenSearch={setOpenSearch} setFilter={setFilter} setFilteredListings={setFilteredListings}></SearchFilter>}
+    <Grid item xs={12}>
+      <div>
+        <ToggleButtonGroup
+          color="primary"
+          value={toggleState}
+          exclusive
+          onChange={handleChange}
+          aria-label="Platform"
+        >
+          <ToggleButton value="All Events">All Events</ToggleButton>
+          <ToggleButton value="Upcoming Events">Upcoming Events</ToggleButton>
+        </ToggleButtonGroup>
+      </div>
+    </Grid>
     {
     
     
