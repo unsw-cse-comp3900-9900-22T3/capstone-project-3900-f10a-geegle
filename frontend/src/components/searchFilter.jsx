@@ -82,19 +82,19 @@ const SearchFilter = ({openSearch, setOpenSearch, setFilter, setFilteredListings
   const handleEventRatingOpen =(event) => {
     setOpenEventRating(event);
     let updatedList = [...searchString]
-    updatedList[4] = event;
+    updatedList[5] = event;
     setSearchString(updatedList);
   }
   const handleEventCostOpen =(event) => {
     setOpenEventCost(event);
     let updatedList = [...searchString]
-    updatedList[5] = event;
+    updatedList[6] = event;
     setSearchString(updatedList);
   }
   const handleEventLocOpen =(event) => {
     setOpenEventLoc(event);
     let updatedList = [...searchString]
-    updatedList[6] = event;
+    updatedList[4] = event;
     setSearchString(updatedList);
   }
 

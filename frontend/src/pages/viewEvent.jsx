@@ -303,7 +303,7 @@ const ViewEvent= () => {
             <Stack spacing={2} direction="row">
               <Button variant="outlined" onClick={handleShowReviews}>{`Reviews (${eventObj.reviews.length})`}</Button>
             </Stack>
-            {Array(Math.ceil(eventObj.ratingRatio * 5))
+            {Array(Math.ceil(eventObj.averageRating))
               .fill(0)
               .map((_, i) => (
                 <svg
@@ -318,7 +318,7 @@ const ViewEvent= () => {
                   />
                 </svg>
               ))}
-            {Array(5 - Math.ceil(eventObj.ratingRatio * 5))
+            {Array(5 - Math.ceil(eventObj.averageRating))
               .fill(0)
               .map((_, i) => (
                 <svg

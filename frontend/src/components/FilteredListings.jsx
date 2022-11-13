@@ -33,7 +33,7 @@ const FilteredListings = ({filteredListings}) => {
             <Typography variant="body2" color="text.secondary">
             {"Description: "+ obj.eventDescription}
             </Typography>
-            {/* {Array(Math.ceil(obj.eachEvent.ratingRatio * 5))
+            {Array(Math.ceil(obj.averageRating))
               .fill(0)
               .map((_, i) => (
                 <svg
@@ -48,7 +48,7 @@ const FilteredListings = ({filteredListings}) => {
                   />
                 </svg>
               ))}
-            {Array(5 - Math.ceil(obj.eachEvent.ratingRatio * 5))
+            {Array(5 - Math.ceil(obj.averageRating))
               .fill(0)
               .map((_, i) => (
                 <svg
@@ -66,11 +66,11 @@ const FilteredListings = ({filteredListings}) => {
                 </svg>
               ))}
             <Typography variant="body2" color="text.secondary">
-              Average Rating: {obj.eachEvent.averageRating}
+              Average Rating: {obj.averageRating}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Reviews: {obj.eachEvent.reviews.length}
-            </Typography> */}
+              Reviews: {obj.reviews.length}
+            </Typography>
 
           </CardContent>
           <CardActions>
