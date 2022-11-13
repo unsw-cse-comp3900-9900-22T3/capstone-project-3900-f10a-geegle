@@ -111,23 +111,20 @@ function CreateEventsForm() {
   const handleTicketSeatSection = (index, event) => {
     const newTicketInfo = { ...ticketInfo };
     const allNewTicketTypes = [...allTicketTypes];
+    //console.log('here');
     if (event.target.checked) {
       allNewTicketTypes[index].seatSections.push(event.target.value);
+      console.log(allNewTicketTypes[index].seatSections);
+      console.log('index',index);
     } else {
-      // const oldSeatSection = allNewTicketTypes[index].seatSection;
-      // oldSeatSection.remove(event.target.value);
-      // const updateSeatSection = oldSeatSection;
-      const updatedSeats = allNewTicketTypes[index].seatSections.filter((section) => !section.includes(event.target.value));
+      const updatedSeats = allNewTicketTypes[index].seatSections.filter((section) => section !== event.target.value);
       allNewTicketTypes[index].seatSections = updatedSeats;
-      //allNewTicketTypes[index].seatSection.remove(event.target.value);
     }
     setAllTicketTypes(allNewTicketTypes);
     console.log('allNewTicketTypes',allNewTicketTypes);
     
   }
   const handleAddTicket = (index) => {
-    //setAllTicketTypes(prev => [...prev, ticketInfo]);
-
     // resetting the fields in ticketInfo
     const newTicketInfo = {  
       ticketType: '',
@@ -154,8 +151,6 @@ function CreateEventsForm() {
     setSeat(event);
   };
   const handleSubmit = async () => {
-    // const resultStart = start.map(item => item.toLocaleDateString());
-    // const resultEnd = end.map(item => item.toLocaleDateString());
     // setting errors back to default
     setEndTimeError(false); // End time before start time error
     setNegCapacityError(false); // capacity < 0
@@ -283,14 +278,16 @@ function CreateEventsForm() {
           </Grid>
           <Grid item xs={12}>
             <TextField
+              required
+              multiline
               id="Event Description"
-              label="Event Description"
-              aria-label="Event Description"
-              type="text"
-              variant="outlined"
-              onChange={(e) => setEventDescription(e.target.value)}
+              onChange = {(e) => setEventDescription(e.target.value)}
+              rows = {7}
+              placeholder = "Event Description"
+              style ={{marginTop: '8px'}}
               fullWidth
-            />
+              
+              />
           </Grid>
           <Grid item xs={12}>
             <FormControl style={{ width: '35%' }}>
@@ -303,7 +300,6 @@ function CreateEventsForm() {
                 value={venue}
                 onChange={(e) => handleVenue(e.target.value)}
               >
-                {/* do we need event types stored in the back end (maybe we need to when we filter?) */}
                 <MenuItem value={'Accor Stadium'}>
                   Accor Stadium - capacity 83500
                 </MenuItem>
