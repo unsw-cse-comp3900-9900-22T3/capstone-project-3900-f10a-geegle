@@ -12,7 +12,7 @@ import { FormControl } from '@mui/material';
 import { Navigate, useNavigate, Link } from 'react-router-dom';
 import LeaveReviewForm from '../components/leaveReviewForm';
 import EditReviewForm from '../components/editReviewForm';
-
+import UserViewPurchasedTix from '../components/UserViewPurchasedTix';
 const MyEvents = () => {
   const [attendingEvents, setAttendingEvents] = React.useState([]);
   const [openReviewForm, setOpenReviewForm] = React.useState(false);
@@ -23,6 +23,7 @@ const MyEvents = () => {
   const [myReview, setMyReview] = React.useState('');
   const [editForm, setEditForm] = React.useState(false);
   const [editFormObj, setEditFormObj] = React.useState({});
+  const [puchasedModal, setPuchasedModal] = React.useState(false);
 
 
   const handleForm = () => {
@@ -61,7 +62,7 @@ const MyEvents = () => {
           'Content-Type': 'application/json',
           'auth-token': localStorage.getItem('token'),
         },
-        // body: JSON.stringify({userID:userID }),
+       
       })
       json = await response.json();
     } else {
@@ -157,6 +158,7 @@ const MyEvents = () => {
         image1: eventJson.image1,
         image2: eventJson.image2,
         image3: eventJson.image3,
+        seatedEvent: eventJson.seatedEvent,
         published: eventJson.published,
         startDateTime: eventJson.startDateTime,
         totalTicketAmount:eventJson.totalTicketAmount,
@@ -210,6 +212,17 @@ const MyEvents = () => {
                 size="small">
                   view
               </Button>
+              <Button 
+                component={Link}
+                to= {{pathname: `/events/user/tickets/${obj.eventID}`}}
+               >
+                  view your order
+              </Button>
+              {/* <Button 
+                onClick = {()=>setPuchasedModal(true)}
+               >
+                 
+              </Button> */}
               {!obj.leftReview && <Button onClick={handleForm}>
                 Leave Review
               </Button>}
@@ -218,6 +231,7 @@ const MyEvents = () => {
               </Button> */}
               {obj.leftReview && <Button onClick={()=>handleEdit(obj)}>Edit Review</Button>}
           </CardActions>
+         
         </Card> 
       </div>
       )

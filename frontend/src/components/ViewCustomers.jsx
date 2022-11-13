@@ -6,6 +6,7 @@ import Typography from '@mui/material/Typography';
 import { Grid } from '@mui/material';
 import CustomerTickets from '../components/CustomerTickets';
 import CustomiseEmail from '../components/CustomiseEmail';
+import { useNavigate } from 'react-router-dom';
 
 const ViewCustomers= ({
   customerModal, 
@@ -29,6 +30,7 @@ const ViewCustomers= ({
   const [viewTicketModal, setViewTicketModal] = useState(false);
   const [emailModal, setEmailModal] = useState(false);
   const [clickedCustomer, setClickedCustomer] = useState({});
+  const navigate = useNavigate();
   const fetchCustomers = async() => {
     const response = await fetch(`http://localhost:3000/events/${clickedEventInfo.eventID}/guest`, {
       method: 'GET',
@@ -44,8 +46,8 @@ const ViewCustomers= ({
   const handleViewCustomerTickets = (customerTicketInfo) => {
     setViewTicketModal(true);
     setClickedCustomer(customerTicketInfo);
-
   }
+
   useEffect(()=> {
     fetchCustomers();
   },[])
