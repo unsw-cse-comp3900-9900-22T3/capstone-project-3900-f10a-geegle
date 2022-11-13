@@ -94,6 +94,13 @@ const assignSeatToTicketDb = async(ticketID, seatID) => {
     return result.rows[0]
 }
 
+// UPDATE
+const unassignEventSeatsDb = async(eventID) => {
+    const result = await db.query(
+        "UPDATE tickets SET seatid = null where eventID = $1", [eventID]
+    )
+}
+
 export {
     getTicketByEventIdDb,
     getTicketByIdDb,
@@ -106,5 +113,6 @@ export {
     addTicketDb,
     removeTicketByIdDb,
     assignSeatToTicketDb,
-    addTicketPurchaseDb
+    addTicketPurchaseDb,
+    unassignEventSeatsDb
 }
