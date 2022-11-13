@@ -18,7 +18,7 @@ function TicketTypeInput( {
   index,
   venue
 }) {
-  const [eventSeatSection, setEventSeatSection] = useState({0: []});
+  const [eventSeatSection, setEventSeatSection] = useState([]);
   const fetchSeatSection = async () => {
     console.log(venue);
     const response = await fetch(`http://localhost:3000/events/venues/${venue}/seatSections`, {
@@ -31,11 +31,11 @@ function TicketTypeInput( {
       //   venue: venue.venue
       // })
     });
-    const json = await response.json();
+    const json = (await response.json()).seatSections;
     if (response.ok) {
-      const venueSection = [];
-      venueSection.push(json.seatSections);
-      setEventSeatSection(venueSection);
+      //const venueSection = [];
+      //venueSection.push(json.seatSections);
+      setEventSeatSection([...json]);
       // console.log(venueSection);
     }
   }
@@ -80,7 +80,7 @@ return (
     />
     </Grid>
     <Grid item xs = {12}>
-      {eventSeatSection[0].map((elem, idx) => {
+      {eventSeatSection.map((elem, idx) => {
         return (
           <div key={idx} style={{display: "inline"}}>
             <FormControlLabel
