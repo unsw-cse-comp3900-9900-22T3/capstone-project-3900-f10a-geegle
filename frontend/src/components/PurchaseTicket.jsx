@@ -59,7 +59,7 @@ const PurchaseTicket= ({
   const [hasSeats, setHasSeats] = useState(false);
   const [checkoutSuccess, setCheckoutSuccess] = useState(false);
   const [checkoutError, setCheckoutError] = useState(false);
-  const [checkoutErrorMsg, setCheckoutErrorMsg] = useState(false);
+  //const [checkoutErrorMsg, setCheckoutErrorMsg] = useState("");
 
 
 
@@ -206,7 +206,7 @@ const PurchaseTicket= ({
       setCheckoutSuccess(true);
     } else {
       setCheckoutError(true);
-      setCheckoutErrorMsg(r);
+      
     }
   }
   const handleQuantity = (event, index) => {
@@ -369,7 +369,7 @@ const PurchaseTicket= ({
           ? (<Alert severity="success">you have successfully purchased your tickets, look out for a confirmation email</Alert>) 
           : null}
         {checkoutError === true 
-          ? (<Alert severity="error">{checkoutErrorMsg}</Alert>) 
+          ? (<Alert severity="error">Invalid credit card details, please check again</Alert>) 
           : null}
         
       </Box>

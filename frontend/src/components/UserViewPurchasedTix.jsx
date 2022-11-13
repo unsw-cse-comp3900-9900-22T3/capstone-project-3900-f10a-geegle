@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import { Grid } from '@mui/material';
+import { Grid, Alert, Card } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 
 const EmailSuccessModal = ({
@@ -96,6 +96,7 @@ const ConfirmRefundModal = ({
     })
     
     if (response.ok) {
+      setRefundSuccess(true);
       const responseEmail = await fetch(`http://localhost:3000/events/emailCancelBooking/${ticketInfo.ticketID}`, {
         method: 'POST',
         headers: {
@@ -104,7 +105,7 @@ const ConfirmRefundModal = ({
         },
       })
     }
-    setRefundSuccess(true);
+    //setRefundSuccess(true);
   }
   return (
     <Modal
@@ -172,6 +173,15 @@ const UserViewPurchasedTix = (
     boxShadow: 24,
     p: 4,
   };
+  const dateOptions = {
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric',
+    hour: 'numeric', 
+    minute: 'numeric', 
+    hour12: true
+  }
   const [purchasedTixs, setPurchasedTixs] = useState([]);
   const [confirmRefundPrompt, setConfirmRefundPrompt] = useState(false);
   const [ticketInfo, setTicketInfo] = useState({});
@@ -179,6 +189,7 @@ const UserViewPurchasedTix = (
   const [eventInfo, setEventInfo] = useState({});
   const { eventId} = useParams();
   const [lateRefundError, setLateRefundError] = useState(false)
+  const [sevenDaysBeforeStart, setSevenDaysBeforeStart] = useState(new Date())
   const navigate = useNavigate();
   const getEventInfo = async() => {
     const response = await fetch(`http://localhost:3000/events/${eventId}/info`, {
@@ -208,8 +219,11 @@ const UserViewPurchasedTix = (
       totalTicketAmount:eventJson.totalTicketAmount,
     }
     console.log(eventDetails);
-    
+    const startDate = new Date(eventDetails.startDateTime);
+    const startDateInMs = startDate.getTime();
+    setSevenDaysBeforeStart(new Date(startDateInMs - 7 * 24 * 60 * 60 * 1000));
     setEventInfo({...eventDetails});
+    return eventDetails;
       
   }
   const getPurchasedTixs = async() => {
@@ -228,11 +242,20 @@ const UserViewPurchasedTix = (
     }
     
   }
-  const handleRefundPrompt = (ticket,) => {
-    //if (new Date() < new Date(eventInfo.startDateTime) - 7)
+  const handleRefundPrompt = (ticket) => {
     setLateRefundError(false);
     setTicketInfo({...ticket});
-    setConfirmRefundPrompt(true);
+    const startDate = new Date(eventInfo.startDateTime);
+    const startDateInMs = startDate.getTime();
+    const sevenDaysBeforeStart = new Date(startDateInMs - 7 * 24 * 60 * 60 * 1000); //in milliseconds
+    const currDate = new Date();
+    if (currDate<= sevenDaysBeforeStart) {
+      setConfirmRefundPrompt(true);
+    } else {
+      setConfirmRefundPrompt(false);
+      setLateRefundError(true);
+
+    }  
   }
 
   const closeTicketView = () => {
@@ -245,7 +268,6 @@ const UserViewPurchasedTix = (
   },[])
   return (
     <Modal
-      hideBackdrop
       open={purchasedModal}
       onClose={closeTicketView}
       aria-labelledby="view purchased tickets"
@@ -254,7 +276,18 @@ const UserViewPurchasedTix = (
         <Typography variant="h5" color="text.secondary">
           Your Purchased Tickets for {eventInfo.eventName}
         </Typography>
-        <Grid container spacing={3}>
+        <Card style={{padding: '20px'}}>
+          <Typography  variant="h6" color="text.secondary" sx={{fontWeight: "bold", lineHeight: "1.2"}}>
+            Event Start Date and Time: {(new Date(eventInfo.startDateTime)).toLocaleString("en-AU",dateOptions)}
+          </Typography>
+          <Typography  variant="h6" color="text.secondary" sx={{fontWeight: "bold", lineHeight: "1.2"}}>
+            Event End Date and Time: {(new Date(eventInfo.endDateTime)).toLocaleString("en-AU",dateOptions)}
+          </Typography>
+          <Typography  variant="h6" color="text.secondary" sx={{lineHeight: "1.2"}}>
+            Refunds can only be made if it is at least 7 days before your event, which is before {sevenDaysBeforeStart.toLocaleString("en-AU",dateOptions)}
+          </Typography>
+        </Card>
+        <Grid container spacing={3} sx={{marginTop: "8px"}}>
           <Grid item xs={3}>
             <Typography variant="h6" color="text.secondary" style={{fontWeight:'bold'}}>
               Ticket Type
@@ -283,7 +316,7 @@ const UserViewPurchasedTix = (
           </Grid>
         </Grid>
          {eventInfo.seatedEvent === true ? (
-          <Box style={{overflow:'auto', height: '80%'}}>
+          <Box style={{overflow:'auto', height: '45%'}}>
             < Grid container spacing={1}>
               {(purchasedTixs).map((ticket, index) => {
                 const SeatComponent = (()=> {
@@ -336,7 +369,7 @@ const UserViewPurchasedTix = (
           </Box>
           
          ) : (
-          <Box style={{overflow:'auto', height: '80%'}}>
+          <Box style={{overflow:'auto', height: '45%'}}>
             < Grid container spacing={1}>
               {purchasedTixs.map((ticket, index) => {
                 //console.log(seatComponent)
@@ -372,6 +405,9 @@ const UserViewPurchasedTix = (
             >
               Close
         </Button>
+        {lateRefundError === true ? (
+          <Alert severity="error">Refunds can only be processed if it is at least 7 days before the event</Alert>
+         ) : null}
         { confirmRefundPrompt === true ? (
           <ConfirmRefundModal
           confirmRefundPrompt = {confirmRefundPrompt}
