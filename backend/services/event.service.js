@@ -1,4 +1,3 @@
-import e from 'express'
 import {addEventDb, getAllEventsNotSoldOutDb, getAllEventsDb, getEventByIdDb, getEventByIdDisplayDb,
         getEventsByHostIdDb, getEventVenueByNameDb, getEventVenueByIdDb, getEventGuestListByIdDb, getHostofEventDb, 
         isSeatedEventDb, addEventVenueDb, publishEventByIdDb, addEventTicketTypeSeatingAllocation,
@@ -7,10 +6,10 @@ import {addEventDb, getAllEventsNotSoldOutDb, getAllEventsDb, getEventByIdDb, ge
         from '../db/event.db.js' 
 import { getEventReviewsByEventIdDb, getReviewLikeDb, getReviewLikeAmountDb } from '../db/review.db.js'
 import { getReplyAmountByReviewIDDb } from '../db/reply.db.js'
-import {addTicketDb} from '../db/ticket.db.js'
+import { addTicketDb, unassignEventSeatsDb } from '../db/ticket.db.js'
 import { getUserByIdDb } from '../db/user.db.js'
 import { isVenueSeatingAvailableDb } from '../db/venueSeating.db.js'
-import { getTicketPurchaseByUserIdDb } from '../db/ticketpurchase.db.js'
+import { getTicketPurchaseByUserIdDb, removeTicketPurchaseByEventIdDb } from '../db/ticketpurchase.db.js'
 
 
 /*  Request
@@ -147,8 +146,9 @@ export const unpublishEventsService = async(req, res) => {
         if (!event[0].published) {
             return {events: null, statusCode : 400, msg: 'Event is already unpublished'}
         }
-        const unpublishedEvent = await unpublishEventByIdDb(eventID);
-
+        const unpublishedEvent = await unpublishEventByIdDb(eventID)
+        await removeTicketPurchaseByEventIdDb(eventID)
+        await unassignEventSeatsDb(eventID)
         return {events: {
                     eventID: unpublishedEvent.eventid,
                     published: unpublishedEvent.published
@@ -180,6 +180,9 @@ export const deleteEventsService = async(req, res) => {
         }
         if (req.userID != event[0].hostid) {
             return {statusCode : 403, msg: 'You are not the owner of this event'}
+        }
+        if (event[0].published === true) {
+            return {statusCode : 400, msg: 'Unpublish event before deleting'}
         }
 
         await removeEventByIdDb(eventID);
