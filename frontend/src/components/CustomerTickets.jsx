@@ -75,7 +75,7 @@ const CustomerTickets = ({
           <Box style={{overflow:'auto', height: '80%'}}>
             < Grid container spacing={1}>
               {(customerTicketInfo.tickets).map((c, index) => {
-                console.log('c', c);
+                //console.log('c', c);
                 const SeatComponent = (()=> {
                   //console.log("in function function");
                   if(c.seat.seatRow !== null) {
