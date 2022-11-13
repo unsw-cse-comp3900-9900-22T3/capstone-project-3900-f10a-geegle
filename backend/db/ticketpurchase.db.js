@@ -41,12 +41,18 @@ const removeTicketPurchaseByTicketIdDb = async(ticketId) => {
     )
 }
 
-// UPDATE
+// DELETE
+const removeTicketPurchaseByEventIdDb = async(eventID) => {
+    const result = await db.query (
+        "DELETE FROM ticketPurchases tp WHERE tp.ticketID IN (SELECT ticketID FROM tickets WHERE eventID = $1)", [eventID]
+    )
+}
 
 export {
     getTicketPurchaseByTicketIdDb,
     getTicketPurchaseByUserIdDb,
     getUserTicketsdDb,
     addTicketPurchaseDb,
-    removeTicketPurchaseByTicketIdDb
+    removeTicketPurchaseByTicketIdDb,
+    removeTicketPurchaseByEventIdDb
 }
