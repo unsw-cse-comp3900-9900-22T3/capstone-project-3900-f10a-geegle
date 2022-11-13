@@ -587,7 +587,8 @@ export const getEventsFilteredService = async(from, to, category, location, rati
         }
 
         if (location) {
-            eventList = eventList.filter(event => event.venuelocation.toLowerCase().includes(location.toLowerCase()))
+            eventList = eventList.filter(event => event.venuelocation.toLowerCase().includes(location.toLowerCase()) || 
+                                                  event.venuename.toLowerCase().includes(location.toLowerCase()))
         }
 
         if (rating) {
