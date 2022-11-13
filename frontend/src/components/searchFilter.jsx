@@ -50,8 +50,11 @@ const SearchFilter = ({openSearch, setOpenSearch, setFilter, setFilteredListings
   const [startDate, setStartDate] = React.useState(new Date().toISOString());
   const [endDate, setEndDate] = React.useState(new Date().toISOString());
   const [eventType, setEventType] = React.useState('');
+  const [eventLocation, setEventLocation] = React.useState('');
+  const [eventRating, setEventRating] = React.useState('');
+  const [eventCost, setEventCost] = React.useState('');
   const [keyword, setKeyword] = React.useState('');
-  const [searchString,setSearchString] = React.useState([false,false,false,false]);
+  const [searchString,setSearchString] = React.useState([false,false,false,false,false,false,false]);
   const navigate = useNavigate();
   const handleClose = () => {
     navigate('/');
@@ -61,35 +64,44 @@ const SearchFilter = ({openSearch, setOpenSearch, setFilter, setFilteredListings
   const handleStartOpen = (event) => {
     setOpenStartDate(event);
     let updatedList = [...searchString]
-    // if (event){
-      updatedList[1] = event;
-    // }
+    updatedList[1] = event;
     setSearchString(updatedList);
   };
   const handleEndOpen = (event) => {
     setOpenEndDate(event);
     let updatedList = [...searchString]
-    // if (event){
-      updatedList[2] = event;
-    // }
+    updatedList[2] = event;
     setSearchString(updatedList);
   };
   const handleEventCatOpen = (event) => {
     setOpenEventCat(event);
     let updatedList = [...searchString]
-    // if (event){
-      updatedList[3] = event;
-    // }
+    updatedList[3] = event;
     setSearchString(updatedList);
   };
   const handleEventRatingOpen =(event) => {
     setOpenEventRating(event);
+    let updatedList = [...searchString]
+    updatedList[4] = event;
+    setSearchString(updatedList);
   }
   const handleEventCostOpen =(event) => {
     setOpenEventCost(event);
+    let updatedList = [...searchString]
+    updatedList[5] = event;
+    setSearchString(updatedList);
   }
   const handleEventLocOpen =(event) => {
     setOpenEventLoc(event);
+    let updatedList = [...searchString]
+    updatedList[6] = event;
+    setSearchString(updatedList);
+  }
+
+  const updateEventCost = (event) => {
+    if (event.target.value !== '') {
+      setEventCost(parseInt(event.target.value))
+    }
   }
 
   // check if a string is only spaces https://bobbyhadz.com/blog/javascript-check-if-string-contains-only-spaces
@@ -132,6 +144,15 @@ const SearchFilter = ({openSearch, setOpenSearch, setFilter, setFilteredListings
           case 3:
             concatStr=`category=${eventType.replace(/ /g, '%')}`;
             break;
+          case 4:
+            concatStr=`location=${eventLocation.replace(/ /g, '%')}`;
+            break;
+          case 5:
+            concatStr=`rating=${eventRating}`;
+            break;
+          case 6:
+            concatStr=`priceLimit=${eventCost}`;
+            break;
         }
         combinedStr=combinedStr+concatStr+'&'
       }
@@ -151,7 +172,7 @@ const SearchFilter = ({openSearch, setOpenSearch, setFilter, setFilteredListings
       console.log('result', json);
       handleClose();
       setFilter(true);
-      setFilteredListings(...json.events);
+      setFilteredListings(json.events);
     }
   }
   
@@ -159,6 +180,7 @@ const SearchFilter = ({openSearch, setOpenSearch, setFilter, setFilteredListings
   console.log(startDate);
   console.log(endDate);
   console.log(eventType);
+  // console.log(filteredListings);
   return (
     <>
       <Modal
@@ -250,9 +272,69 @@ const SearchFilter = ({openSearch, setOpenSearch, setFilter, setFilteredListings
                 </FormControl>
               </Grid>
             }
-
+            {openEventLoc && 
+              <Grid item xs={12}>
+                <FormControl style={{ width: '35%' }}>
+                  <InputLabel id="Event location label">Event Location</InputLabel>
+                  <Select
+                    labelId="Event Location label"
+                    id="Event Location"
+                    label="Event Location"
+                    aria-label="Event Location"
+                    value={eventLocation}
+                    onChange={(e) => setEventLocation(e.target.value)}
+                  >
+                    {/* do we need event types stored in the back end (maybe we need to when we filter?) */}
+                    <MenuItem value={'Accor Stadium'}>Accor Stadium</MenuItem>
+                    <MenuItem value={'ICC Sydney'}>ICC Sydney</MenuItem>
+                    <MenuItem value={'Ivy Precinct'}>Ivy Precinct</MenuItem>
+                    <MenuItem value={'Doltone House - Jones Bay Wharf'}>Doltone House - Jones Bay Wharf</MenuItem>
+                    <MenuItem value={'UNSW Roundhouse'}>UNSW Roundhouse</MenuItem>
+                    <MenuItem value={'Other'}>Other</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+            }
+            {openEventRating && 
+              <Grid item xs={12}>
+                <FormControl style={{ width: '35%' }}>
+                  <InputLabel id="Event Rating label">Event Rating Equivalent or Higher</InputLabel>
+                  <Select
+                    labelId="Event Rating label"
+                    id="Event Rating"
+                    label="Event Rating"
+                    aria-label="Event Rating"
+                    value={eventRating}
+                    onChange={(e) => setEventRating(e.target.value)}
+                  >
+                    {/* do we need event types stored in the back end (maybe we need to when we filter?) */}
+                    <MenuItem value={'1'}>1</MenuItem>
+                    <MenuItem value={'2'}>2</MenuItem>
+                    <MenuItem value={'3'}>3</MenuItem>
+                    <MenuItem value={'4'}>4</MenuItem>
+                    <MenuItem value={'5'}>5</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+            }
+            {openEventCost && 
+              <Grid item xs={12}>
+                <TextField
+                  aria-label="Cost Input"
+                  placeholder='$AUD'
+                  onChange={e => updateEventCost(e)}
+                  id="eventCost"
+                  label="eventCost"
+                  type="number"
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+              </Grid>
+            }
             <Button type="submit" value="submit" onClick={(e)=>handleSubmit(e)}>Submit</Button>
           </Box>
+          
         </form>
       </Modal>
     </>
