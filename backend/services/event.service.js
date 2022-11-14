@@ -2,13 +2,18 @@ import {addEventDb, getAllEventsNotSoldOutDb, getAllEventsDb, getEventByIdDb, ge
         getEventsByHostIdDb, getEventVenueByNameDb, getEventVenueByIdDb, getEventGuestListByIdDb, getHostofEventDb, 
         isSeatedEventDb, addEventVenueDb, publishEventByIdDb, addEventTicketTypeSeatingAllocation,
         unpublishEventByIdDb, removeEventByIdDb, getEventsUserAttendingDb, isEventSoldOutDb, getSoldOutEventsDb,
-        getMatchingEventsDb, getEventsByTicketPriceLimitDb, getAllEventCategoriesDb} 
+        getMatchingEventsDb, getEventsByTicketPriceLimitDb, getAllEventCategoriesDb, getEventsUserAttendingFromHostDb} 
         from '../db/event.db.js' 
 import { getEventReviewsByEventIdDb, getReviewLikeDb, getReviewLikeAmountDb } from '../db/review.db.js'
 import { getReplyAmountByReviewIDDb } from '../db/reply.db.js'
 import { addTicketDb, unassignEventSeatsDb } from '../db/ticket.db.js'
 import { getUserByIdDb } from '../db/user.db.js'
 import { isVenueSeatingAvailableDb } from '../db/venueSeating.db.js'
+import { getEventsFromUserTicketsDb, getTicketPurchaseByUserIdDb, getUserTicketsdDb } from '../db/ticketpurchase.db.js'
+import { getAllLPTORankings } from '../utils/lpto.ranking.js'
+import { getEventSimilarityById } from '../db/similarity.db.js'
+import { getEventTicketTypesController } from '../controllers/booking.controller.js'
+import { updateAllEventSimilarity } from '../utils/event.similarity.js'
 import { getTicketPurchaseByUserIdDb, removeTicketPurchaseByEventIdDb } from '../db/ticketpurchase.db.js'
 
 
@@ -120,6 +125,10 @@ export const publishEventsService = async(req, res) => {
             return {events: null, statusCode : 400, msg: 'Event is already published'}
         }
         const publishedEvent = await publishEventByIdDb(eventID);
+
+        // updating event similarity 
+        const allEvents = await getAllEventsDb();
+        updateAllEventSimilarity(allEvents);
 
         return {events: {
                     eventID: publishedEvent.eventid,
@@ -688,4 +697,106 @@ export const getAllEventCategoriesService = async() => {
     }
 
     return { categories: categories, statusCode: 200, msg: 'All event categories' }
+}
+
+export const getRecommendedEventsForUserService = async(req, res) => {
+    try {    
+        const userID = req.userID;
+        let eventList = await getAllEventsNotSoldOutDb();
+        let upcomingEventList = [];
+        const upcomingEventDateCutoff = new Date().setMonth((new Date().getMonth() + 1))
+        for (let i = 0; i < eventList.length; i++) {
+            if (new Date(eventList[i].startdatetime) >= new Date() && 
+                new Date(eventList[i].startdatetime) <= upcomingEventDateCutoff &&
+                eventList[i].published) {
+                    upcomingEventList.push(eventList[i])
+            }
+        }
+        // Updates the event with LPTO rankings
+        let events = await getAllLPTORankings(upcomingEventList, userID);
+        let userEventTickets = await getEventsFromUserTicketsDb(userID);
+        let eventsCopy = events;
+        let purchasedEvents = [];
+
+        // Checks if any of the purchased tickets correspond to live events
+        for (let i = 0; i < userEventTickets.length; i++) {
+            for (let j = 0; j < events.length; j++) {
+                if (userEventTickets[i].eventid == events[j].eventid) {
+                    // remove event from recommended if already purchased
+                    purchasedEvents.push(events[j]);
+                    eventsCopy.splice(j, 1);
+                }
+            }
+        }
+        
+        for (let i = 0; i < purchasedEvents.length; i++) {
+            let hostEvents = await getEventsByHostIdDb(purchasedEvents[i].hostid);
+            let userEvents = await getEventsUserAttendingFromHostDb(req.userID, purchasedEvents[i].hostid);
+            // Determine ratio of past events that have same hostID
+            let hostCount = 0;
+            let userCount = 0;
+            for (let he in hostEvents) {
+                if (new Date(he.startdatetime) < new Date()) {
+                    hostCount++;
+                }
+            }
+            for (let ue in userEvents) {
+                if (new Date(ue.startdatetime) < new Date()) {
+                    userCount++;
+                }
+            }
+
+            let hostAttendRatio = 0.00;
+            if (hostCount != 0) {
+                hostAttendRatio = userCount / hostCount;
+            }
+            // Updates rating for each event
+            for (let j = 0; j < eventsCopy.length; j++) {
+                let similarityVal = 0.00;
+                if (eventsCopy[j].eventid < purchasedEvents[i].eventid) {
+                    similarityVal = await getEventSimilarityById(eventsCopy[j].eventid, purchasedEvents[i].eventid);
+                } else {
+                    similarityVal = await getEventSimilarityById(purchasedEvents[i].eventid, eventsCopy[j].eventid);
+                }
+                if (eventsCopy[j].hostid == purchasedEvents[i].hostid) {
+                    similarityVal = similarityVal + (hostAttendRatio * similarityVal);
+                }
+                eventsCopy[j]['rating'] = (eventsCopy[j]['rating'] || 0) + similarityVal;
+            }
+        }
+        // resolve ties by LPTO rating (LPTO max score is 520 mil)
+        // or sort by LPTO if no tickets have been purchased
+        for (let i = 0; i < eventsCopy.length; i++) {
+            eventsCopy[i]['rating'] = (eventsCopy[i]['rating'] || 0) + (eventsCopy[i].LPTO / 1140000000); 
+        }
+
+        let recommendedList = []
+        for (let i = 0; i < eventsCopy.length; i++) {
+            recommendedList.push({
+                eventID: eventsCopy[i].eventid,
+                eventName: eventsCopy[i].eventname,
+                hostID: eventsCopy[i].hostid,
+                hostName: eventsCopy[i].firstname + ' ' + eventsCopy[i].lastname,
+                startDateTime: eventsCopy[i].startdatetime,
+                endDateTime: eventsCopy[i].enddatetime,
+                eventDescription: eventsCopy[i].eventdescription,
+                eventType: eventsCopy[i].eventtype,
+                eventVenue: eventsCopy[i].venuename,
+                eventLocation: eventsCopy[i].venuelocation,
+                venueCapacity: eventsCopy[i].maxcapacity,
+                capacity: eventsCopy[i].capacity,
+                totalTicketAmount: eventsCopy[i].totalticketamount,
+                image1: eventsCopy[i].image1,
+                image2: eventsCopy[i].image2,
+                image3: eventsCopy[i].image3,
+                rating: eventsCopy[i].rating,
+                lpto: eventsCopy[i].LPTO
+            });
+        }
+        // Sorts list by ranking
+        recommendedList.sort((a,b) => b.rating - a.rating);
+        return {events: recommendedList, statusCode: 200, msg: "Events recommended"}
+    } catch (e) {
+        throw (e)
+    }
 }
