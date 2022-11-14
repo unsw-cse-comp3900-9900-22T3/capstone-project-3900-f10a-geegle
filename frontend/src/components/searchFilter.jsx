@@ -164,15 +164,32 @@ const SearchFilter = ({openSearch, setOpenSearch, setFilter, setFilteredListings
     }
     console.log(combinedStr);
     // calling api
-    const response = await fetch(`http://localhost:3000/events/find?${combinedStr}`, {
+    if(!localStorage.getItem('token')) {
+      const response = await fetch(`http://localhost:3000/events/find?${combinedStr}`, {
       method: 'GET'
     })
-    const json = await response.json();
-    if (response.ok) {
-      console.log('result', json);
-      handleClose();
-      setFilter(true);
-      setFilteredListings(json.events);
+      const json = await response.json();
+      if (response.ok) {
+        console.log('result', json);
+        handleClose();
+        setFilter(true);
+        setFilteredListings(json.events);
+      }
+    } else {
+      const response = await fetch(`http://localhost:3000/events/find?${combinedStr}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'auth-token': localStorage.getItem('token'),
+      }})
+      const json = await response.json();
+      if (response.ok) {
+        console.log('result', json);
+        handleClose();
+        setFilter(true);
+        setFilteredListings(json.events);
+      }
+
     }
   }
   
