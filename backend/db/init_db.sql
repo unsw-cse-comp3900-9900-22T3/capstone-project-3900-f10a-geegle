@@ -155,6 +155,17 @@ CREATE TABLE eventTicketToSeatingAllocation (
         references events (eventID) ON DELETE CASCADE
 );
 
+CREATE TABLE eventSimilarity (
+    event1 integer NOT NULL,
+    event2 integer NOT NULL,
+    similarity_rating decimal,
+    primary key (event1, event2),
+    foreign key (event1)
+        references events(eventID) ON DELETE CASCADE,
+    foreign key (event2)
+        references events(eventID) ON DELETE CASCADE
+);
+
 --CREATE TABLE eventTicketToSeatingAllocation (
 --    ticketID SERIAL,
 --    seatSection text,

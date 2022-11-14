@@ -5,6 +5,7 @@ import db from './db/db.js';
 import authRouter from './routes/auth.route.js';
 import eventRouter from './routes/event.route.js';
 import userRouter from './routes/user.route.js';
+import { updateSim } from './utils/event.similarity.js'
 
 db.query('select * from users', (err, res) => {
     console.log(res.rows)
@@ -12,6 +13,9 @@ db.query('select * from users', (err, res) => {
 db.query('select * from reviewLikes', (err, res) => {
     console.log(res.rows)
 });
+
+// insert into db, eventSim if not processed
+await updateSim();
 
 const app = express();
 const PORT = 3000;
