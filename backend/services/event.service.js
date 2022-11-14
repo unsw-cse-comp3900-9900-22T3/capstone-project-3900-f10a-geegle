@@ -662,9 +662,9 @@ export const getRecommendedEventsForUserService = async(req, res) => {
             }
         }
         let events = await getAllLPTORankings(upcomingEventList, userID);
-        console.log(events)
         let userEventTickets = await getEventsFromUserTicketsDb(userID);
         console.log(userEventTickets)
+        console.log(userEventTickets.length)
         let eventsCopy = events;
         let purchasedEvents = [];
 
@@ -677,6 +677,7 @@ export const getRecommendedEventsForUserService = async(req, res) => {
                 }
             }
         }
+        console.log(eventsCopy)
         
         for (let i = 0; i < purchasedEvents.length; i++) {
             let hostEvents = await getEventsByHostIdDb(purchasedEvents[i].hostid);
@@ -715,7 +716,7 @@ export const getRecommendedEventsForUserService = async(req, res) => {
         // resolve ties by LPTO rating (LPTO max score is 520 mil)
         // or sort by LPTO if no tickets have been purchased
         for (let i = 0; i < eventsCopy.length; i++) {
-            eventsCopy[i]['rating'] = (eventsCopy[i]['rating'] || 0) + (eventsCopy[i].LPTO); //1140000000
+            eventsCopy[i]['rating'] = (eventsCopy[i]['rating'] || 0) + (eventsCopy[i].LPTO / 1140000000); 
         }
 
         // eventsCopy.sort((a,b) => b.rating - a.rating);
@@ -739,9 +740,9 @@ export const getRecommendedEventsForUserService = async(req, res) => {
                 venueCapacity: eventsCopy[i].maxcapacity,
                 capacity: eventsCopy[i].capacity,
                 totalTicketAmount: eventsCopy[i].totalticketamount,
-                image1: eventsCopy[i].image1,
-                image2: eventsCopy[i].image2,
-                image3: eventsCopy[i].image3,
+                // image1: eventsCopy[i].image1,
+                // image2: eventsCopy[i].image2,
+                // image3: eventsCopy[i].image3,
                 rating: eventsCopy[i].rating,
                 lpto: eventsCopy[i].LPTO
             });
