@@ -18,14 +18,14 @@ eventRouter.put('/:eventID/cancel', verifyToken, unpublishEventsController)
 eventRouter.put('/:eventID/edit', verifyToken, editEventsController)
 eventRouter.delete('/:eventID/delete', verifyToken, deleteEventsController)
 eventRouter.get('/:eventID/info', userLoggedIn, getEventController);
-eventRouter.get('/upcoming', getUpcomingEventsController);
-eventRouter.get('/all', getAllEventsController);
+eventRouter.get('/upcoming', userLoggedIn, getUpcomingEventsController);
+eventRouter.get('/all', userLoggedIn, getAllEventsController);
 eventRouter.get('/host', verifyToken, getHostEventsController);
 eventRouter.get('/recommended', verifyToken, getRecommendedEventsForUserController)
 eventRouter.get('/host/details/:hostID', getHostDetailsController);
 eventRouter.get('/attending', verifyToken, getEventsUserAttendingController);
 eventRouter.get('/:eventID/guest', verifyToken, getEventGuestListController);
-eventRouter.get('/:eventID/isSoldOut', isEventSoldOutController);
+eventRouter.get('/:eventID/isSoldOut', userLoggedIn, isEventSoldOutController);
 eventRouter.get('/soldOut', userLoggedIn, getSoldOutEventsController);
 eventRouter.get('/find', userLoggedIn, getMatchingEventsController);
 eventRouter.get('/categories', getAllEventCategoriesController);

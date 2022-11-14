@@ -25,6 +25,7 @@ export const verifyToken = async (req, res, next) => {
 export const userLoggedIn = async (req, res, next) => {
     const token = req.headers["auth-token"]
     if (!token) {
+        req.userID = 0;
         return next()
     }
 
