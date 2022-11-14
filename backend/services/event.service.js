@@ -9,12 +9,11 @@ import { getReplyAmountByReviewIDDb } from '../db/reply.db.js'
 import { addTicketDb, unassignEventSeatsDb } from '../db/ticket.db.js'
 import { getUserByIdDb } from '../db/user.db.js'
 import { isVenueSeatingAvailableDb } from '../db/venueSeating.db.js'
-import { getEventsFromUserTicketsDb, getTicketPurchaseByUserIdDb, getUserTicketsdDb } from '../db/ticketpurchase.db.js'
+import { getEventsFromUserTicketsDb, getTicketPurchaseByUserIdDb, removeTicketPurchaseByEventIdDb } from '../db/ticketpurchase.db.js'
 import { getAllLPTORankings } from '../utils/lpto.ranking.js'
 import { getEventSimilarityById } from '../db/similarity.db.js'
 import { getEventTicketTypesController } from '../controllers/booking.controller.js'
 import { updateAllEventSimilarity } from '../utils/event.similarity.js'
-import { getTicketPurchaseByUserIdDb, removeTicketPurchaseByEventIdDb } from '../db/ticketpurchase.db.js'
 
 
 /*  Request
@@ -256,7 +255,7 @@ export const getUpcomingEventsService = async(req, res) => {
                 new Date(eventList[i].startdatetime) <= upcomingEventDateCutoff &&
                 eventList[i].published) {
 
-                const reviewRating = await eventRatingScore(eventList[i].eventid)
+                const reviewRating = await eventRatingScore(eventList[i].eventid, req.userID)
                 upcomingEventList.push({
                     eventID: eventList[i].eventid,
                     eventName: eventList[i].eventname,
@@ -296,7 +295,7 @@ export const getAllEventsService = async(req, res) => {
 
                 let soldOut = !availableEventList.some(event => event.eventid === eventList[i].eventid)
                 
-                const reviewRating = await eventRatingScore(eventList[i].eventid)
+                const reviewRating = await eventRatingScore(eventList[i].eventid, req.userID)
                 upcomingEventList.push({
                     eventID: eventList[i].eventid,
                     eventName: eventList[i].eventname,
@@ -512,7 +511,7 @@ export const getSoldOutEventsService = async(req, res) => {
         if (!userID) userID = 0
         const events = []
         for (let i = 0; i < eventList.length; i++) {
-            const reviewRating = await eventRatingScore(eventList[i].eventid, userID)
+            const reviewRating = await eventRatingScore(eventList[i].eventid, req.userID)
             events.push({
                 eventID: eventList[i].eventid,
                 eventName: eventList[i].eventname,
@@ -611,7 +610,7 @@ export const getEventsFilteredService = async(from, to, category, location, rati
         if (rating) {
             const eventRatings = {}
             for (let e of eventList) {
-                eventRatings[e.eventid] = (await eventRatingScore(e.eventid)).rating
+                eventRatings[e.eventid] = (await eventRatingScore(e.eventid, userID)).rating
             }
 
             eventList = eventList.filter(event => eventRatings[event.eventid] >= parseInt(rating))
