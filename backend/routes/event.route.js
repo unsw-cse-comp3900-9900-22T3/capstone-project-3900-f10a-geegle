@@ -17,7 +17,7 @@ eventRouter.put('/:eventID/cancel', verifyToken, unpublishEventsController)
 // TODO
 eventRouter.put('/:eventID/edit', verifyToken, editEventsController)
 eventRouter.delete('/:eventID/delete', verifyToken, deleteEventsController)
-eventRouter.get('/:eventID/info', getEventController);
+eventRouter.get('/:eventID/info', userLoggedIn, getEventController);
 eventRouter.get('/upcoming', getUpcomingEventsController);
 eventRouter.get('/all', getAllEventsController);
 eventRouter.get('/host', verifyToken, getHostEventsController);

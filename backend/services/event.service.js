@@ -202,8 +202,10 @@ export const getEventService = async(req, res) => {
             return {events: null, statusCode: 404, msg: 'Event Id Not Found'}
         } 
 
+        let userID = req.userID
+        if (!userID) userID = 0
         const seating = await isSeatedEventDb(req.params.eventID)
-        const reviewRating = await eventRatingScore(event[0].eventid)
+        const reviewRating = await eventRatingScore(event[0].eventid, userID)
         return {event: {
                     eventID: event[0].eventid,
                     eventName: event[0].eventname,
