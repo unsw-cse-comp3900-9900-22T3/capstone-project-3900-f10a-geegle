@@ -662,9 +662,9 @@ export const getRecommendedEventsForUserService = async(req, res) => {
             }
         }
         console.log(upcomingEventList);
-        let events = getAllLPTORankings(upcomingEventList, userID);
+        let events = await getAllLPTORankings(upcomingEventList, userID);
         console.log(events)
-        let userEventTickets = getEventsFromUserTicketsDb(userID);
+        let userEventTickets = await getEventsFromUserTicketsDb(userID);
         console.log(userEventTickets)
         let eventsCopy = events;
         let purchasedEvents = [];
@@ -716,7 +716,7 @@ export const getRecommendedEventsForUserService = async(req, res) => {
         // resolve ties by LPTO rating (LPTO max score is 520 mil)
         // or sort by LPTO if no tickets have been purchased
         for (let i = 0; i < eventsCopy.length; i++) {
-            eventsCopy[i][rating] = (eventsCopy[i][rating] || 0)+ (eventsCopy[i].LPTO / 1140000000);
+            eventsCopy[i][rating] = (eventsCopy[i][rating] || 0)+ (eventsCopy[i].LPTO); //1140000000
         }
 
         // eventsCopy.sort((a,b) => b.rating - a.rating);
