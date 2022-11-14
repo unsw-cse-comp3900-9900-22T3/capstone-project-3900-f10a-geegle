@@ -327,7 +327,7 @@ const ViewEvent= () => {
               <Typography variant="h2" color="text.secondary">
                 {eventInfo.eventName}
               </Typography>
-              <Typography component = "div" variant="h5" color="text.secondary">
+              <Typography component={Link} to= {{pathname: `/host/${eventInfo.hostID}/profile`}} state={eventInfo.eventID} variant="h5" color="text.secondary">
                 Host : {eventInfo.hostName}
               </Typography>
             </Box>
@@ -392,7 +392,7 @@ const ViewEvent= () => {
             <Stack spacing={2} direction="row">
               <Button variant="outlined" onClick={handleShowReviews}>{`Reviews (${eventObj.reviews.length})`}</Button>
             </Stack>
-            {Array(Math.ceil(eventObj.ratingRatio * 5))
+            {Array(Math.ceil(eventObj.averageRating))
               .fill(0)
               .map((_, i) => (
                 <svg
@@ -407,7 +407,7 @@ const ViewEvent= () => {
                   />
                 </svg>
               ))}
-            {Array(5 - Math.ceil(eventObj.ratingRatio * 5))
+            {Array(5 - Math.ceil(eventObj.averageRating))
               .fill(0)
               .map((_, i) => (
                 <svg

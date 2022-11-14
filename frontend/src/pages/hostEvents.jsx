@@ -208,7 +208,7 @@ const HostEventsPage = () => {
   }
 
   const handlePublish = async(obj, idx) => {
-    const response = await fetch(`http://localhost:3000/events/${obj.eachEvent.eventID}/publish`, {
+    const response = await fetch(`http://localhost:3000/events/${obj.eventID}/publish`, {
       method: 'PUT',
       headers: {
       'Content-Type': 'application/json',
@@ -223,7 +223,7 @@ const HostEventsPage = () => {
   }
 
   const openConfirmModal = async(obj, idx) => {
-    setClickedEventUnpublished(obj.eachEvent);
+    setClickedEventUnpublished(obj);
     setConfirmUnpubPrompt(true);
   }
 
@@ -237,32 +237,32 @@ const HostEventsPage = () => {
         },
       });
       const json = await response.json();
-      const events = []
-      for (const eve of json.events) {
-        events.push({
-          eachEvent: {
-            venueCapacity: eve.venueCapacity,
-            capacity: eve.capacity,
-            endDateTime: eve.endDateTime,
-            eventDescription: eve.eventDescription,
-            eventID: eve.eventID,
-            eventLocation: eve.eventLocation,
-            eventName: eve.eventName,
-            eventType: eve.eventType,
-            eventVenue: eve.eventVenue,
-            hostID: eve.hostID,
-            image1: eve.image1,
-            image2: eve.image2,
-            image3: eve.image3,
-            published: eve.published,
-            startDateTime: eve.startDateTime,
-            totalTicketAmount:eve.totalTicketAmount,
-            seatedEvent:eve.seatedEvent
-          }
-        })
-      }
-      setMyListings(events)
-      // setMyListings(json);
+      console.log('host payload', json);
+      // const events = []
+      // for (const eve of json.events) {
+      //   events.push({
+      //     eachEvent: {
+      //       venueCapacity: eve.venueCapacity,
+      //       capacity: eve.capacity,
+      //       endDateTime: eve.endDateTime,
+      //       eventDescription: eve.eventDescription,
+      //       eventID: eve.eventID,
+      //       eventLocation: eve.eventLocation,
+      //       eventName: eve.eventName,
+      //       eventType: eve.eventType,
+      //       eventVenue: eve.eventVenue,
+      //       hostID: eve.hostID,
+      //       image1: eve.image1,
+      //       image2: eve.image2,
+      //       image3: eve.image3,
+      //       published: eve.published,
+      //       startDateTime: eve.startDateTime,
+      //       totalTicketAmount:eve.totalTicketAmount,
+      //       seatedEvent:eve.seatedEvent
+      //     }
+      //   })
+      // }
+      setMyListings(json.events)
     }
   }
 
@@ -283,26 +283,70 @@ const HostEventsPage = () => {
         <CardMedia
             component="img"
             height="100%"
-            image={obj.eachEvent.image1}
+            image={obj.image1}
             alt="green iguana"
         />
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
-          {obj.eachEvent.eventName}
+          {obj.eventName}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-          {obj.eachEvent.eventType +' | '+ obj.eachEvent.eventVenue+' | Event Capacity: '+obj.eachEvent.capacity+'| Venue Capacity'+ obj.eachEvent.venueCapacity}
+          {obj.eventType +' | '+ obj.eventVenue+' | Event Capacity: '+obj.capacity+'| Venue Capacity'+ obj.venueCapacity}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-          {"Description: "+ obj.eachEvent.eventDescription}
+          {"Description: "+ obj.eventDescription}
           </Typography>
+          {Array(Math.ceil(obj.averageRating))
+              .fill(0)
+              .map((_, i) => (
+                <svg
+                  key={i}
+                  height="35"
+                  width="35"
+                  aria-label="coloured star rating"
+                >
+                  <polygon
+                    points="9.9, 1.1, 3.3, 21.78, 19.8, 8.58, 0, 8.58, 16.5, 21.78"
+                    fill="#ffd800"
+                  />
+                </svg>
+              ))}
+            {Array(5 - Math.ceil(obj.averageRating))
+              .fill(0)
+              .map((_, i) => (
+                <svg
+                  key={i}
+                  height="35"
+                  width="35"
+                  aria-label="uncoloured star rating"
+                >
+                  <polygon
+                    points="9.9, 1.1, 3.3, 21.78, 19.8, 8.58, 0, 8.58, 16.5, 21.78"
+                    fill="#7e7e7e"
+                    stroke="#7e7e7e"
+                    strokeWidth="1"
+                  />
+                </svg>
+              ))}
+            <Typography variant="body2" color="text.secondary">
+              Average Rating: {obj.averageRating}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Reviews: {obj.reviews.length}
+            </Typography>
         </CardContent>
         <CardActions>
-            <Button size="small"
-              >view</Button>
-            {obj.eachEvent.published && <Button size="small" onClick={()=>handleViewCustomers(obj.eachEvent)}>Customers</Button>}
-            {obj.eachEvent.published && <Button size="small" onClick={()=>openConfirmModal(obj, idx)}>Cancel</Button>}
-            {!obj.eachEvent.published && <Button size="small" onClick={e=>handlePublish(obj, idx)}>publish</Button>}
+            <Button 
+              component={Link}
+              to= {{pathname: `/event/view/${obj.eventID}`}}
+              state= {obj}
+              size="small">
+                view
+            </Button>
+            {obj.published && <Button size="small" onClick={()=>handleViewCustomers(obj)}>Customers</Button>}
+            {obj.published && <Button size="small" onClick={()=>openConfirmModal(obj, idx)}>Cancel</Button>}
+            {!obj.published && <Button size="small" onClick={e=>handlePublish(obj, idx)}>publish</Button>}
+            
         </CardActions>
       </Card> 
       )
