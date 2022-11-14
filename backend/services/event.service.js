@@ -213,7 +213,8 @@ export const getEventService = async(req, res) => {
         let userID = req.userID
         if (!userID) userID = 0
         const seating = await isSeatedEventDb(req.params.eventID)
-        const reviewRating = await eventRatingScore(event[0].eventid, userID)
+        const reviewRating = await eventRatingScore(req.params.eventID, userID)
+        const soldOut = await isEventSoldOutDb(req.params.eventID)
         return {event: {
                     eventID: event[0].eventid,
                     eventName: event[0].eventname,
@@ -233,6 +234,7 @@ export const getEventService = async(req, res) => {
                     totalTicketAmount: event[0].totalticketamount,
                     reviews: reviewRating.reviews,
                     averageRating: reviewRating.rating,
+                    soldOut: soldOut.length ? true : false,
                     image1: event[0].image1,
                     image2: event[0].image2,
                     image3: event[0].image3,
@@ -334,6 +336,7 @@ export const getHostEventsService = async(req, res) => {
         for (let i = 0; i < eventList.length; i++) {
             const seating = await isSeatedEventDb(eventList[i].eventid)
             const reviewRating = await eventRatingScore(eventList[i].eventid, req.userID)
+            const soldOut = await isEventSoldOutDb(eventList[i].eventid)
             
             upcomingEventList.push({
                 eventID: eventList[i].eventid,
@@ -352,6 +355,7 @@ export const getHostEventsService = async(req, res) => {
                 published: eventList[i].published,
                 reviews: reviewRating.reviews,
                 averageRating: reviewRating.rating,
+                soldOut: soldOut.length ? true : false,
                 image1: eventList[i].image1,
                 image2: eventList[i].image2,
                 image3: eventList[i].image3,
@@ -371,6 +375,8 @@ export const getEventsUserAttendingService = async(req, res) => {
         let events = [];
         for (let i = 0; i < eventList.length; i++) {
             const event = await getEventByIdDisplayDb(eventList[i].eventid)
+            const soldOut = await isEventSoldOutDb(eventList[i].eventid)
+
             events.push({
                 eventID: event[0].eventid,
                 eventName: event[0].eventname,
@@ -386,6 +392,7 @@ export const getEventsUserAttendingService = async(req, res) => {
                 venueCapacity: event[0].maxcapacity,
                 capacity: event[0].capacity,
                 totalTicketAmount: event[0].totalticketamount,
+                soldOut: soldOut.length ? true : false,
                 image1: event[0].image1,
                 image2: event[0].image2,
                 image3: event[0].image3
@@ -548,6 +555,8 @@ export const getEventsSearchedService = async(searchWords, userID) => {
         for (let i = 0; i < eventList.length; i++) {
             if (eventList[i].published) {
                 const reviewRating = await eventRatingScore(eventList[i].eventid, userID)
+                const soldOut = await isEventSoldOutDb(eventList[i].eventid)
+
                 events.push({
                     eventID: eventList[i].eventid,
                     eventName: eventList[i].eventname,
@@ -564,6 +573,7 @@ export const getEventsSearchedService = async(searchWords, userID) => {
                     totalTicketAmount: eventList[i].totalticketamount,
                     reviews: reviewRating.reviews,
                     averageRating: reviewRating.rating,
+                    soldOut: soldOut.length ? true : false,
                     image1: eventList[i].image1,
                     image2: eventList[i].image2,
                     image3: eventList[i].image3
@@ -625,6 +635,8 @@ export const getEventsFilteredService = async(from, to, category, location, rati
         for (let i = 0; i < eventList.length; i++) {
             if (eventList[i].published) {
                 const reviewRating = await eventRatingScore(eventList[i].eventid, userID)
+                const soldOut = await isEventSoldOutDb(eventList[i].eventid)
+            
                 events.push({
                     eventID: eventList[i].eventid,
                     eventName: eventList[i].eventname,
@@ -641,6 +653,7 @@ export const getEventsFilteredService = async(from, to, category, location, rati
                     totalTicketAmount: eventList[i].totalticketamount,
                     reviews: reviewRating.reviews,
                     averageRating: reviewRating.rating,
+                    soldOut: soldOut.length ? true : false,
                     image1: eventList[i].image1,
                     image2: eventList[i].image2,
                     image3: eventList[i].image3
