@@ -8,7 +8,7 @@ import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import CardHeader from '@mui/material/CardHeader';
-import { FormControl } from '@mui/material';
+import { FormControl, Grid } from '@mui/material';
 import { Navigate, useNavigate, Link } from 'react-router-dom';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
@@ -170,7 +170,7 @@ const PublicLanding = () => {
         })
       }
       setUpcomingListings(events)
-      //console.log(upcomingListings)
+      
   }
 
   // upon entering the page
@@ -181,92 +181,106 @@ const PublicLanding = () => {
   }, []);
   
   return (
-    <>  
-    <div>
-      <ToggleButtonGroup
-        color="primary"
-        value={toggleState}
-        exclusive
-        onChange={handleChange}
-        aria-label="Platform"
-      >
-        <ToggleButton value="All Events">All Events</ToggleButton>
-        <ToggleButton value="Upcoming Events">Upcoming Events</ToggleButton>
-      </ToggleButtonGroup>
-    </div>
-    {
-    
-    
+    <Grid container spacing={2} style={{padding: "3.2rem"}}>  
+      <Grid item xs={12}>
+        <Box>
+          <ToggleButtonGroup
+            color="primary"
+            value={toggleState}
+            exclusive
+            onChange={handleChange}
+            aria-label="Platform"
+          >
+            <ToggleButton value="All Events">All Events</ToggleButton>
+            <ToggleButton value="Upcoming Events">Upcoming Events</ToggleButton>
+          </ToggleButtonGroup>
+        </Box>
+      </Grid>
+      <Grid item xs= {12}>
+        <Grid container spacing ={6}>
+        {
       toggleState === 'All Events'?
       allListings.map((obj, idx) => {
         return (
-        <Card key={idx} sx={{ maxWidth: '100%' ,display: 'grid', gridTemplateColumns: '3fr 6fr'}}>
-          <CardMedia
-              component="img"
-              height="100%"
-              image={obj.eachEvent.image1}
-              alt="green iguana"
-          />
-          <CardContent>
-            <Typography gutterBottom variant="h5" component="div">
-            {obj.eachEvent.eventName}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-            {obj.eachEvent.eventType +' | '+ obj.eachEvent.eventVenue+' | '+obj.eachEvent.capacity}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-            {"Description: "+ obj.eachEvent.eventDescription}
-            </Typography>
-            {Array(Math.ceil(obj.eachEvent.ratingRatio * 5))
-              .fill(0)
-              .map((_, i) => (
-                <svg
-                  key={i}
-                  height="35"
-                  width="35"
-                  aria-label="coloured star rating"
-                >
-                  <polygon
-                    points="9.9, 1.1, 3.3, 21.78, 19.8, 8.58, 0, 8.58, 16.5, 21.78"
-                    fill="#ffd800"
-                  />
-                </svg>
-              ))}
-            {Array(5 - Math.ceil(obj.eachEvent.ratingRatio * 5))
-              .fill(0)
-              .map((_, i) => (
-                <svg
-                  key={i}
-                  height="35"
-                  width="35"
-                  aria-label="uncoloured star rating"
-                >
-                  <polygon
-                    points="9.9, 1.1, 3.3, 21.78, 19.8, 8.58, 0, 8.58, 16.5, 21.78"
-                    fill="#7e7e7e"
-                    stroke="#7e7e7e"
-                    strokeWidth="1"
-                  />
-                </svg>
-              ))}
-            <Typography variant="body2" color="text.secondary">
-              Average Rating: {obj.eachEvent.averageRating}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Reviews: {obj.eachEvent.reviews.length}
-            </Typography>
+        <Grid container item xs={12} >
+          <Card key={idx} style={{display: 'flex', width: '100%', height:'20rem'}} >
+            <Box id="card media" width = "40%" >
+              <CardMedia
+                  component="img"
+                  height="100%"
+                  image={obj.eachEvent.image1}
+                  alt="event thumbnail"
+                  style={{overflow:"auto"}}
+              />
+            </Box>
+            <Box id="card contend and action container" style={{display:'flex', flexDirection: 'column', width:'60%'}}>
+              <Box id="card content" style={{height:'90%', overflow:'auto'}}>
+                <CardContent>
+                  <Typography gutterBottom variant="h5" component="div">
+                  {obj.eachEvent.eventName}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                  {obj.eachEvent.eventType +' | '+ obj.eachEvent.eventVenue+' | '+obj.eachEvent.capacity}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                  {"Description: "+ obj.eachEvent.eventDescription}
+                  </Typography>
+                  {Array(Math.ceil(obj.eachEvent.ratingRatio * 5))
+                    .fill(0)
+                    .map((_, i) => (
+                      <svg
+                        key={i}
+                        height="35"
+                        width="35"
+                        aria-label="coloured star rating"
+                      >
+                        <polygon
+                          points="9.9, 1.1, 3.3, 21.78, 19.8, 8.58, 0, 8.58, 16.5, 21.78"
+                          fill="#ffd800"
+                        />
+                      </svg>
+                    ))}
+                  {Array(5 - Math.ceil(obj.eachEvent.ratingRatio * 5))
+                    .fill(0)
+                    .map((_, i) => (
+                      <svg
+                        key={i}
+                        height="35"
+                        width="35"
+                        aria-label="uncoloured star rating"
+                      >
+                        <polygon
+                          points="9.9, 1.1, 3.3, 21.78, 19.8, 8.58, 0, 8.58, 16.5, 21.78"
+                          fill="#7e7e7e"
+                          stroke="#7e7e7e"
+                          strokeWidth="1"
+                        />
+                      </svg>
+                    ))}
+                  <Typography variant="body2" color="text.secondary">
+                    Average Rating: {obj.eachEvent.averageRating}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Reviews: {obj.eachEvent.reviews.length}
+                  </Typography>
 
-          </CardContent>
-          <CardActions>
-            <Button 
-              component={Link}
-              to= {{pathname: `/event/view/${obj.eachEvent.eventID}`}}
-              state= {obj.eachEvent}
-              size="small">
-                view
-            </Button>
-          </CardActions>
-        </Card> 
+                </CardContent>
+              </Box>
+              <Box id= "card actions">
+                <CardActions>
+                  <Button 
+                    component={Link}
+                    to= {{pathname: `/event/view/${obj.eachEvent.eventID}`}}
+                    state= {obj.eachEvent}
+                    size="small">
+                      view
+                  </Button>
+              </CardActions>
+              </Box>
+            </Box>
+          </Card> 
+        </Grid>
+        
         )
       }) : (
         upcomingListings.map((obj, idx) => {
@@ -342,7 +356,10 @@ const PublicLanding = () => {
       })
       ) 
     }
-    </>
+        </Grid>
+      </Grid>
+    
+    </Grid>
   );
 };
 export default PublicLanding ;
