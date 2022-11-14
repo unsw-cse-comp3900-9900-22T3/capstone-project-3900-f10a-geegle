@@ -21,3 +21,22 @@ export const verifyToken = async (req, res, next) => {
         return res.status(401).json({ msg: "Invalid token" })
     }
 }
+
+export const userLoggedIn = async (req, res, next) => {
+    const token = req.headers["auth-token"]
+
+    if (!token) {
+        next()
+    }
+
+    try {
+        const verify = jwt.verify(token, process.env.SECRET)
+        /* Token data once decrypted
+            { userID: 1234}
+        */
+        req.userID = verify.userID
+        next()
+    } catch (error) {
+        return res.status(401).json({ msg: "Invalid token" })
+    }
+}
