@@ -147,11 +147,13 @@ export const unpublishEventsService = async(req, res) => {
             return {events: null, statusCode : 400, msg: 'Event is already unpublished'}
         }
         const unpublishedEvent = await unpublishEventByIdDb(eventID)
+        const guests = await getEventGuestListByIdDb(eventID)
         await removeTicketPurchaseByEventIdDb(eventID)
         await unassignEventSeatsDb(eventID)
         return {events: {
                     eventID: unpublishedEvent.eventid,
-                    published: unpublishedEvent.published
+                    published: unpublishedEvent.published,
+                    guests: guests
                 },
                 statusCode : 200, 
                 msg: 'Event Unpublished'}
