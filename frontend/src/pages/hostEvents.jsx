@@ -107,8 +107,6 @@ const ConfirmUnpublishModal = ({
     hour12: true
   }
   const [unpublishSuccess, setUnpublishSuccess] = React.useState(false);
-  console.log(eventInfo)
-  console.log(eventInfo.eventName)
   const closeConfirmModal = () => {
     setConfirmUnpubPrompt(false);
   }
@@ -125,12 +123,17 @@ const ConfirmUnpublishModal = ({
    
     if (response.ok) {
       setUnpublishSuccess(true);
+      const guestList = ((await response.json()).events).guests;
+      const guestObj = JSON.stringify({
+        guests: guestList
+      });
       const responseEmail = await fetch(`http://localhost:3000/events/${eventInfo.eventID}/emailUnpublish`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'auth-token': localStorage.getItem('token'),
         },
+        body: guestObj
       })
       fetchHostEvents();
     };
@@ -234,7 +237,6 @@ const HostEventsPage = () => {
         },
       });
       const json = await response.json();
-      console.log(json);
       const events = []
       for (const eve of json.events) {
         events.push({

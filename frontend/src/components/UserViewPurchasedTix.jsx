@@ -46,7 +46,7 @@ const EmailSuccessModal = ({
   >
     <Box sx={style}>
       <Typography variant="h5" style={{color: 'green'}}>
-        You have successfully refunded your ticket, you will recieve a confirmation email shortly
+        You have successfully refunded your ticket, you will recieve a confirmation email shortly.
       </Typography>
       <Button 
           variant="text"
