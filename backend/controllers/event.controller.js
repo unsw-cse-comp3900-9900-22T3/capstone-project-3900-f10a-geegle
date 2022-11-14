@@ -359,7 +359,7 @@ export const getAllEventCategoriesController = async(req, res) => {
 export const getRecommendedEventsForUserController = async(req, res) => {
     try {
         const {events, statusCode, msg} = await getRecommendedEventsForUserService(req, res);
-        res.status(statusCode).json({events, msq})
+        res.status(statusCode).json({events, msg})
     } catch (e) {
         res.status(500).send(e.message)
     }

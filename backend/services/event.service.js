@@ -648,7 +648,7 @@ export const getAllEventCategoriesService = async() => {
     return { categories: categories, statusCode: 200, msg: 'All event categories' }
 }
 
-export const getRecommendedEventsForUserService = async() => {
+export const getRecommendedEventsForUserService = async(req, res) => {
     try {    
         const userID = req.userID;
         let eventList = await getAllEventsNotSoldOutDb();
@@ -661,6 +661,7 @@ export const getRecommendedEventsForUserService = async() => {
                     upcomingEventList.push(eventList[i])
             }
         }
+
         let events = getAllLPTORankings(upcomingEventList, userID);
 
         let userEventTickets = getEventsFromUserTicketsDb(userID);
@@ -688,7 +689,7 @@ export const getRecommendedEventsForUserService = async() => {
                     hostCount++;
                 }
             }
-            for (ue in userEvents) {
+            for (let ue in userEvents) {
                 if (new Date(ue.startdatetime) < new Date()) {
                     userCount++;
                 }
@@ -713,11 +714,14 @@ export const getRecommendedEventsForUserService = async() => {
         }
         // resolve ties by LPTO rating (LPTO max score is 520 mil)
         // or sort by LPTO if no tickets have been purchased
-        eventsCopy[j][rating] = (eventsCopy[j][rating] || 0)+ (eventsCopy[j].LPTO / 1140000000);
-        eventsCopy.sort((a,b) => b.rating - a.rating);
-        if (userEventTickets.length == 0) {
-            eventsCopy = events;
+        for (let i = 0; i < eventsCopy.length; i++) {
+            eventsCopy[i][rating] = (eventsCopy[i][rating] || 0)+ (eventsCopy[i].LPTO / 1140000000);
         }
+
+        // eventsCopy.sort((a,b) => b.rating - a.rating);
+        // if (userEventTickets.length == 0) {
+        //     eventsCopy = events;
+        // }
 
         let recommendedList = []
         for (let i = 0; i < eventsCopy.length; i++) {
@@ -737,9 +741,11 @@ export const getRecommendedEventsForUserService = async() => {
                 totalTicketAmount: eventsCopy[i].totalticketamount,
                 image1: eventsCopy[i].image1,
                 image2: eventsCopy[i].image2,
-                image3: eventsCopy[i].image3
+                image3: eventsCopy[i].image3,
+                rating: eventsCopy[i].rating
             });
         }
+        recommendedList.sort((a,b) => b.rating - a.rating);
         return {events: recommendedList, statusCode: 200, msg: "Events recommended"}
     } catch (e) {
         throw (e)
