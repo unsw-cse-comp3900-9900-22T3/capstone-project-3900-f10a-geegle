@@ -17,7 +17,7 @@ const getEventSimilarityById = async(ID1, ID2) => {
         "SELECT * FROM eventSimilarity WHERE event1 = $1 and event2 = $2", 
         [ID1, ID2]
     )
-    return result.rows[0].similarity_rating
+    return parseFloat(result.rows[0].similarity_rating)
 }
 
 export {
