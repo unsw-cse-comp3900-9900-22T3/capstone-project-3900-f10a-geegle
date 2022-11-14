@@ -1,15 +1,16 @@
 import { getAllEventsDb } from "../db/event.db.js";
 import { addEventSimilarityById } from "../db/similarity.db.js";
 
-export async function testAlgo() {
-    // aim to move events out of this
+// Dummy function to populate db on startup
+export async function updateSim() {
     const events = await getAllEventsDb();
     updateAllEventSimilarity(events);
 }
 
+// Updates all the similarity values of each event when a new
+// event is inserted/published --> needed due to updated word pool
 export async function updateAllEventSimilarity(events) {
     let event_keywords = extractKeywordsFromEvents(events);
-    console.log(event_keywords);
     // Insert all words into hashmap so no duplicates
     // Counts total occurence of each word across all text
     let all_word_occ = {}
@@ -18,8 +19,6 @@ export async function updateAllEventSimilarity(events) {
             all_word_occ[event_keywords[i][j]] = (all_word_occ[event_keywords[i][j]] || 0) + 1;
         }
     }
-    console.log("Total word frequency: ");
-    console.log(all_word_occ)
 
     // Create a map for each event against total occurences
     let word_freq_by_doc = populateWordMap(all_word_occ);
@@ -32,10 +31,6 @@ export async function updateAllEventSimilarity(events) {
         incrimentDocMapFromEventMap(word_freq_by_doc, event_word_freq);
         word_freq_by_event.push(event_word_freq);
     }
-    console.log("Total document frequency:")
-    console.log(word_freq_by_doc)
-    console.log("Total frequency by event:")
-    console.log(word_freq_by_event)
 
     // Calculate Individual TF-IDF of all event words
     let tfidf_vals = [];
@@ -54,14 +49,12 @@ export async function updateAllEventSimilarity(events) {
         }
         tfidf_vals.push(tfidf_arr);
     }
-    console.log(tfidf_vals);
     
     // Determine cosine similarity between TF-IDF vectorised inputs
     for (let i = 0; i < events.length; i++) {
         for (let j = i + 1; j < events.length; j++) {
             const similarity_val = cosineSimilarity(tfidf_vals[i], tfidf_vals[j]);
             addEventSimilarityById(events[i].eventid, events[j].eventid, similarity_val.toFixed(4));
-            console.log("EventID: " + events[i].eventid + "&EventID:" + events[j].eventid + " " + similarity_val.toFixed(4));
         }
     }
 }

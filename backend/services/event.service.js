@@ -661,14 +661,13 @@ export const getRecommendedEventsForUserService = async(req, res) => {
                     upcomingEventList.push(eventList[i])
             }
         }
+        // Updates the event with LPTO rankings
         let events = await getAllLPTORankings(upcomingEventList, userID);
         let userEventTickets = await getEventsFromUserTicketsDb(userID);
-        console.log(userEventTickets)
-        console.log(userEventTickets.length)
-        console.log(await getUserTicketsdDb(userID))
         let eventsCopy = events;
         let purchasedEvents = [];
 
+        // Checks if any of the purchased tickets correspond to live events
         for (let i = 0; i < userEventTickets.length; i++) {
             for (let j = 0; j < events.length; j++) {
                 if (userEventTickets[i].eventid == events[j].eventid) {
@@ -682,6 +681,7 @@ export const getRecommendedEventsForUserService = async(req, res) => {
         for (let i = 0; i < purchasedEvents.length; i++) {
             let hostEvents = await getEventsByHostIdDb(purchasedEvents[i].hostid);
             let userEvents = await getEventsUserAttendingFromHostDb(req.userID, purchasedEvents[i].hostid);
+            // Determine ratio of past events that have same hostID
             let hostCount = 0;
             let userCount = 0;
             for (let he in hostEvents) {
@@ -699,7 +699,7 @@ export const getRecommendedEventsForUserService = async(req, res) => {
             if (hostCount != 0) {
                 hostAttendRatio = userCount / hostCount;
             }
-            console.log(hostAttendRatio.toFixed(4));
+            // Updates rating for each event
             for (let j = 0; j < eventsCopy.length; j++) {
                 let similarityVal = 0.00;
                 if (eventsCopy[j].eventid < purchasedEvents[i].eventid) {
@@ -710,9 +710,7 @@ export const getRecommendedEventsForUserService = async(req, res) => {
                 if (eventsCopy[j].hostid == purchasedEvents[i].hostid) {
                     similarityVal = similarityVal + (hostAttendRatio * similarityVal);
                 }
-                console.log(similarityVal)
                 eventsCopy[j]['rating'] = (eventsCopy[j]['rating'] || 0) + similarityVal;
-                console.log(eventsCopy[j]['rating']) 
             }
         }
         // resolve ties by LPTO rating (LPTO max score is 520 mil)
@@ -720,11 +718,6 @@ export const getRecommendedEventsForUserService = async(req, res) => {
         for (let i = 0; i < eventsCopy.length; i++) {
             eventsCopy[i]['rating'] = (eventsCopy[i]['rating'] || 0) + (eventsCopy[i].LPTO / 1140000000); 
         }
-
-        // eventsCopy.sort((a,b) => b.rating - a.rating);
-        // if (userEventTickets.length == 0) {
-        //     eventsCopy = events;
-        // }
 
         let recommendedList = []
         for (let i = 0; i < eventsCopy.length; i++) {
@@ -742,13 +735,14 @@ export const getRecommendedEventsForUserService = async(req, res) => {
                 venueCapacity: eventsCopy[i].maxcapacity,
                 capacity: eventsCopy[i].capacity,
                 totalTicketAmount: eventsCopy[i].totalticketamount,
-                // image1: eventsCopy[i].image1,
-                // image2: eventsCopy[i].image2,
-                // image3: eventsCopy[i].image3,
+                image1: eventsCopy[i].image1,
+                image2: eventsCopy[i].image2,
+                image3: eventsCopy[i].image3,
                 rating: eventsCopy[i].rating,
                 lpto: eventsCopy[i].LPTO
             });
         }
+        // Sorts list by ranking
         recommendedList.sort((a,b) => b.rating - a.rating);
         return {events: recommendedList, statusCode: 200, msg: "Events recommended"}
     } catch (e) {
