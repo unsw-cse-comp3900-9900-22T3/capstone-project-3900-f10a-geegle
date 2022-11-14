@@ -92,7 +92,8 @@ const SeatAllocation= ({
     fetchAvailSeats();
     fetchUnAvailSeats();
     let chosenSeatsArray = [];
-    quantity.map((q, ticketTypeIdx) => {
+    console.log("seat allocation qty",quantity);
+    quantity.forEach((q, ticketTypeIdx) => {
       for(let ticketNum=0; ticketNum< q; ticketNum++) {
         const newSeatInfo = {
         ticketType: availTicketTypes[ticketTypeIdx].ticketType,
