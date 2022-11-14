@@ -5,7 +5,7 @@ import { getAvailableTicketsByEventIdDb } from "../db/ticket.db.js";
 
 export async function getAllLPTORankings(events, user) {
     for (let i = 0; i < events.length; i++) {
-        let lptoVal = await getSingleEventLPTO(e);
+        let lptoVal = await getSingleEventLPTO(e[i]);
         e[i]['LPTO'] =  (e[i]['LPTO'] || 0) + lptoVal;
     }
     return events;
