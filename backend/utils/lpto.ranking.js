@@ -68,7 +68,7 @@ async function peiValue(event) {
 
 // Determines a q_ei value based on the quality of the event (host reviews etc.)
 async function qeiValue(event) {
-    host_events = await getEventsByHostIdDb(event.hostid);
+    let host_events = await getEventsByHostIdDb(event.hostid);
     let num_reviews = 0;
     let total_score = 0.00;
 
