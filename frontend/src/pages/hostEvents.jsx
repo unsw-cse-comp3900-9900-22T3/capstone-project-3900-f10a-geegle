@@ -344,7 +344,7 @@ const HostEventsPage = () => {
                 view
             </Button>
             {obj.published && <Button size="small" onClick={()=>handleViewCustomers(obj)}>Customers</Button>}
-            {obj.published && <Button size="small" onClick={e=>handleUnpublish(obj, idx)}>Cancel</Button>}
+            {obj.published && <Button size="small" onClick={()=>openConfirmModal(obj, idx)}>Cancel</Button>}
             {!obj.published && <Button size="small" onClick={e=>handlePublish(obj, idx)}>publish</Button>}
             
         </CardActions>
