@@ -661,11 +661,11 @@ export const getRecommendedEventsForUserService = async(req, res) => {
                     upcomingEventList.push(eventList[i])
             }
         }
-
+        console.log(upcomingEventList);
         let events = getAllLPTORankings(upcomingEventList, userID);
-
+        console.log(events)
         let userEventTickets = getEventsFromUserTicketsDb(userID);
-
+        console.log(userEventTickets)
         let eventsCopy = events;
         let purchasedEvents = [];
 
@@ -699,6 +699,7 @@ export const getRecommendedEventsForUserService = async(req, res) => {
             if (hostCount != 0) {
                 hostAttendRatio = userCount / hostCount;
             }
+            console.log(userCount + " " + hostCount)
             for (let j = 0; j < eventsCopy.length; j++) {
                 let similarityVal = 0.00;
                 if (eventsCopy[j].eventid < purchasedEvents[i].eventid) {
