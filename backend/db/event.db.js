@@ -109,7 +109,7 @@ const isEventSoldOutDb = async(eventID) => {
 //READ
 const getSoldOutEventsDb = async() => {
     const result = await db.query(
-        "SELECT * FROM events e WHERE e.totalTicketAmount =  " +
+        "SELECT * FROM events e JOIN users u ON e.hostID = u.userID JOIN venues v ON e.eventvenue = v.venueID WHERE e.totalTicketAmount =  " +
         "(SELECT count(*) FROM ticketpurchases tp JOIN tickets t ON tp.ticketid = t.ticketid WHERE t.eventID = e.eventID)"
     )
     return result.rows
@@ -119,7 +119,7 @@ const getSoldOutEventsDb = async() => {
 const getMatchingEventsDb = async(searchWords) => {
     const search = '%' + searchWords + '%'
     const result = await db.query(
-        "SELECT * FROM events e JOIN users u ON e.hostID = u.userID " + 
+        "SELECT * FROM events e JOIN users u ON e.hostID = u.userID JOIN venues v ON e.eventvenue = v.venueID " + 
         "WHERE e.eventName ILIKE $1 OR e.eventDescription ILIKE $2 OR e.eventType ILIKE $3", 
         [search, search, search]
     )

@@ -14,11 +14,81 @@ import { FormControl } from '@mui/material';
 import { Navigate, useNavigate, Link, useParams, useLocation } from 'react-router-dom';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import { Grid } from '@mui/material';
+import { Grid, Modal } from '@mui/material';
 import Stack from '@mui/material/Stack';
 import { GifBoxOutlined } from '@mui/icons-material';
 import ViewReviews from './viewReviews';
 import PurchaseTicket from '../components/PurchaseTicket';
+
+const LogInPurchaseModal=(
+  {
+    logInPrompt,
+    setLogInPrompt
+  }
+) => {
+  const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '50vw',
+    height: '40vh',
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    gap: '16px',
+    alignItems: 'center',
+    p: 4,
+  };
+  return (
+    <Modal
+    hideBackdrop
+    open={logInPrompt}
+    onClose={()=>setLogInPrompt(false)}
+    aria-labelledby="log in to purchase modal"
+  >
+    <Box sx={style}>
+      <Box id="content container" style={{width: "50vw", height: '40vh', display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", gap:"3rem"}}>
+        <Typography variant="h4">
+          Please login/register to purchase tickets
+        </Typography>
+        <Box id= "buttons">
+          <Button 
+              style={{marginRight: "15px",width: "8rem", fontSize: "1.3rem", backgroundColor: "#9579e7"}}
+              variant="contained"
+              size="large"
+              component={Link}
+              to={{pathname: `/login`}}
+              >
+                login
+          </Button>
+          <Button 
+              style={{marginRight: "15px", width: "8rem", fontSize: "1.3rem", backgroundColor: "#9579e7"}}
+              variant="contained"
+              size="large"
+              component={Link}
+              to={{pathname: `/register`}}
+              >
+                register
+          </Button>
+          <Button 
+              style={{width: "8rem", fontSize: "1.3rem"}}
+              variant="contained"
+              onClick = {()=>setLogInPrompt(false)}
+              size="large"
+              >
+                close
+          </Button>
+        </Box>
+      </Box>
+    </Box>
+  </Modal>
+  )
+}
+
 const ViewEvent= () => {
   const { eventId} = useParams();
   const state = useLocation();
@@ -51,6 +121,7 @@ const ViewEvent= () => {
   const [allTicketTypes, setAllTicketTypes] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [showReviews, setShowReviews] = useState(false);
+  const [logInPrompt, setLogInPrompt] = useState(false);
   const style = {
     position: 'absolute',
     top: '50%',
@@ -144,7 +215,16 @@ const ViewEvent= () => {
   //     setReviews(allReviews)
   //   }
   // }
-
+  const handleTicketModal = () => {
+    //setTicketModal(false);
+    if (localStorage.getItem('token') !== null) {
+      setTicketModal(true);
+      setLogInPrompt(false);
+  } else {
+      setTicketModal(false);
+      setLogInPrompt(true);
+  }
+  }
   const handleShowReviews = (e) => {
     if (showReviews) {
       setShowReviews(false);
@@ -256,10 +336,19 @@ const ViewEvent= () => {
                 variant ='outlined'
                 id = 'Purchase Ticket Button'
                 size='large'
-                onClick = {() => setTicketModal(true)}
+                onClick = {() => handleTicketModal()}
               > Buy Tickets
               </Button>
-              {ticketModal === true ? (<PurchaseTicket eventInfo = {eventInfo} setEventInfo={setEventInfo} ticketModal={ticketModal} setTicketModal ={setTicketModal}/>):null}
+              {ticketModal === true ? (
+                <PurchaseTicket 
+                  eventInfo = {eventInfo} 
+                  setEventInfo={setEventInfo} 
+                  ticketModal={ticketModal} 
+                  setTicketModal ={setTicketModal}/>):null}
+              {logInPrompt === true ? (
+                <LogInPurchaseModal 
+                  logInPrompt= {logInPrompt}
+                  setLogInPrompt ={setLogInPrompt}/>):null}
             </Box>
             </Box>
           <Box id="details section" sx={{marginTop: "2%"}}>

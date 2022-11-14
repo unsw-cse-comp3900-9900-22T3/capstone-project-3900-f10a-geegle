@@ -65,18 +65,18 @@ const PaymentConfirmation= ({
     if (hasSeats === false) {
       // initialise chosenSeats array
       let chosenSeatsArray = [];
-    quantity.map((q, ticketTypeIdx) => {
-      for(let ticketNum=0; ticketNum< q; ticketNum++) {
-        const newSeatInfo = {
-        ticketType: availTicketTypes[ticketTypeIdx].ticketType,
-        section: '',
-        seatId: ''
+      quantity.map((q, ticketTypeIdx) => {
+        for(let ticketNum=0; ticketNum< q; ticketNum++) {
+          const newSeatInfo = {
+          ticketType: availTicketTypes[ticketTypeIdx].ticketType,
+          section: '',
+          seatId: ''
+          }
+          chosenSeatsArray.push(newSeatInfo);   
         }
-        chosenSeatsArray.push(newSeatInfo);   
-      }
-    })
-    console.log("chosen seats array",chosenSeatsArray);
-    setChosenSeats(chosenSeatsArray)
+      })
+      console.log("chosen seats array",chosenSeatsArray);
+      setChosenSeats(chosenSeatsArray);
     }
   },[])
   return (   
@@ -105,7 +105,7 @@ const PaymentConfirmation= ({
               <TextField
                 required
                 id="editNumber"
-                placeholder=''
+                placeholder="xxxxxxxxxxxxxxxx"
                 onChange={e => setNewCreditCardNum(e.target.value)}
                 type='text'
               />
@@ -115,7 +115,7 @@ const PaymentConfirmation= ({
               <TextField
                   required
                   id="editCCV"
-                  placeholder=""
+                  placeholder="xxx"
                   onChange={e => setNewCCV(e.target.value)}
                   type='text' 
               />
