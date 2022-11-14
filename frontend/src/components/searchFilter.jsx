@@ -142,10 +142,10 @@ const SearchFilter = ({openSearch, setOpenSearch, setFilter, setFilteredListings
             concatStr=`to=${endDate}`;
             break;
           case 3:
-            concatStr=`category=${eventType.replace(/ /g, '%')}`;
+            concatStr=`category=${eventType.replace(/ /g, '%20')}`;
             break;
           case 4:
-            concatStr=`location=${eventLocation.replace(/ /g, '%')}`;
+            concatStr=`location=${eventLocation.replace(/ /g, '%20')}`;
             break;
           case 5:
             concatStr=`rating=${eventRating}`;
@@ -216,7 +216,7 @@ const SearchFilter = ({openSearch, setOpenSearch, setFilter, setFilteredListings
               <FormControlLabel control={<Checkbox onChange={(e) => handleEventCatOpen(e.target.checked)}/>} label="Event Category" />
               <FormControlLabel control={<Checkbox onChange={(e) => handleEventLocOpen(e.target.checked)}/>} label="Event Location" />
               <FormControlLabel control={<Checkbox onChange={(e) => handleEventRatingOpen(e.target.checked)}/>} label="Event Rating" />
-              <FormControlLabel control={<Checkbox onChange={(e) => handleEventCostOpen(e.target.checked)}/>} label="Cost" />
+              <FormControlLabel control={<Checkbox onChange={(e) => handleEventCostOpen(e.target.checked)}/>} label="Maximum Ticket Price" />
             </Box>
             {openStartDate && 
               <Grid item xs={12}>

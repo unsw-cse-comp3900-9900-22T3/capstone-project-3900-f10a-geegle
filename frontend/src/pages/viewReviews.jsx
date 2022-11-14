@@ -174,6 +174,8 @@ export default function ViewReviews({showReviews, setShowReviews, eventReviews, 
   // }
 
   const likeReview = async(reviewId, eventId) => {
+    console.log('reviewId', reviewId);
+    console.log('eventId', eventId);
     const response = await fetch(`http://localhost:3000/events/${eventId}/reviews/${reviewId}/like`, {
       method: 'POST',
       headers: {
@@ -196,6 +198,7 @@ export default function ViewReviews({showReviews, setShowReviews, eventReviews, 
   const fetchReviews = async(eventId) => {
     let json = []
 
+      console.log('here');
       if (localStorage.getItem('token')) { 
         const response = await fetch(`http://localhost:3000/events/${eventId}/reviews/user`, {
           method: 'GET',
@@ -207,6 +210,7 @@ export default function ViewReviews({showReviews, setShowReviews, eventReviews, 
         })
         if (response.ok) {
           json = await response.json();
+          console.log('reviews',json);
         }
       } else {
         const response = await fetch(`http://localhost:3000/events/${eventId}/reviews`, {
@@ -218,6 +222,7 @@ export default function ViewReviews({showReviews, setShowReviews, eventReviews, 
         })
         if (response.ok){
           json = await response.json();
+          console.log('reviews',json);
         }
       }
       setReviews(json.reviews);
