@@ -497,9 +497,11 @@ export const isEventSoldOutService = async(req, res) => {
 export const getSoldOutEventsService = async(req, res) => {
     try {
         const eventList = await getSoldOutEventsDb()
-        
+        let userID = req.userID
+        if (!userID) userID = 0
         const events = []
         for (let i = 0; i < eventList.length; i++) {
+            const reviewRating = await eventRatingScore(eventList[i].eventid, userID)
             events.push({
                 eventID: eventList[i].eventid,
                 eventName: eventList[i].eventname,
@@ -514,6 +516,8 @@ export const getSoldOutEventsService = async(req, res) => {
                 venueCapacity: eventList[i].maxcapacity,
                 capacity: eventList[i].capacity,
                 totalTicketAmount: eventList[i].totalticketamount,
+                reviews: reviewRating.reviews,
+                eventRating: reviewRating.rating,
                 image1: eventList[i].image1,
                 image2: eventList[i].image2,
                 image3: eventList[i].image3
@@ -526,14 +530,14 @@ export const getSoldOutEventsService = async(req, res) => {
     }
 }
 
-export const getEventsSearchedService = async(searchWords) => {
+export const getEventsSearchedService = async(searchWords, userID) => {
     try {
         const eventList = await getMatchingEventsDb(searchWords)
         
         const events = []
         for (let i = 0; i < eventList.length; i++) {
             if (eventList[i].published) {
-                const reviewRating = await eventRatingScore(eventList[i].eventid)
+                const reviewRating = await eventRatingScore(eventList[i].eventid, userID)
                 events.push({
                     eventID: eventList[i].eventid,
                     eventName: eventList[i].eventname,
@@ -563,7 +567,7 @@ export const getEventsSearchedService = async(searchWords) => {
     }
 }
 
-export const getEventsFilteredService = async(from, to, category, location, rating, priceLimit) => {
+export const getEventsFilteredService = async(from, to, category, location, rating, priceLimit, userID) => {
     try {
         let eventList = await getAllEventsDb();
         if (from) {
@@ -610,7 +614,7 @@ export const getEventsFilteredService = async(from, to, category, location, rati
         const events = []
         for (let i = 0; i < eventList.length; i++) {
             if (eventList[i].published) {
-                const reviewRating = await eventRatingScore(eventList[i].eventid)
+                const reviewRating = await eventRatingScore(eventList[i].eventid, userID)
                 events.push({
                     eventID: eventList[i].eventid,
                     eventName: eventList[i].eventname,

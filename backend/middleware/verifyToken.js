@@ -24,9 +24,8 @@ export const verifyToken = async (req, res, next) => {
 
 export const userLoggedIn = async (req, res, next) => {
     const token = req.headers["auth-token"]
-
     if (!token) {
-        next()
+        return next()
     }
 
     try {

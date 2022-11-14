@@ -72,7 +72,7 @@ export const bookEventService = async(req, res) => {
             <p>Dear ${user.firstname}, <br><br> Thank you for your purchase to ${event[0].eventname}. Please find a summary of your order below: <br> <br> <hr> <br> </p>
             <div>
             <center> 
-            <img  src="cid:eventImage">
+            <img  src="cid:eventImage" alt="Event">
             <h1> ${event[0].eventname} </h1>
             <p> ${event[0].venuename} <br> ${event[0].startdatetime} - ${event[0].enddatetime}  <br> Seating Information: <br>${printSeats} </p>
             </center>
@@ -99,7 +99,7 @@ export const bookEventService = async(req, res) => {
             }, 
             {   // encoded string as an attachment
                 filename: 'eventImage.png',
-                content: event[0].image1.split("base64,")[1],
+                content: (event[0]) ? null : event[0].image1.split("base64,")[1],
                 encoding: 'base64',
                 cid: 'eventImage'
             }
