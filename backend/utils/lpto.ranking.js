@@ -73,7 +73,7 @@ async function qeiValue(event) {
     let total_score = 0.00;
 
     for (let i = 0; i < host_events.length; i++) {
-        event_reviews = await getEventReviewsByEventIdDb(host_events[i].eventid);
+        let event_reviews = await getEventReviewsByEventIdDb(host_events[i].eventid);
         for (let j = 0; j < event_reviews.length; j++) {
             num_reviews++
             total_score += parseFloat(event_reviews[j].rating);
