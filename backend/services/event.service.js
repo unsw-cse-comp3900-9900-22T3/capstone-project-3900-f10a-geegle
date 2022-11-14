@@ -709,13 +709,13 @@ export const getRecommendedEventsForUserService = async(req, res) => {
                 if (eventsCopy[j].hostid == purchasedEvents[i].hostid) {
                     similarityVal = similarityVal + (hostAttendRatio * similarityVal);
                 }
-                eventsCopy[j][rating] = (eventsCopy[j][rating] || 0) + similarityVal;
+                eventsCopy[j]['rating'] = (eventsCopy[j]['rating'] || 0) + similarityVal;
             }
         }
         // resolve ties by LPTO rating (LPTO max score is 520 mil)
         // or sort by LPTO if no tickets have been purchased
         for (let i = 0; i < eventsCopy.length; i++) {
-            eventsCopy[i][rating] = (eventsCopy[i][rating] || 0)+ (eventsCopy[i].LPTO); //1140000000
+            eventsCopy[i]['rating'] = (eventsCopy[i]['rating'] || 0) + (eventsCopy[i].LPTO); //1140000000
         }
 
         // eventsCopy.sort((a,b) => b.rating - a.rating);
@@ -742,7 +742,8 @@ export const getRecommendedEventsForUserService = async(req, res) => {
                 image1: eventsCopy[i].image1,
                 image2: eventsCopy[i].image2,
                 image3: eventsCopy[i].image3,
-                rating: eventsCopy[i].rating
+                rating: eventsCopy[i].rating,
+                lpto: eventsCopy[i].LPTO
             });
         }
         recommendedList.sort((a,b) => b.rating - a.rating);
