@@ -16,7 +16,7 @@ async function getSingleEventLPTO(event, user) {
     // feasibility score f_ei (0 to 1)
     let eventStart = new Date(event.startdatetime);
     let currTime = new Date();
-    let timeDiff = (currTime - eventStart)/36e5;
+    let timeDiff = (eventStart - currTime)/36e5;
     
     let f = feiValue(timeDiff);
     console.log(f)
