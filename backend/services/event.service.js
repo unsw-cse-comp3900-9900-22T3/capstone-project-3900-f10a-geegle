@@ -678,7 +678,6 @@ export const getRecommendedEventsForUserService = async(req, res) => {
                 }
             }
         }
-        console.log(eventsCopy)
         
         for (let i = 0; i < purchasedEvents.length; i++) {
             let hostEvents = await getEventsByHostIdDb(purchasedEvents[i].hostid);
@@ -696,11 +695,11 @@ export const getRecommendedEventsForUserService = async(req, res) => {
                 }
             }
 
-            let hostAttendRatio = 0;
+            let hostAttendRatio = 0.00;
             if (hostCount != 0) {
                 hostAttendRatio = userCount / hostCount;
             }
-            console.log(userCount + " " + hostCount)
+            console.log(hostAttendRatio.toFixed(4));
             for (let j = 0; j < eventsCopy.length; j++) {
                 let similarityVal = 0.00;
                 if (eventsCopy[j].eventid < purchasedEvents[i].eventid) {
@@ -711,7 +710,9 @@ export const getRecommendedEventsForUserService = async(req, res) => {
                 if (eventsCopy[j].hostid == purchasedEvents[i].hostid) {
                     similarityVal = similarityVal + (hostAttendRatio * similarityVal);
                 }
+                console.log(similarityVal)
                 eventsCopy[j]['rating'] = (eventsCopy[j]['rating'] || 0) + similarityVal;
+                console.log(eventsCopy[j]['rating']) 
             }
         }
         // resolve ties by LPTO rating (LPTO max score is 520 mil)
