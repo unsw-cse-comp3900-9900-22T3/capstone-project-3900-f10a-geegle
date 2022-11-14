@@ -9,7 +9,7 @@ import { getEventReviewsByEventIdDb } from '../db/review.db.js'
 import {addTicketDb} from '../db/ticket.db.js'
 import { getUserByIdDb } from '../db/user.db.js'
 import { isVenueSeatingAvailableDb } from '../db/venueSeating.db.js'
-import { getEventsFromUserTicketsDb, getTicketPurchaseByUserIdDb } from '../db/ticketpurchase.db.js'
+import { getEventsFromUserTicketsDb, getTicketPurchaseByUserIdDb, getUserTicketsdDb } from '../db/ticketpurchase.db.js'
 import { getAllLPTORankings } from '../utils/lpto.ranking.js'
 import { getEventSimilarityById } from '../db/similarity.db.js'
 import { getEventTicketTypesController } from '../controllers/booking.controller.js'
@@ -665,6 +665,7 @@ export const getRecommendedEventsForUserService = async(req, res) => {
         let userEventTickets = await getEventsFromUserTicketsDb(userID);
         console.log(userEventTickets)
         console.log(userEventTickets.length)
+        console.log(await getUserTicketsdDb(userID))
         let eventsCopy = events;
         let purchasedEvents = [];
 
