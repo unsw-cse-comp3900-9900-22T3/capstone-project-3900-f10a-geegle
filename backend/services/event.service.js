@@ -661,7 +661,6 @@ export const getRecommendedEventsForUserService = async(req, res) => {
                     upcomingEventList.push(eventList[i])
             }
         }
-        console.log(upcomingEventList);
         let events = await getAllLPTORankings(upcomingEventList, userID);
         console.log(events)
         let userEventTickets = await getEventsFromUserTicketsDb(userID);
