@@ -21,6 +21,60 @@ import TicketTypeCard from '../components/TicketTypeCard';
 import SeatAllocation from '../components/SeatAllocation';
 import PaymentConfirmation from '../components/PaymentConfirmation';
 import { KeyboardReturnRounded } from '@mui/icons-material';
+
+const PurchaseSuccessModal = ({
+  setCheckoutSuccess,
+  checkoutSuccess,
+  closeTicketModal
+}) => {
+  const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '50vw',
+    height: '40vh',
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    gap: '16px',
+    alignItems: 'center',
+    p: 4,
+  };
+
+  const handleClose = () => {
+    closeTicketModal();
+    setCheckoutSuccess(false);
+  }
+  return (
+    <Modal
+    hideBackdrop
+    open={checkoutSuccess}
+    onClose={()=>setCheckoutSuccess(false)}
+    aria-labelledby="confirm refund success modal"
+  >
+    <Box sx={style}>
+      <Typography variant="h5" style={{color: 'green'}}>
+        Your Purchase was successful, you will recieve a confirmation email with your order summary shortly.
+      </Typography>
+      <Button 
+          variant="text"
+          size="large"
+          style={{fontSize:'1.07rem'}}
+          onClick = {()=>handleClose()}
+          >
+            Close
+      </Button>
+    </Box>
+  </Modal>
+)
+}
+
+
+
 const PurchaseTicket= ({
   eventInfo, 
   setEventInfo, 
@@ -54,13 +108,11 @@ const PurchaseTicket= ({
   const [totalPrice, setTotalPrice] = useState(0);
   const [inputError, setInputError] = useState(false);
   const [exceedError, setExceedError] = useState(false);
-  const [inputErrorTic, setInputErrorTic] = useState("");
   const [ticketTypeExceeded, setTicketTypeExceeded] = useState("");
   const [hasSeats, setHasSeats] = useState(false);
   const [checkoutSuccess, setCheckoutSuccess] = useState(false);
   const [checkoutError, setCheckoutError] = useState(false);
-  const [checkoutErrorMsg, setCheckoutErrorMsg] = useState(false);
-
+  const navigate = useNavigate();
 
 
   // page 1 is ticket selection page
@@ -74,6 +126,7 @@ const PurchaseTicket= ({
     section: '',
     seatId: ''
   }]);
+  const [emptySeats, setEmptySeats] = useState(false);
   
   // payment confirmation page variables (page 3)
   const [paymentOption, setPaymentOption] = useState("stored");
@@ -84,6 +137,9 @@ const PurchaseTicket= ({
   
 
 
+  const closeTicketModal = () => {
+    setTicketModal(false);
+  }
   /**
    * handleNextPage error checks the current page before
    * going to the next page
@@ -94,19 +150,16 @@ const PurchaseTicket= ({
       // reset the error states
       setInputError(false);
       setExceedError(false);
-      let idx = 0;
-      for (const qty of quantity) {
-        if (isNaN(qty)) {
-          console.log("here");
-          console.log(qty)
-          setInputError(true);
-          setInputErrorTic(availTicketTypes[idx].ticketType);
-          return;
-        }
-      idx++;
+  
+
+      // check if at least one seat is selected (use Input error)
+      if (quantity.every((val)=> val === 0)) {
+        setInputError(true);
+        return;
       }
+
       // check for quantity exceeding the remaining ticket
-      idx = 0;
+      let idx = 0;
       for (const qty of quantity) {
         if (parseInt(qty) > parseInt(availTicketTypes[idx].remaining)) {
           setExceedError(true);
@@ -116,37 +169,41 @@ const PurchaseTicket= ({
         idx++;
       }
       // when there are no errors then we allow the use to go to the 
-      // next page for seat allocations
-      if (inputError === false && exceedError === false) {
-        // go to page 2
-        if (hasSeats === true) {
-          setCurrentPage(2);
-        } else {
-          // go to payment page
-          setCurrentPage(3)
-        }
+      // go to page 2 for seat allocations if event is seated
+      // go to page 3 for payment details if event is not seated
+      if (hasSeats === true) {
+        setCurrentPage(2);
       } else {
-        // stay in page 1
-        setCurrentPage(1)
+        // go to payment page
+        setCurrentPage(3)
       }
     } else if (currentPage === 2) {
+      // reset error states for seat allocations
       setDuplicateError(false);
+      setEmptySeats(false);
+
+      // pass chosen seatId into an array
       const seatIdChosen = chosenSeats.map((seat,index) => {
         return seat.seatId;
       })
 
-      const duplicate = seatIdChosen.some((seat,index)=> seatIdChosen.indexOf(seat) !== index
-      )
-      if (duplicate === true) {
-        setDuplicateError(true);
-        setCurrentPage(2);
-      } else {
-        setDuplicateError(false);
-        // no error, allow user to move to the next page
-        setCurrentPage(3);
+      // check if seats are selected for all tickets
+      const checkEmpty = seatIdChosen.some((seat,index)=> seat === "")
+      if (checkEmpty === true) {
+        setEmptySeats(true);
+        return;
       }
 
+      // check if no two seats are the same
+      const duplicate = seatIdChosen.some((seat,index)=> seatIdChosen.indexOf(seat) !== index)
+      if (duplicate === true) {
+        setDuplicateError(true);
+        return;
+      }
 
+       // no error, allow user to move to the next page
+      setCurrentPage(3);
+     
     }
   }
   const handleCheckout = async(event, index) => {
@@ -157,14 +214,13 @@ const PurchaseTicket= ({
     setCheckoutSuccess(false);
     setCheckoutError(false);
     const tickets = chosenSeats.map((obj, index)=> obj.ticketType);
-    console.log('ticket', tickets);
     const section = chosenSeats.map((obj, index)=> obj.section);
     let seatId = chosenSeats.map((obj, index)=> obj.seatId); 
     let jsonString = "";
     if(hasSeats === false) {
       seatId = [];
     }
-    console.log('seat id', seatId);
+
     if (paymentOption === "stored") {
       jsonString = JSON.stringify({
         tickets: tickets,
@@ -204,9 +260,21 @@ const PurchaseTicket= ({
     const r = await fetch(`http://localhost:3000/events/${eventInfo.eventID}/purchase`, requestOptions)
     if (r.ok ) {
       setCheckoutSuccess(true);
+      const bookingInfo = (await r.json()).booking;
+      const bookingJsonStr = JSON.stringify({
+        booking: bookingInfo
+      });
+      const responseEmail = await fetch(`http://localhost:3000/events/${eventInfo.eventID}/emailPurchase`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'auth-token': localStorage.getItem('token'),
+        },
+        body: bookingJsonStr
+      })
     } else {
       setCheckoutError(true);
-      setCheckoutErrorMsg(r);
+      
     }
   }
   const handleQuantity = (event, index) => {
@@ -221,7 +289,6 @@ const PurchaseTicket= ({
     for (const qty of tempQtys) {
       // skipping on adding if the number is not a number
       if (!isNaN(parseInt(qty))) {
-        
         newTotal = newTotal + parseInt(qty)*(availTicketTypes[idx].price);
       }
       idx++;
@@ -241,7 +308,12 @@ const PurchaseTicket= ({
     const ticketData = (await response.json());
     if (response.ok) {
       setAvailTicketTypes(ticketData.tickets)
-      //for ()
+      const numOfAvailTypes = (ticketData.tickets).length;
+      let tempArray = [];
+      for (let i = 0; i<numOfAvailTypes; i++) {
+        tempArray.push(0);
+      }
+      setQuantity([...tempArray]);
     };
   }
 
@@ -258,6 +330,9 @@ const PurchaseTicket= ({
       return (
         <>
           <Box id="ticket container" sx ={{mt:'1.5vw'}}>
+            <Box id="ticket heading title">
+              <Typography aria-label="ticket page title" variant="h5" width="100%">Tickets Available for purchase</Typography>
+            </Box>
             {availTicketTypes.map((ticket,index) => {
               return <TicketTypeCard  
               eventInfo = {eventInfo}
@@ -320,15 +395,14 @@ const PurchaseTicket= ({
             Check out
           </Button>
         )
-       
     }
   }
+
   useEffect(() => {
     getAvailTicketTypes();
     eventHasSeats();
   },[])
 
-  console.log("here in modal")
   return (
     <Modal
       open={ticketModal}
@@ -357,20 +431,31 @@ const PurchaseTicket= ({
           {nextOrCheckoutButton()} 
         </Box>
         {inputError === true 
-          ? (<Alert severity="error">Error, make sure quanity for {inputErrorTic} are numbers before going to next page, if you do not want a ticket for a ticket type, input 0</Alert>) 
+          ? (<Alert severity="error">Error, please select at least 1 ticket</Alert>) 
           : null}
         {exceedError === true 
           ? (<Alert severity="error">Error, quantity exceeded for {ticketTypeExceeded} is below the remaining ticket</Alert>) 
           : null}
+        {emptySeats === true 
+          ? (<Alert severity="error">Error, you have not chosen a seat for your ticket/tickets, please check</Alert>) 
+          : null}
         {duplicateError === true 
-          ? (<Alert severity="error">Error, please make sure chosen seats are not the same seats for yor tickets</Alert>) 
+          ? (<Alert severity="error">Error, please make sure chosen seats are not the same seats for your tickets</Alert>) 
+          : null}
+        {/* {checkoutSuccess === true 
+          ? (<Alert severity="success">you have successfully purchased your tickets, look out for a confirmation email</Alert>) 
+          : null} */}
+        {checkoutError === true 
+          ? (<Alert severity="error">Invalid credit card details, please check that Credit Card Number is 16 digits, CVV is 3 digits, month is in the form of mm and year is in the form of yy</Alert>) 
           : null}
         {checkoutSuccess === true 
-          ? (<Alert severity="success">you have successfully purchased your tickets, look out for a confirmation email</Alert>) 
-          : null}
-        {checkoutError === true 
-          ? (<Alert severity="error">{checkoutErrorMsg}</Alert>) 
-          : null}
+          ? (
+            <PurchaseSuccessModal 
+              setCheckoutSuccess = {setCheckoutSuccess}
+              checkoutSuccess = {checkoutSuccess}
+              closeTicketModal = {closeTicketModal}/>
+          ) 
+          : null} 
         
       </Box>
     </Modal>

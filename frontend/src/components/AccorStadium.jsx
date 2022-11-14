@@ -8,7 +8,6 @@ const AccorStadium = ({
 }) => {
   const styles = {
     gridContainer: {
-      // border: "3px solid black",
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
