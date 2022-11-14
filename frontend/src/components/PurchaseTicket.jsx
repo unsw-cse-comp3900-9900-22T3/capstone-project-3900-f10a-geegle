@@ -150,7 +150,7 @@ const PurchaseTicket= ({
       // reset the error states
       setInputError(false);
       setExceedError(false);
-      console.log("quantity", quantity);
+  
 
       // check if at least one seat is selected (use Input error)
       if (quantity.every((val)=> val === 0)) {
@@ -160,7 +160,6 @@ const PurchaseTicket= ({
 
       // check for quantity exceeding the remaining ticket
       let idx = 0;
-      console.log("quantity 2", quantity);
       for (const qty of quantity) {
         if (parseInt(qty) > parseInt(availTicketTypes[idx].remaining)) {
           setExceedError(true);
@@ -215,14 +214,13 @@ const PurchaseTicket= ({
     setCheckoutSuccess(false);
     setCheckoutError(false);
     const tickets = chosenSeats.map((obj, index)=> obj.ticketType);
-    console.log('ticket', tickets);
     const section = chosenSeats.map((obj, index)=> obj.section);
     let seatId = chosenSeats.map((obj, index)=> obj.seatId); 
     let jsonString = "";
     if(hasSeats === false) {
       seatId = [];
     }
-    console.log('seat id', seatId);
+
     if (paymentOption === "stored") {
       jsonString = JSON.stringify({
         tickets: tickets,
@@ -263,11 +261,9 @@ const PurchaseTicket= ({
     if (r.ok ) {
       setCheckoutSuccess(true);
       const bookingInfo = (await r.json()).booking;
-      console.log('booking info', bookingInfo);
       const bookingJsonStr = JSON.stringify({
         booking: bookingInfo
       });
-      console.log(bookingJsonStr);
       const responseEmail = await fetch(`http://localhost:3000/events/${eventInfo.eventID}/emailPurchase`, {
         method: 'POST',
         headers: {
@@ -407,7 +403,6 @@ const PurchaseTicket= ({
     eventHasSeats();
   },[])
 
-  console.log("here in modal")
   return (
     <Modal
       open={ticketModal}

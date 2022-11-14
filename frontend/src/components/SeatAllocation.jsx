@@ -1,16 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Alert from '@mui/material/Alert';
-import CardHeader from '@mui/material/CardHeader';
-import { FormControl } from '@mui/material';
-import { Navigate, useNavigate, Link, useParams } from 'react-router-dom';
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import {Card} from '@mui/material';
 import AccorStadium from '../components/AccorStadium';
 import DoltonHouse from '../components/DoltonHouse';
-import TicketTypeCard from '../components/TicketTypeCard';
 import SeatSelectionCard from '../components/SeatSelectioncard';
 const SeatAllocation= ({
   eventInfo, 
@@ -35,7 +28,6 @@ const SeatAllocation= ({
     });
     const seatData = (await response.json());
     if (response.ok) {
-      console.log('seat data frist instance',seatData);
       setSeatingSectionAllocation(seatData.seatSections);
       const seatKeys = Object.keys(seatData.seatSections);
       setSeatSections(seatKeys);
@@ -53,7 +45,6 @@ const SeatAllocation= ({
     const seatData = (await response.json());
     if (response.ok) {
       setAvailSeats(seatData.seats);
-      console.log('avail',seatData.seats);
     }
   }
 
@@ -68,7 +59,6 @@ const SeatAllocation= ({
     const seatData = (await response.json());
     if (response.ok) {
       setUnAvailSeats(seatData.seats);
-      console.log('unavail',seatData.seats);
     }
   }
   
@@ -92,7 +82,6 @@ const SeatAllocation= ({
     fetchAvailSeats();
     fetchUnAvailSeats();
     let chosenSeatsArray = [];
-    console.log("seat allocation qty",quantity);
     quantity.forEach((q, ticketTypeIdx) => {
       for(let ticketNum=0; ticketNum< q; ticketNum++) {
         const newSeatInfo = {
@@ -103,7 +92,6 @@ const SeatAllocation= ({
         chosenSeatsArray.push(newSeatInfo);   
       }
     })
-    console.log("chosen seats array",chosenSeatsArray);
     setChosenSeats(chosenSeatsArray)
   },[])
 

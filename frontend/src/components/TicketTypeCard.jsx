@@ -45,12 +45,12 @@ const TicketTypeCard= ({
           Quantity:
         </Typography>
         <FormControl fullWidth>
-        <InputLabel id="demo-simple-select-label">Quantity</InputLabel>
+        <InputLabel id="Quantity label">Quantity</InputLabel>
         <Select
-          labelId="demo-simple-select-label"
-          id="demo-simple-select"
+          labelId="quantity drop down"
+          id="quantity drop down"
           value={localQuantity}
-          label="Age"
+          label="Quantity label"
           onChange={event=>handleQtyChange(event,index)}
         >
           <MenuItem value={0}>0</MenuItem>
