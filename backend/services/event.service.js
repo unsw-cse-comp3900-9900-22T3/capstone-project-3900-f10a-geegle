@@ -147,11 +147,13 @@ export const unpublishEventsService = async(req, res) => {
             return {events: null, statusCode : 400, msg: 'Event is already unpublished'}
         }
         const unpublishedEvent = await unpublishEventByIdDb(eventID)
+        const guests = await getEventGuestListByIdDb(eventID)
         await removeTicketPurchaseByEventIdDb(eventID)
         await unassignEventSeatsDb(eventID)
         return {events: {
                     eventID: unpublishedEvent.eventid,
-                    published: unpublishedEvent.published
+                    published: unpublishedEvent.published,
+                    guests: guests
                 },
                 statusCode : 200, 
                 msg: 'Event Unpublished'}
@@ -321,7 +323,7 @@ export const getHostEventsService = async(req, res) => {
         let upcomingEventList = [];
         for (let i = 0; i < eventList.length; i++) {
             const seating = await isSeatedEventDb(eventList[i].eventid)
-            const reviewRating = await eventRatingScore(eventList[i].eventid)
+            const reviewRating = await eventRatingScore(eventList[i].eventid, req.userID)
             
             upcomingEventList.push({
                 eventID: eventList[i].eventid,
@@ -649,6 +651,8 @@ const eventRatingScore = async(eventID, userID = 0) => {
         delete eventReviews[i]['reviewid']
         eventReviews[i]['userID'] = eventReviews[i]['userid']
         delete eventReviews[i]['userid']
+        const user = await getUserByIdDb(eventReviews[i]['userID'])
+        eventReviews[i]['username'] = user.firstname + ' ' + user.lastname
         eventReviews[i]['eventID'] = eventReviews[i]['eventid']
         delete eventReviews[i]['eventid']
         eventReviews[i]['postedOn'] = eventReviews[i]['postedon']

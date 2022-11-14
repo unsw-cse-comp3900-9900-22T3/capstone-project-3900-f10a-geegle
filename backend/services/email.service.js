@@ -157,10 +157,8 @@ export const cancelUserBookingService = async(req, res) => {
 export const unpublishEventsService = async(req, res) => {
     try {
         const eventID = req.params.eventID;
+        const { guests } = req.body
         const event = await eventdb.getEventByIdDb(eventID);
-
-        // Getting guest list details to send event cancellation email
-        const guests = await eventdb.getEventGuestListByIdDb(eventID)
         
         for (let guest of guests) {
             var mailOptions = {
