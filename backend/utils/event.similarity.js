@@ -1,4 +1,5 @@
 import { getAllEventsDb } from "../db/event.db.js";
+import { addEventSimilarityById } from "../db/similarity.db.js";
 
 export async function testAlgo() {
     // aim to move events out of this
@@ -6,7 +7,7 @@ export async function testAlgo() {
     updateAllEventSimilarity(events);
 }
 
-async function updateAllEventSimilarity(events) {
+export async function updateAllEventSimilarity(events) {
     let event_keywords = extractKeywordsFromEvents(events);
     console.log(event_keywords);
     // Insert all words into hashmap so no duplicates
@@ -42,8 +43,9 @@ async function updateAllEventSimilarity(events) {
         let tfidf_map = populateWordMap(all_word_occ);
         let tfidf_arr = []
         for (let word in word_freq_by_event[i]) {
-            // Augmented frequency to prevent bias towards longer documents
-            let tf = (0.5 + 0.5*(word_freq_by_event[i][word]/event_keywords[i].length));
+            // Augmented frequency to prevent bias towards longer documents - removed due reduced matching
+            // let tf = (0.5 + 0.5*(word_freq_by_event[i][word]/event_keywords[i].length));
+            let tf = (word_freq_by_event[i][word]/event_keywords[i].length);
             // Smoothing on idf values applied - 1 added to denominator and idf val
             let idf = Math.log(events.length/(word_freq_by_doc[word]+ 1)) + 1;
             // let idf = Math.log(events.length/word_freq_by_doc[word]);
@@ -58,6 +60,7 @@ async function updateAllEventSimilarity(events) {
     for (let i = 0; i < events.length; i++) {
         for (let j = i + 1; j < events.length; j++) {
             const similarity_val = cosineSimilarity(tfidf_vals[i], tfidf_vals[j]);
+            addEventSimilarityById(events[i].eventid, events[j].eventid, similarity_val.toFixed(4));
             console.log("EventID: " + events[i].eventid + "&EventID:" + events[j].eventid + " " + similarity_val.toFixed(4));
         }
     }

@@ -1,7 +1,7 @@
 import { createEventsService, publishEventsService, unpublishEventsService, editEventsService, deleteEventsService, 
          getEventService, getUpcomingEventsService, getAllEventsService, getHostEventsService, getHostDetailsService, 
          getEventsUserAttendingService, getEventGuestListService, isEventSoldOutService, getSoldOutEventsService,
-         getEventsSearchedService, getEventsFilteredService, getAllEventCategoriesService } 
+         getEventsSearchedService, getEventsFilteredService, getAllEventCategoriesService, getRecommendedEventsForUserService } 
          from "../services/event.service.js";
 
 import { getEventReviewsService, createEventReviewService, editEventReviewService, 
@@ -351,6 +351,15 @@ export const getAllEventCategoriesController = async(req, res) => {
         const {categories, statusCode, msg} = await getAllEventCategoriesService(req, res);     
         res.status(statusCode).json({categories, msg})
         
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
+
+export const getRecommendedEventsForUserController = async(req, res) => {
+    try {
+        const {events, statusCode, msg} = await getRecommendedEventsForUserService(req, res);
+        res.status(statusCode).json({events, msq})
     } catch (e) {
         res.status(500).send(e.message)
     }

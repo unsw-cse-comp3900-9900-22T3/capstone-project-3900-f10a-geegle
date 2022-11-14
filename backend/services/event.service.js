@@ -3,13 +3,17 @@ import {addEventDb, getAllEventsNotSoldOutDb, getAllEventsDb, getEventByIdDb, ge
         getEventsByHostIdDb, getEventVenueByNameDb, getEventVenueByIdDb, getEventGuestListByIdDb, getHostofEventDb, 
         isSeatedEventDb, addEventVenueDb, publishEventByIdDb, addEventTicketTypeSeatingAllocation,
         unpublishEventByIdDb, removeEventByIdDb, getEventsUserAttendingDb, isEventSoldOutDb, getSoldOutEventsDb,
-        getMatchingEventsDb, getEventsByTicketPriceLimitDb, getAllEventCategoriesDb} 
+        getMatchingEventsDb, getEventsByTicketPriceLimitDb, getAllEventCategoriesDb, getEventsUserAttendingFromHostDb} 
         from '../db/event.db.js' 
 import { getEventReviewsByEventIdDb } from '../db/review.db.js'
 import {addTicketDb} from '../db/ticket.db.js'
 import { getUserByIdDb } from '../db/user.db.js'
 import { isVenueSeatingAvailableDb } from '../db/venueSeating.db.js'
-import { getTicketPurchaseByUserIdDb } from '../db/ticketpurchase.db.js'
+import { getEventsFromUserTicketsDb, getTicketPurchaseByUserIdDb } from '../db/ticketpurchase.db.js'
+import { getAllLPTORankings } from '../utils/lpto.ranking.js'
+import { getEventSimilarityById } from '../db/similarity.db.js'
+import { getEventTicketTypesController } from '../controllers/booking.controller.js'
+import { updateAllEventSimilarity } from '../utils/event.similarity.js'
 
 
 /*  Request
@@ -120,6 +124,10 @@ export const publishEventsService = async(req, res) => {
             return {events: null, statusCode : 400, msg: 'Event is already published'}
         }
         const publishedEvent = await publishEventByIdDb(eventID);
+
+        // updating event similarity 
+        const allEvents = await getAllEventsDb();
+        updateAllEventSimilarity(allEvents);
 
         return {events: {
                     eventID: publishedEvent.eventid,
@@ -638,4 +646,102 @@ export const getAllEventCategoriesService = async() => {
     }
 
     return { categories: categories, statusCode: 200, msg: 'All event categories' }
+}
+
+export const getRecommendedEventsForUserService = async() => {
+    try {    
+        const userID = req.userID;
+        let eventList = await getAllEventsNotSoldOutDb();
+        let upcomingEventList = [];
+        const upcomingEventDateCutoff = new Date().setMonth((new Date().getMonth() + 1))
+        for (let i = 0; i < eventList.length; i++) {
+            if (new Date(eventList[i].startdatetime) >= new Date() && 
+                new Date(eventList[i].startdatetime) <= upcomingEventDateCutoff &&
+                eventList[i].published) {
+                    upcomingEventList.push(eventList[i])
+            }
+        }
+        let events = getAllLPTORankings(upcomingEventList, userID);
+
+        let userEventTickets = getEventsFromUserTicketsDb(userID);
+
+        let eventsCopy = events;
+        let purchasedEvents = [];
+
+        for (let i = 0; i < userEventTickets.length; i++) {
+            for (let j = 0; j < events.length; j++) {
+                if (userEventTickets[i].eventid == events[j].eventid) {
+                    // remove event from recommended if already purchased
+                    purchasedEvents.push(events[j]);
+                    eventsCopy.splice(j, 1);
+                }
+            }
+        }
+        
+        for (let i = 0; i < purchasedEvents.length; i++) {
+            let hostEvents = await getEventsByHostIdDb(purchasedEvents[i].hostid);
+            let userEvents = await getEventsUserAttendingFromHostDb(req.userID, purchasedEvents[i].hostid);
+            let hostCount = 0;
+            let userCount = 0;
+            for (let he in hostEvents) {
+                if (new Date(he.startdatetime) < new Date()) {
+                    hostCount++;
+                }
+            }
+            for (ue in userEvents) {
+                if (new Date(ue.startdatetime) < new Date()) {
+                    userCount++;
+                }
+            }
+
+            let hostAttendRatio = 0;
+            if (hostCount != 0) {
+                hostAttendRatio = userCount / hostCount;
+            }
+            for (let j = 0; j < eventsCopy.length; j++) {
+                let similarityVal = 0.00;
+                if (eventsCopy[j].eventid < purchasedEvents[i].eventid) {
+                    similarityVal = await getEventSimilarityById(eventsCopy[j].eventid, purchasedEvents[i].eventid);
+                } else {
+                    similarityVal = await getEventSimilarityById(purchasedEvents[i].eventid, eventsCopy[j].eventid);
+                }
+                if (eventsCopy[j].hostid == purchasedEvents[i].hostid) {
+                    similarityVal = similarityVal + (hostAttendRatio * similarityVal);
+                }
+                eventsCopy[j][rating] = (eventsCopy[j][rating] || 0) + similarityVal;
+            }
+        }
+        // resolve ties by LPTO rating (LPTO max score is 520 mil)
+        // or sort by LPTO if no tickets have been purchased
+        eventsCopy[j][rating] = (eventsCopy[j][rating] || 0)+ (eventsCopy[j].LPTO / 1140000000);
+        eventsCopy.sort((a,b) => b.rating - a.rating);
+        if (userEventTickets.length == 0) {
+            eventsCopy = events;
+        }
+
+        let recommendedList = []
+        for (let i = 0; i < eventsCopy.length; i++) {
+            recommendedList.push({
+                eventID: eventsCopy[i].eventid,
+                eventName: eventsCopy[i].eventname,
+                hostID: eventsCopy[i].hostid,
+                hostName: eventsCopy[i].firstname + ' ' + eventsCopy[i].lastname,
+                startDateTime: eventsCopy[i].startdatetime,
+                endDateTime: eventsCopy[i].enddatetime,
+                eventDescription: eventsCopy[i].eventdescription,
+                eventType: eventsCopy[i].eventtype,
+                eventVenue: eventsCopy[i].venuename,
+                eventLocation: eventsCopy[i].venuelocation,
+                venueCapacity: eventsCopy[i].maxcapacity,
+                capacity: eventsCopy[i].capacity,
+                totalTicketAmount: eventsCopy[i].totalticketamount,
+                image1: eventsCopy[i].image1,
+                image2: eventsCopy[i].image2,
+                image3: eventsCopy[i].image3
+            });
+        }
+        return {events: recommendedList, statusCode: 200, msg: "Events recommended"}
+    } catch (e) {
+        throw (e)
+    }
 }

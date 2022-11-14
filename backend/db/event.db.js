@@ -32,6 +32,15 @@ const getEventsUserAttendingDb = async(userID) => {
 }
 
 // READ
+const getEventsUserAttendingFromHostDb = async(userID, hostID) => {
+    const result = await db.query (
+        "SELECT DISTINCT e.eventID from ticketPurchases tp " +
+        "JOIN tickets t ON tp.ticketid = t.ticketid " +
+        "JOIN events e ON t.eventID = e.eventID WHERE tp.userID = $1 AND e.hostID = $2", [userID, hostID])
+    return result.rows
+}
+
+// READ
 const getAllEventsNotSoldOutDb = async() => {
     const result = await db.query (
         "SELECT * FROM events e JOIN venues v ON (e.eventVenue = v.venueID) " +
@@ -205,6 +214,7 @@ export {
     getEventByIdDisplayDb,
     getEventsByHostIdDb,
     getEventsUserAttendingDb,
+    getEventsUserAttendingFromHostDb,
     getAllEventsNotSoldOutDb,
     getAllEventsDb,
     getEventVenueByNameDb,

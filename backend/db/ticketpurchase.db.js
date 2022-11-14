@@ -41,12 +41,20 @@ const removeTicketPurchaseByTicketIdDb = async(ticketId) => {
     )
 }
 
-// UPDATE
+
+const getEventsFromUserTicketsDb = async(userID) => {
+    const result = await db.query (
+        "SELECT distinct e.eventid FROM ticketPurchases tp JOIN tickets t on tp.ticketid = t.ticketid JOIN events e on t.eventid = e.eventid " +
+        "JOIN seats s on t.ticketid = s.seatid JOIN venues v on s.venueid = v.venueid WHERE tp.userID = $1", 
+        [userID])
+    return result.rows
+}
 
 export {
     getTicketPurchaseByTicketIdDb,
     getTicketPurchaseByUserIdDb,
     getUserTicketsdDb,
     addTicketPurchaseDb,
-    removeTicketPurchaseByTicketIdDb
+    removeTicketPurchaseByTicketIdDb,
+    getEventsFromUserTicketsDb
 }
