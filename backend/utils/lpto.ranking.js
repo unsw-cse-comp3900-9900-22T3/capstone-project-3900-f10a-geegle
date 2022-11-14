@@ -19,21 +19,26 @@ async function getSingleEventLPTO(event, user) {
     let timeDiff = (currTime - eventStart)/36e5;
     
     let f = feiValue(timeDiff);
+    console.log(f)
     // popularity score p_ei (1 to 5)
     let p = peiValue(event);
+    console.log(p)
     // quality score q_ei (0 - 6)
     let q = qeiValue(event);
+    console(q)
     // a score (1 - 18)
     let a = aValue();
     // b score (1 - 11)
     let b = bValue(timeDiff);
+    console.log(b)
     // multipliers
     const alpha = 1;
     const beta = 2;
     const gamma = 1;
     const delta = 5;
 
-    return f * (p**alpha) * (q**beta) * (a**gamma) * (b**delta);
+    console.log(f * (p ** alpha) * (q ** beta) * (a ** gamma) * (b ** delta));
+    return f * (p ** alpha) * (q ** beta) * (a ** gamma) * (b ** delta);
 
 }
 
