@@ -307,7 +307,6 @@ const SearchFilter = ({openSearch, setOpenSearch, setFilter, setFilteredListings
                     value={eventRating}
                     onChange={(e) => setEventRating(e.target.value)}
                   >
-                    {/* do we need event types stored in the back end (maybe we need to when we filter?) */}
                     <MenuItem value={'1'}>1</MenuItem>
                     <MenuItem value={'2'}>2</MenuItem>
                     <MenuItem value={'3'}>3</MenuItem>
