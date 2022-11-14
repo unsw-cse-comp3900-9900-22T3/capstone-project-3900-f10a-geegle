@@ -28,6 +28,7 @@ function ChildModal({reviewId, eventId}) {
   const [open, setOpen] = React.useState(false);
   const [replies, setReplies] = React.useState([]);
   const [newReply, setNewReply] = React.useState("");
+  const [sentReply, setSentReply] = React.useState(false);
   
   const handleOpen = () => {
     setOpen(true);
@@ -51,9 +52,29 @@ function ChildModal({reviewId, eventId}) {
     })
     
     if (response.ok) {
+      const json = await response.json()
+      let replyObj = JSON.stringify({
+        replies: {
+          replyID: json.replies.replyID,
+          reviewID: json.replies.reviewID,
+          reply: json.replies.reply,
+          repliedOn: json.replies.repliedOn,
+          userID: json.replies.userID,
+          user: json.replies.user
+        }
+      })
       fetchReplies();
       setNewReply("");
-    }
+      const emailRes = await fetch(`http://localhost:3000/events/${eventId}/reviews/${reviewId}/emailReply`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'auth-token': localStorage.getItem('token')
+        },
+        body: replyObj
+      })
+
+      setSentEmail(true);
   }
   const fetchReplies = async() => {
     const response = await fetch(`http://localhost:3000/events/${eventId}/reviews/${reviewId}/reply`, {
@@ -71,6 +92,11 @@ function ChildModal({reviewId, eventId}) {
       }
       setReplies(allReplies)
     }
+  }
+
+  const handleReply = (e) => {
+    setNewReply(e.target.value);
+    setSentReply(false);
   }
 
   React.useEffect(()=> {
@@ -117,7 +143,7 @@ function ChildModal({reviewId, eventId}) {
                   aria-label="Send a Reply"
                   type="text"
                   variant="outlined"
-                  onChange={(e) => setNewReply(e.target.value)}
+                  onChange={(e) => handleReply(e)}
                   value={newReply}
                   fullWidth
 
@@ -127,6 +153,9 @@ function ChildModal({reviewId, eventId}) {
                   onClick={() => handleSendReply() }>
                   Send Reply
               </Button>
+              {sentReply && <Typography variant="h6" component="div" color='green'>
+                Replied and Email has been sent to review authur!
+              </Typography>}
             </FormControl>
           </Box>
           
