@@ -25,7 +25,7 @@ async function getSingleEventLPTO(event, user) {
     console.log(p)
     // quality score q_ei (0 - 6)
     let q = qeiValue(event);
-    console(q)
+    console.log(q)
     // a score (1 - 18)
     let a = aValue();
     // b score (1 - 11)
