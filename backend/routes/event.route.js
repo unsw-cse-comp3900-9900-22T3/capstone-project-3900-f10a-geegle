@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { getEventController, getUpcomingEventsController, getAllEventsController, createEventsController,
          publishEventsController, unpublishEventsController, editEventsController, deleteEventsController, 
          getHostEventsController, getEventsUserAttendingController, getEventGuestListController, getHostDetailsController,
-         isEventSoldOutController, getSoldOutEventsController, getMatchingEventsController, getAllEventCategoriesController, getRecommendedEventsForUserController } 
+         isEventSoldOutController, getSoldOutEventsController, getMatchingEventsController, getAllEventCategoriesController, getRecommendedEventsForUserController, getEventNotificationsController } 
          from '../controllers/event.controller.js'
 import { verifyToken, userLoggedIn } from '../middleware/verifyToken.js';
 import bookingRouter from './booking.route.js';
@@ -29,6 +29,7 @@ eventRouter.get('/:eventID/isSoldOut', userLoggedIn, isEventSoldOutController);
 eventRouter.get('/soldOut', userLoggedIn, getSoldOutEventsController);
 eventRouter.get('/find', userLoggedIn, getMatchingEventsController);
 eventRouter.get('/categories', getAllEventCategoriesController);
+eventRouter.get('/notifications/:eventID', verifyToken, getEventNotificationsController);
 
 eventRouter.use(bookingRouter)
 eventRouter.use(reviewRouter)

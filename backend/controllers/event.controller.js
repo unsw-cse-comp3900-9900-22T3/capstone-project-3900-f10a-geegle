@@ -362,7 +362,24 @@ export const getAllEventCategoriesController = async(req, res) => {
 export const getRecommendedEventsForUserController = async(req, res) => {
     try {
         const {events, statusCode, msg} = await getRecommendedEventsForUserService(req, res);
-        res.status(statusCode).json({events, msg})
+        if (!events) {
+            res.status(statusCode).json(msg)
+        } else {
+            res.status(statusCode).json({events, msg})
+        }
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
+
+export const getEventNotificationsController = async(req, res) => {
+    try {
+        const {event, statusCode, msg} = await getEventNotificationsService(req, res);
+        if (!event) {
+            res.status(statusCode).json(msg)
+        } else {
+            res.status(statusCode).json({event, msg})
+        }
     } catch (e) {
         res.status(500).send(e.message)
     }
