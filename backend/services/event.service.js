@@ -794,8 +794,38 @@ export const getRecommendedEventsForUserService = async(req, res) => {
         }
         // Sorts list by ranking
         recommendedList.sort((a,b) => b.rating - a.rating);
+        // List can be cleansed of ranking if necessary here
         return {events: recommendedList, statusCode: 200, msg: "Events recommended"}
     } catch (e) {
         throw (e)
+    }
+}
+
+export const getEventNotificationsService = async(req, res) => {
+    try {
+        const events = getEventByIdDb(req.params.eventID);
+        if (events.length == 0) {
+            return {statusCode : 404, msg: 'Event does not exist'}
+        }
+
+        const event = events[0]
+        if (event.hostid != req.userID) {
+            return {statusCode: 403, msg: 'You are not the owner of the event'}
+        }
+
+        // Milestones:
+        // Event Published
+        const published = event.published
+        // First 10 Sales
+        const eventTickets = get
+        // 100 sales
+        // Reached 50% sales
+        // Sold out
+        // Received 5 5 star reviews
+        // Received 10 5 star reviews
+
+
+    } catch (e) {
+
     }
 }
