@@ -37,8 +37,8 @@ const addReviewDb = async(eventID, userID, rating, review, postedOn) => {
 // UPDATE
 const editReviewByIdDb = async(reviewID, review, rating, timestamp) => {
     const result = await db.query (
-        "UPDATE reviews SET review = $1, rating = $2, postedOn = $3, edited = $4 WHERE reviewID = $4 RETURNING *",
-        [review, rating, timestamp, reviewID, true]
+        "UPDATE reviews SET review = $1, rating = $2, postedOn = $3, edited = $4 WHERE reviewID = $5 RETURNING *",
+        [review, rating, timestamp, true, reviewID]
     )
     return result.rows[0]
 }

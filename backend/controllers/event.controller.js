@@ -335,7 +335,7 @@ export const getMatchingEventsController = async(req, res) => {
         const { searchWords, from, to, category, location, rating, priceLimit } = req.query
         let userID = req.userID
         if (!userID) userID = 0
-        console.log("hi")
+        
         let events, statusCode, msg
         if (searchWords) {
             ({events, statusCode, msg} = await getEventsSearchedService(searchWords, userID))
