@@ -358,6 +358,13 @@ const HostEventsPage = () => {
                       {obj.published && <Button size="small" onClick={()=>handleViewCustomers(obj)}>Customers</Button>}
                       {obj.published && <Button size="small" onClick={()=>openConfirmModal(obj, idx)}>Cancel</Button>}
                       {!obj.published && <Button size="small" onClick={e=>handlePublish(obj, idx)}>publish</Button>}
+                      <Button 
+                        component={Link}
+                        to= {{pathname: `/events/${obj.eventID}/dashboard`}}
+                        state= {obj}
+                        size="small">
+                          Dashboard
+                      </Button>
                     </CardActions>
                   </Box>
                 </Box>

@@ -13,6 +13,8 @@ import MyEvents from './pages/myEvents';
 import HostProfile from './components/hostProfile'
 import UserViewPurchasedTix from './components/UserViewPurchasedTix';
 import EventCalendar from './components/eventCalendar';
+import Dashboard from './components/dashboard';
+
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   return (
@@ -33,6 +35,7 @@ function App() {
           <Route exact path={`/host/:hostId/profile`} element={<HostProfile/>}></Route>
           <Route exact path={`/events/user/tickets/:eventId`} element={<UserViewPurchasedTix/>}></Route>
           <Route exact path={`/events/calendar`} element={<EventCalendar/>}></Route>
+          <Route exact path={`/events/:eventId/dashboard`} element={<Dashboard/>}></Route>
         </Routes>
       </Router>
     </>
