@@ -35,10 +35,19 @@ export const createEventsService = async(req, res) => {
             eventDescription, eventType, eventVenue, capacity,
             image1, image2, image3} = events
         
+        if (!eventName) {
+            return {events: null, statusCode : 400, msg: 'Event name cannot be empty'}
+        }
+
+        if (!eventDescription) {
+            return {events: null, statusCode : 400, msg: 'Event description cannot be empty'}
+        }
+
         if (endDateTime <= startDateTime) {
             return {events: null, statusCode : 400, msg: 'Invalid Starting and Finishing Times'}
         }
-        if (capacity <= 0) {
+
+        if (capacity <= 0 || capacity.indexOf(".") !== -1) {
             return {events: null, statusCode : 400, msg: 'Invalid Capacity'}
         }
 
@@ -46,8 +55,16 @@ export const createEventsService = async(req, res) => {
             return {events: null, statusCode : 400, msg: 'Invalid Event Date'}
         }
 
+        if (tickets.length === 0) {
+            return {events: null, statusCode : 400, msg: 'Event must have tickets'}
+        }
+
         let totalTickets = 0;
         for (let i = 0; i < tickets.length; i++) {
+            if (!tickets[i].ticketType || tickets[i].ticketAmount < 0 || 
+                Math.floor(tickets[i].ticketAmount) !== tickets[i].ticketAmount || tickets[i].price < 0) {
+                return {events: null, statusCode : 400, msg: 'Invalid ticket'}
+            }
             totalTickets += tickets[i].ticketAmount
         }
 
