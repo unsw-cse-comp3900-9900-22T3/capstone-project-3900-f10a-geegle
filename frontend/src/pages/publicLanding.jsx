@@ -24,7 +24,6 @@ const SearchButton = styled(Button)({
   padding: 8,
   borderRadius: 4,
   width: '15%',
-  height: '15%',
   margin: '1%'
 });
 
