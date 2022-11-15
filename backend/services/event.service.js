@@ -456,6 +456,9 @@ export const getHostDetailsService = async(req, res) => {
         let runningTotalReviewRatings = 0.00;
         let totalReviews = 0;
         for (let i = 0; i < eventsByHost.length; i++) {
+            if (eventsByHost[i].published == false) {
+                continue;
+            }
             let eventReviews = await getEventReviewsByEventIdDb(eventsByHost[i].eventid);
             let eventReviewNum = 0;
             let eventReviewScore = 0.00;
