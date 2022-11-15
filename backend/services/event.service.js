@@ -9,11 +9,12 @@ import { getReplyAmountByReviewIDDb } from '../db/reply.db.js'
 import { addTicketDb, unassignEventSeatsDb } from '../db/ticket.db.js'
 import { getUserByIdDb } from '../db/user.db.js'
 import { isVenueSeatingAvailableDb } from '../db/venueSeating.db.js'
-import { getEventsFromUserTicketsDb, getTicketPurchaseByUserIdDb, removeTicketPurchaseByEventIdDb } from '../db/ticketpurchase.db.js'
+import { getEventsFromUserTicketsDb, getTicketPurchaseByEventIdDb, getTicketPurchaseByUserIdDb, removeTicketPurchaseByEventIdDb } from '../db/ticketpurchase.db.js'
 import { getAllLPTORankings } from '../utils/lpto.ranking.js'
 import { getEventSimilarityById } from '../db/similarity.db.js'
 import { getEventTicketTypesController } from '../controllers/booking.controller.js'
 import { updateAllEventSimilarity } from '../utils/event.similarity.js'
+import { addPageViewToMetricDb, getEventMetricsDb } from '../db/dashboard.db.js'
 
 
 /*  Request
@@ -214,6 +215,8 @@ export const getEventService = async(req, res) => {
         if (!userID) userID = 0
         const seating = await isSeatedEventDb(req.params.eventID)
         const reviewRating = await eventRatingScore(event[0].eventid, userID)
+        addPageViewToMetricDb(req.params.eventID, 1, new Date().setHours(0,0,0,0), 0);
+        
         return {event: {
                     eventID: event[0].eventid,
                     eventName: event[0].eventname,
@@ -801,7 +804,7 @@ export const getRecommendedEventsForUserService = async(req, res) => {
     }
 }
 
-export const getEventNotificationsService = async(req, res) => {
+export const getEventDataService = async(req, res) => {
     try {
         const events = getEventByIdDb(req.params.eventID);
         if (events.length == 0) {
@@ -813,19 +816,110 @@ export const getEventNotificationsService = async(req, res) => {
             return {statusCode: 403, msg: 'You are not the owner of the event'}
         }
 
+        // Sorts purchased tickets by date of purchase
+        const eventTicketsPurchased = await getTicketPurchaseByEventIdDb(event.eventid);
+        eventTicketsPurchased.sort((a,b) => a.getTime() - b.getTime());
+
+        let ticketPurchases = [];
+        let ticketRevenue = [];
+        let pageViews = [];
+        let totalPageViews = 0;
+        let totalTicketPurchaseEvents = 0;
+        let totalRevenue = 0;
+        let ticketDayStart;
+        if (eventTicketsPurchased.length != 0) {
+            ticketDayStart = new Date (eventTicketsPurchased[0].ticketpurchasetime);
+            ticketDayStart.setHours(0,0,0,0);
+            let currDate = new Date()
+            while (ticketDayStart <= currDate) {
+                let purchases = 0;
+                let revenue = 0;
+                let nextDay = new Date (ticketDayStart.setDate(ticketDayStart.getDate() + 1))
+                for (let i = 0; i < eventTicketsPurchased.length; i++) {
+                    if (eventTicketsPurchased[i].ticketpurchasetime >= ticketDayStart &&
+                        eventTicketsPurchased[i].ticketpurchasetime < nextDay) {
+                        purchases += 1;
+                        revenue += eventTicketsPurchased[i].price;
+                        totalRevenue += eventTicketsPurchased[i].price;
+                    }
+                    
+                }
+                ticketPurchases.push({
+                   ticketPurchases : purchases,
+                   date : ticketDayStart
+                });
+                
+                ticketRevenue.push({
+                    ticketRevenue : revenue,
+                    date: ticketDayStart
+                });
+                let pageMetrics = getEventMetricsDb(event.eventid, ticketDayStart);
+                let numViews = 0;
+                if (pageViews.length != 0) {
+                    numViews = pageMetrics[0].pageviews;
+                    totalPageViews += pageMetrics[0].pageviews;
+                    totalTicketPurchaseEvents += pageMetrics[0].ticketcheckouts;
+                }
+                pageViews.push({
+                    pageViews : numViews,
+                    date: ticketDayStart
+                });
+
+                ticketDayStart = nextDay;
+            }
+        }
+
+        let totalConversion = 0.00;
+        if (totalPageViews != 0) {
+            totalConversion = totalTicketPurchaseEvents / totalPageViews;
+        }
+
         // Milestones:
         // Event Published
-        const published = event.published
+        const isEventPublished = event.published;
+        
         // First 10 Sales
-        const eventTickets = get
-        // 100 sales
+        const first10 = (eventTicketsPurchased.length >= 10);
+
         // Reached 50% sales
+        const fiftyPercent = ((eventTicketsPurchased.length / event.totalticketamount) >= 0.5);
+
+        // Reached 75% sales
+        const seventyfivePercent = ((eventTicketsPurchased.length / event.totalticketamount) >= 0.75);
+        
         // Sold out
+        const soldOut = ((eventTicketsPurchased.length / event.totalticketamount) >= 1.00);
+        
+        const eventReviews = getEventReviewsByEventIdDb(event.eventid)
+        let fiveStarReviews = 0;
+        for (let i = 0; i < eventReviews.length; i++) {
+            if (eventReviews[i].rating == 5) {
+                fiveStarReviews++;
+            }
+        }
+
         // Received 5 5 star reviews
+        const fiveMaxReviews = (fiveStarReviews >= 5);
         // Received 10 5 star reviews
+        const tenMaxReviews = (fiveStarReviews >= 10);
 
 
+        return ({ stats: {
+            ticketPurchaseChart: ticketPurchases,
+            ticketRevenueChart: ticketRevenue,
+            pageViewChart: pageViews,
+            conversionRate: totalConversion,
+            revenue: totalRevenue,
+            ticketsSold: eventTicketsPurchased.length,
+            eventPublished: isEventPublished,
+            firstTenSales: first10,
+            fiftyPercentSales: fiftyPercent,
+            seventyFivePercentSales: seventyfivePercent,
+            soldOut: soldOut,
+            fiveFiveStars: fiveMaxReviews,
+            tenFiveStars: tenMaxReviews
+        }, statusCode: 200, msg: "Dashboard Stats Generated"});
     } catch (e) {
-
+        throw e
     }
 }

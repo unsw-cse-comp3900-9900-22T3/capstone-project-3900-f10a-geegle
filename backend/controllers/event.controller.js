@@ -1,7 +1,7 @@
 import { createEventsService, publishEventsService, unpublishEventsService, editEventsService, deleteEventsService, 
          getEventService, getUpcomingEventsService, getAllEventsService, getHostEventsService, getHostDetailsService, 
          getEventsUserAttendingService, getEventGuestListService, isEventSoldOutService, getSoldOutEventsService,
-         getEventsSearchedService, getEventsFilteredService, getAllEventCategoriesService, getRecommendedEventsForUserService } 
+         getEventsSearchedService, getEventsFilteredService, getAllEventCategoriesService, getRecommendedEventsForUserService, getEventDataService } 
          from "../services/event.service.js";
 
 import { getEventReviewsService, createEventReviewService, editEventReviewService, 
@@ -372,9 +372,9 @@ export const getRecommendedEventsForUserController = async(req, res) => {
     }
 }
 
-export const getEventNotificationsController = async(req, res) => {
+export const getEventDataController = async(req, res) => {
     try {
-        const {event, statusCode, msg} = await getEventNotificationsService(req, res);
+        const {event, statusCode, msg} = await getEventDataService(req, res);
         if (!event) {
             res.status(statusCode).json(msg)
         } else {

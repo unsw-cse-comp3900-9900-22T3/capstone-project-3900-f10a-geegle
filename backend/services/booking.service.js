@@ -4,6 +4,7 @@ import * as eventdb from '../db/event.db.js'
 import * as ticketPurchasedb from '../db/ticketpurchase.db.js'
 import * as userdb from '../db/user.db.js'
 import nodemailer from 'nodemailer'
+import { addTicketCheckoutsToMetricDb, getEventMetricsDb } from '../db/dashboard.db.js'
 
 export const getEventTicketTypesService = async(req, res) => {
     try {
@@ -345,7 +346,8 @@ export const bookEventService = async(req, res) => {
                                     ticketPurchaseTime: ticketPurchase.ticketpurchasetime })
             
         }
-
+        const metrics = await getEventMetricsDb(eventID, new Date().setHours(0,0,0,0));
+        addTicketCheckoutsToMetricDb(eventID, metrics[0].pageviews, new Date().setHours(0,0,0,0), 1);
         return { booking: ticketPurchases, statusCode: 200, msg: `Tickets purchased to Event ${eventID}`}
 
     } catch (error) {
