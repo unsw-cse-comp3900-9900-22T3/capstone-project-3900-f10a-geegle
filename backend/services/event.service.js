@@ -35,10 +35,19 @@ export const createEventsService = async(req, res) => {
             eventDescription, eventType, eventVenue, capacity,
             image1, image2, image3} = events
         
+        if (!eventName) {
+            return {events: null, statusCode : 400, msg: 'Event name cannot be empty'}
+        }
+
+        if (!eventDescription) {
+            return {events: null, statusCode : 400, msg: 'Event description cannot be empty'}
+        }
+
         if (endDateTime <= startDateTime) {
             return {events: null, statusCode : 400, msg: 'Invalid Starting and Finishing Times'}
         }
-        if (capacity <= 0) {
+
+        if (capacity <= 0 || capacity.indexOf(".") !== -1) {
             return {events: null, statusCode : 400, msg: 'Invalid Capacity'}
         }
 
@@ -46,8 +55,16 @@ export const createEventsService = async(req, res) => {
             return {events: null, statusCode : 400, msg: 'Invalid Event Date'}
         }
 
+        if (tickets.length === 0) {
+            return {events: null, statusCode : 400, msg: 'Event must have tickets'}
+        }
+
         let totalTickets = 0;
         for (let i = 0; i < tickets.length; i++) {
+            if (!tickets[i].ticketType || tickets[i].ticketAmount < 0 || 
+                Math.floor(tickets[i].ticketAmount) !== tickets[i].ticketAmount || tickets[i].price < 0) {
+                return {events: null, statusCode : 400, msg: 'Invalid ticket'}
+            }
             totalTickets += tickets[i].ticketAmount
         }
 
@@ -538,7 +555,7 @@ export const getSoldOutEventsService = async(req, res) => {
                 capacity: eventList[i].capacity,
                 totalTicketAmount: eventList[i].totalticketamount,
                 reviews: reviewRating.reviews,
-                eventRating: reviewRating.rating,
+                averageRating: reviewRating.rating,
                 soldOut: true,
                 image1: eventList[i].image1,
                 image2: eventList[i].image2,
@@ -789,6 +806,8 @@ export const getRecommendedEventsForUserService = async(req, res) => {
 
         let recommendedList = []
         for (let i = 0; i < eventsCopy.length; i++) {
+            const reviewRating = await eventRatingScore(eventsCopy[i].eventid, userID)
+            const soldOut = await isEventSoldOutDb(eventsCopy[i].eventid)
             recommendedList.push({
                 eventID: eventsCopy[i].eventid,
                 eventName: eventsCopy[i].eventname,
@@ -803,6 +822,9 @@ export const getRecommendedEventsForUserService = async(req, res) => {
                 venueCapacity: eventsCopy[i].maxcapacity,
                 capacity: eventsCopy[i].capacity,
                 totalTicketAmount: eventsCopy[i].totalticketamount,
+                reviews: reviewRating.reviews,
+                averageRating: reviewRating.rating,
+                soldOut: soldOut.length ? true : false,
                 image1: eventsCopy[i].image1,
                 image2: eventsCopy[i].image2,
                 image3: eventsCopy[i].image3,
