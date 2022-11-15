@@ -29,6 +29,7 @@ function ChildModal({reviewId, eventId}) {
   const [replies, setReplies] = React.useState([]);
   const [newReply, setNewReply] = React.useState("");
   const [sentReply, setSentReply] = React.useState(false);
+  const [loginErr, setLoginErr] = React.useState(false);
   
   const handleOpen = () => {
     setOpen(true);
@@ -54,6 +55,7 @@ function ChildModal({reviewId, eventId}) {
     // const json = await response.json();
     // console.log(json);
     if (response.ok) {
+      setLoginErr(false);
       const json = await response.json()
       let replyObj = JSON.stringify({
         replies: {
@@ -80,6 +82,8 @@ function ChildModal({reviewId, eventId}) {
       console.log(jsonEmail);
 
       setSentReply(true);
+    } else if(response.status === 401) {
+      setLoginErr(true);
     }
   }
   const fetchReplies = async() => {
@@ -162,6 +166,9 @@ function ChildModal({reviewId, eventId}) {
               {sentReply && <Typography variant="h6" component="div" color='green'>
                 Replied and Email has been sent to review authur!
               </Typography>}
+              {loginErr && <Typography variant="h6" component="div" color='red'>
+                Please login to leave a reply!
+              </Typography>}
             </FormControl>
           </Box>
           
@@ -177,7 +184,7 @@ function ChildModal({reviewId, eventId}) {
   );
 }
 
-const ViewReviews = ({showReviews, setShowReviews, eventReviews, eventId}) => {
+const ViewReviews = ({showReviews, setShowReviews, eventReviews, eventId,getEventInfo}) => {
   // const [open, setOpen] = React.useState(false);
   // const handleOpen = () => {
   //   setOpen(true);
@@ -224,6 +231,7 @@ const ViewReviews = ({showReviews, setShowReviews, eventReviews, eventId}) => {
       const jsonReviewLiked = await (response.json());
       console.log('jsonReviewLiked', jsonReviewLiked);
       await fetchReviews(eventId);
+      await getEventInfo();
     } else if (response.status === 401){
       console.log('here');
       setloginErr(true);
@@ -279,6 +287,7 @@ const ViewReviews = ({showReviews, setShowReviews, eventReviews, eventId}) => {
       const jsonReviewUnLiked = await (response.json());
       console.log('jsonReviewUnliked', jsonReviewUnLiked);
       await fetchReviews(eventId);
+      await getEventInfo();
     } else if (response.status === 401){
       setloginErr(true);
     }

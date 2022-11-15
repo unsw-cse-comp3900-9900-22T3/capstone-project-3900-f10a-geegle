@@ -446,7 +446,7 @@ const ViewEvent= () => {
                 </svg>
               ))}
           </Box>
-          {showReviews && <ViewReviews showReviews={showReviews} setShowReviews={setShowReviews} eventReviews={eventInfo.reviews} eventId={eventId}/>}
+          {showReviews && <ViewReviews showReviews={showReviews} setShowReviews={setShowReviews} eventReviews={eventInfo.reviews} eventId={eventId} getEventInfo={getEventInfo}/>}
         </Box>
       </Box>
     </>
