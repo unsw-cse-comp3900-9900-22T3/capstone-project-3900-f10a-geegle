@@ -35,7 +35,11 @@ const style = {
 const HostProfile=()=> {
 
   const [open, setOpen] = useState(true);
-  const [hostInfo, setHostInfo] = useState([]);
+  const [hostInfo, setHostInfo] = useState({
+    hostName: "",
+    hostRating: 0,
+    hostEmail:""
+  });
   const [hostEvents, setHostEvents] = useState([]);
   const navigate = useNavigate();
   const {hostId} = useParams();
@@ -61,6 +65,9 @@ const HostProfile=()=> {
     })
     const json = await response.json();
     setHostInfo(json)
+    const allEvents = json.events;
+    const hostPublishedEvent = allEvents.filter((ele,idx) => ele.published === true);
+    console.log(hostPublishedEvent);
     setHostEvents(json.events);
     console.log(json)
   }
@@ -79,19 +86,19 @@ const HostProfile=()=> {
         arial-modal={true}
       >
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
+          <Typography id="host description profile" variant="h6" component="h2">
             Host Profile
           </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+          <Typography id="host description name" sx={{ mt: 2 }}>
             Host Name: {hostInfo.hostName}
           </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            Host Rating: {hostInfo.hostRating}
+          <Typography id="host description rating" sx={{ mt: 2 }}>
+            Host Rating: {parseFloat(hostInfo.hostRating).toFixed(2)}
           </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+          <Typography id="host description rating email" sx={{ mt: 2 }}>
             Host Email: {hostInfo.hostEmail}
           </Typography>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
+          <Typography id="host description rating breakdown" variant="h6" component="h2">
             Host Event Rating Breakdown:
           </Typography>
           {hostEvents.map((obj,idx) => {

@@ -88,14 +88,6 @@ const PublishedCard = ({
                 size="small">
                   view
               </Button>
-              {eventObj.eventID === true} ? ()
-              <Button 
-                component={Link}
-                to= {{pathname: `/event/view/${eventObj.eventID}`}}
-                state= {eventObj}
-                size="small">
-                  view
-              </Button>
             </CardActions>
           </Box>
         </Box>
