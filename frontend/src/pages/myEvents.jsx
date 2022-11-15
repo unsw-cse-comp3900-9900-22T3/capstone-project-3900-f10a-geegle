@@ -22,10 +22,12 @@ const MyEvents = () => {
   const [myReview, setMyReview] = React.useState('');
   const [editForm, setEditForm] = React.useState(false);
   const [editFormObj, setEditFormObj] = React.useState({});
+  const [reviewFormObj, setReviewFormObj] = React.useState({});
   const [puchasedModal, setPuchasedModal] = React.useState(false);
 
 
-  const handleForm = () => {
+  const handleForm = (obj) => {
+    setReviewFormObj(obj);
     if(openReviewForm) {
       setOpenReviewForm(false);
     } else {
@@ -37,21 +39,12 @@ const MyEvents = () => {
     setEditFormObj(obj);
     if(editForm) {
       setEditForm(false);
-      // setEditFormObj(obj);
     } else {
       setEditForm(true);
-      //setEditFormObj({});
       
     }
   }
   const getReviews = async(eventId) => {
-    // let userID = -1;
-    // if (!localStorage.getItem('userId')) {
-    //   userID = -1;
-    // } else {
-    //   userID = parseInt(localStorage.getItem('userId'))
-    // }
-    // console.log("here", userID);
     let json = []
 
     if (localStorage.getItem('token')) { 
@@ -70,7 +63,6 @@ const MyEvents = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        // body: JSON.stringify({userID:userID }),
       })
       json = await response.json();
     }
@@ -87,9 +79,6 @@ const MyEvents = () => {
       }
       averageRating = (totalRating)/(json.reviews.length)
       ratingRatio = (totalRating)/(json.reviews.length * 5)
-      // setRatingRatio(ratingRatio)
-      // setAverageRating(averageRating)
-      // setReviews(allReviews)
     }
     allInfo = [allReviews, averageRating, ratingRatio];
     return allInfo;
@@ -126,41 +115,30 @@ const MyEvents = () => {
       },
     });
     const json = await response.json();
+    console.log('attending events json',json);
     const allMyEvents = []
     for (const event of json.events) {
-      const eventId = event.eventID;
-      const eventInfoRes = await fetch(`http://localhost:3000/events/${eventId}/info`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          //'auth-token': localStorage.getItem('token'),
-        },
-      });
-      const eventJson = (await eventInfoRes.json()).event;
-      const allInfoArray = await getReviews(eventId);
-      const editedInfo = await checkReview(eventId);
-      console.log('editedInfo', editedInfo)
-      console.log(eventJson);
-
+      const allInfoArray = await getReviews(event.eventID);
+      const editedInfo = await checkReview(event.eventID);
       allMyEvents.push({
-        venueCapacity: eventJson.venueCapacity,
-        capacity: eventJson.capacity,
-        endDateTime: eventJson.endDateTime,
-        eventDescription: eventJson.eventDescription,
-        eventID: eventJson.eventID,
-        eventLocation: eventJson.eventLocation,
-        eventName: eventJson.eventName,
-        eventType: eventJson.eventType,
-        eventVenue: eventJson.eventVenue,
-        hostID: eventJson.hostID,
-        hostName: eventJson.hostName,
-        image1: eventJson.image1,
-        image2: eventJson.image2,
-        image3: eventJson.image3,
-        seatedEvent: eventJson.seatedEvent,
-        published: eventJson.published,
-        startDateTime: eventJson.startDateTime,
-        totalTicketAmount:eventJson.totalTicketAmount,
+        venueCapacity: event.venueCapacity,
+        capacity: event.capacity,
+        endDateTime: event.endDateTime,
+        eventDescription: event.eventDescription,
+        eventID: event.eventID,
+        eventLocation: event.eventLocation,
+        eventName: event.eventName,
+        eventType: event.eventType,
+        eventVenue: event.eventVenue,
+        hostID: event.hostID,
+        hostName: event.hostName,
+        image1: event.image1,
+        image2: event.image2,
+        image3: event.image3,
+        seatedEvent: event.seatedEvent,
+        published: event.published,
+        startDateTime: event.startDateTime,
+        totalTicketAmount:event.totalTicketAmount,
         reviews: allInfoArray[0],
         averageRating: allInfoArray[1],
         ratingRatio: allInfoArray[2],
@@ -190,7 +168,7 @@ const MyEvents = () => {
       {attendingEvents.map((obj, idx) => {
       return (
       <Grid container item xs={12} >
-        <LeaveReviewForm openReviewForm={openReviewForm} setOpenReviewForm={setOpenReviewForm} obj={obj}></LeaveReviewForm>
+        <LeaveReviewForm openReviewForm={openReviewForm} setOpenReviewForm={setOpenReviewForm} obj={reviewFormObj}></LeaveReviewForm>
         {editForm && <EditReviewForm editForm={editForm} setEditForm={setEditForm} obj={editFormObj}></EditReviewForm>}
         <Card key={idx} style={{display: 'flex', width: '100%', height:'20rem'}} >
           <Box id="card media" width = "40%" >
@@ -268,17 +246,9 @@ const MyEvents = () => {
                 >
                     view your order
                 </Button>
-                {/* <Button 
-                  onClick = {()=>setPuchasedModal(true)}
-                >
-                  
-                </Button> */}
-                {!obj.leftReview && <Button onClick={handleForm}>
+                {!obj.leftReview && <Button onClick={()=>handleForm(obj)}>
                   Leave Review
                 </Button>}
-                {/* <Button onClick={handleForm}>
-                  Leave Review
-                </Button> */}
                 {obj.leftReview && <Button onClick={()=>handleEdit(obj)}>Edit Review</Button>}
               </CardActions>
             </Box>
