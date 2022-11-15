@@ -51,6 +51,7 @@ const PublicLanding = () => {
   const [allListings, setAllListings] = React.useState([]);
   const [upcomingListings, setUpcomingListings] = React.useState([]);
   const [soldOut, setSoldOut] = React.useState([]);
+  const [recommended, setRecommended] = React.useState([]);
   const [reviews, setReviews] = React.useState([]);
   const [averageRatingHook, setAverageRating] =React.useState(0);
   const [ratingRatioHook, setRatingRatio] = React.useState(0);
@@ -61,7 +62,7 @@ const PublicLanding = () => {
   const [filteredListings, setFilteredListings] = React.useState([]);
   const navigate = useNavigate();
 
-  console.log('filtered Listings', filteredListings);
+  //console.log('filtered Listings', filteredListings);
  
   const getReviews = async(eventId) => {
     let json = []
@@ -230,6 +231,21 @@ const PublicLanding = () => {
       }
       setUpcomingListings(events);
   }
+
+  const fetchRecommended = async() => {
+    const response = await fetch(`http://localhost:3000/events/recommended`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'auth-token': localStorage.getItem('token')
+      },
+
+    })
+    
+    const eventJson = (await response.json()).events;
+    console.log(eventJson);
+    setRecommended([...eventJson]);
+  }
   const handleChange = (event, newAlignment) => {
     setToggleState(newAlignment);
     if (newAlignment === "Upcoming Events") {
@@ -237,9 +253,9 @@ const PublicLanding = () => {
     } else if (newAlignment === "All Events") {
       fetchAllEvents();
     } else if (newAlignment === "Sold Out") {
-      //fetchSoldOut();
+      fetchSoldOut();
     } else if (newAlignment === "For You") {
-      //fetchSoldOut();
+      fetchRecommended();
     }
     
   };
@@ -254,6 +270,7 @@ const PublicLanding = () => {
     fetchAllEvents();
     //fetchUpcomingEvents();
     //fetchSoldOut();
+    //fetchRecommend();
   }, []);
   
   return (
@@ -278,7 +295,10 @@ const PublicLanding = () => {
             <ToggleButton value="All Events">All Events</ToggleButton>
             <ToggleButton value="Upcoming Events">Upcoming Events</ToggleButton>
             <ToggleButton value="Sold Out">Sold Out</ToggleButton>
-            <ToggleButton value="For You">For You</ToggleButton>
+            {localStorage.getItem('token') !== null ? (
+              <ToggleButton value="For You">For You</ToggleButton>
+            ):null}
+            
           </ToggleButtonGroup>
           ): null}
         </Box>
@@ -299,12 +319,18 @@ const PublicLanding = () => {
               <PublishedCard eventObj ={obj.eachEvent} idx={idx} />
             )}
           )}
-          {/* {(!filter && toggleState === 'Sold Out') && 
+          {(!filter && toggleState === 'Sold Out') && 
             soldOut.map((obj, idx) => {
             return (
               <PublishedCard eventObj ={obj} idx={idx} />
             )}
-          )} */}
+          )}
+          {(!filter && toggleState === 'For You') && 
+            recommended.map((obj, idx) => {
+            return (
+              <PublishedCard eventObj ={obj} idx={idx} />
+            )}
+          )}
         </Grid>
       </Grid>
     </Grid>

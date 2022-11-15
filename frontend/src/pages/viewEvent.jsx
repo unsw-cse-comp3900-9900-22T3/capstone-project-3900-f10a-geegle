@@ -93,7 +93,6 @@ const ViewEvent= () => {
   const { eventId} = useParams();
   const state = useLocation();
   const eventObj = state.state;
-  //console.log('here', eventObj);
   const [eventInfo, setEventInfo] = useState({
     capacity: '',
     endDateTime: '',
@@ -219,7 +218,6 @@ const ViewEvent= () => {
   //   }
   // }
   const handleTicketModal = () => {
-    //setTicketModal(false);
     if (localStorage.getItem('token') !== null) {
       setTicketModal(true);
       setLogInPrompt(false);
@@ -249,7 +247,6 @@ const ViewEvent= () => {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        // 'auth-token': localStorage.getItem('token'),
       },
     })
     const json = await response.json();
@@ -263,9 +260,6 @@ const ViewEvent= () => {
   const getEventInfo = async() => {
 
     let response = '';
-    // let eventJson = {};
-    // let eventDetails = {};
-    console.log('here');
     if(localStorage.getItem('token')) {
       response = await fetch(`http://localhost:3000/events/${eventId}/info`, {
         method: 'GET',
@@ -374,6 +368,7 @@ const ViewEvent= () => {
                 </Button>)}
               {ticketModal === true ? (
                 <PurchaseTicket 
+                  getEventInfo = {getEventInfo}
                   eventInfo = {eventInfo} 
                   setEventInfo={setEventInfo} 
                   ticketModal={ticketModal} 
