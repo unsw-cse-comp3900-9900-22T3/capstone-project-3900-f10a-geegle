@@ -25,7 +25,8 @@ import { KeyboardReturnRounded } from '@mui/icons-material';
 const PurchaseSuccessModal = ({
   setCheckoutSuccess,
   checkoutSuccess,
-  closeTicketModal
+  closeTicketModal,
+  getEventInfo
 }) => {
   const style = {
     position: 'absolute',
@@ -48,6 +49,7 @@ const PurchaseSuccessModal = ({
   const handleClose = () => {
     closeTicketModal();
     setCheckoutSuccess(false);
+    getEventInfo();
   }
   return (
     <Modal
@@ -76,6 +78,7 @@ const PurchaseSuccessModal = ({
 
 
 const PurchaseTicket= ({
+  getEventInfo,
   eventInfo, 
   setEventInfo, 
   ticketModal, 
@@ -453,7 +456,8 @@ const PurchaseTicket= ({
             <PurchaseSuccessModal 
               setCheckoutSuccess = {setCheckoutSuccess}
               checkoutSuccess = {checkoutSuccess}
-              closeTicketModal = {closeTicketModal}/>
+              closeTicketModal = {closeTicketModal}
+              getEventInfo = {getEventInfo}/>
           ) 
           : null} 
         
