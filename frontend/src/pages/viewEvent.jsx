@@ -93,7 +93,7 @@ const ViewEvent= () => {
   const { eventId} = useParams();
   const state = useLocation();
   const eventObj = state.state;
-  console.log(eventObj);
+  //console.log('here', eventObj);
   const [eventInfo, setEventInfo] = useState({
     capacity: '',
     endDateTime: '',
@@ -114,6 +114,8 @@ const ViewEvent= () => {
     published: '',
     startDateTime: '',
     totalTicketAmount:'',
+    reviews:[],
+    averageRating:0
   });
   const [hostName, setHostName] = useState('');
   const [imageArray, setImageArray] = useState([]);
@@ -258,44 +260,63 @@ const ViewEvent= () => {
     setAllTicketTypes(tickets);
   }
   const getEventInfo = async() => {
-    const response = await fetch(`http://localhost:3000/events/${eventId}/info`, {
-      method: 'GET'
-    })
-    const eventJson = (await response.json()).event;
-    const eventDetails = {
-      venueCapacity: eventJson.venueCapacity,
-      capacity: eventJson.capacity,
-      endDateTime: eventJson.endDateTime,
-      eventDescription: eventJson.eventDescription,
-      eventID: eventJson.eventID,
-      eventLocation: eventJson.eventLocation,
-      eventName: eventJson.eventName,
-      eventType: eventJson.eventType,
-      eventVenue: eventJson.eventVenue,
-      eventVenueId: eventJson.eventVenueId,
-      hostEmail: eventJson.hostEmail,
-      seatedEvent: eventJson.seatedEvent,
-      hostID: eventJson.hostID,
-      hostName: eventJson.hostName,
-      image1: eventJson.image1,
-      image2: eventJson.image2,
-      image3: eventJson.image3,
-      published: eventJson.published,
-      startDateTime: eventJson.startDateTime,
-      totalTicketAmount:eventJson.totalTicketAmount,
+
+    let response = '';
+    // let eventJson = {};
+    // let eventDetails = {};
+    console.log('here');
+    if(localStorage.getItem('token')) {
+      response = await fetch(`http://localhost:3000/events/${eventId}/info`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'auth-token': localStorage.getItem('token'),
+        },
+      })
+    } else {
+      response = await fetch(`http://localhost:3000/events/${eventId}/info`, {
+        method: 'GET'
+      })
     }
-    console.log(eventDetails);
-    const fetchedImages = [eventDetails.image1,eventDetails.image2, eventDetails.image3];
-    const nonEmptyImages = fetchedImages.filter(image => {
-      return image !== "";
-    });
-    console.log("non empty image",nonEmptyImages);
-    console.log(eventDetails);
-    setImageArray(nonEmptyImages);
-    setEventInfo({...eventDetails});
-     //getHostInfo(eventDetails);
-      
+
+    
+    const eventJson = (await response.json()).event;
+    console.log(eventJson);
+      const eventDetails = {
+        venueCapacity: eventJson.venueCapacity,
+        capacity: eventJson.capacity,
+        endDateTime: eventJson.endDateTime,
+        eventDescription: eventJson.eventDescription,
+        eventID: eventJson.eventID,
+        eventLocation: eventJson.eventLocation,
+        eventName: eventJson.eventName,
+        eventType: eventJson.eventType,
+        eventVenue: eventJson.eventVenue,
+        eventVenueId: eventJson.eventVenueId,
+        hostEmail: eventJson.hostEmail,
+        seatedEvent: eventJson.seatedEvent,
+        hostID: eventJson.hostID,
+        hostName: eventJson.hostName,
+        image1: eventJson.image1,
+        image2: eventJson.image2,
+        image3: eventJson.image3,
+        published: eventJson.published,
+        startDateTime: eventJson.startDateTime,
+        totalTicketAmount:eventJson.totalTicketAmount,
+        averageRating:eventJson.averageRating,
+        reviews:eventJson.reviews
+      }
+      console.log(eventDetails);
+      const fetchedImages = [eventDetails.image1,eventDetails.image2, eventDetails.image3];
+      const nonEmptyImages = fetchedImages.filter(image => {
+        return image !== "";
+      });
+      console.log("non empty image",nonEmptyImages);
+      console.log('hello', eventDetails);
+      setImageArray(nonEmptyImages);
+      setEventInfo({...eventDetails});
   }
+
   useEffect(()=> {
     getEventInfo();
     getTicketInfo();
@@ -390,9 +411,9 @@ const ViewEvent= () => {
           </Box>
           <Box>
             <Stack spacing={2} direction="row">
-              <Button variant="outlined" onClick={handleShowReviews}>{`Reviews (${eventObj.reviews.length})`}</Button>
+              <Button variant="outlined" onClick={handleShowReviews}>{`Reviews (${eventInfo.reviews.length})`}</Button>
             </Stack>
-            {Array(Math.ceil(eventObj.averageRating))
+            {Array(Math.ceil(eventInfo.averageRating))
               .fill(0)
               .map((_, i) => (
                 <svg
@@ -407,7 +428,7 @@ const ViewEvent= () => {
                   />
                 </svg>
               ))}
-            {Array(5 - Math.ceil(eventObj.averageRating))
+            {Array(5 - Math.ceil(eventInfo.averageRating))
               .fill(0)
               .map((_, i) => (
                 <svg
@@ -425,7 +446,7 @@ const ViewEvent= () => {
                 </svg>
               ))}
           </Box>
-          {showReviews && <ViewReviews showReviews={showReviews} setShowReviews={setShowReviews} eventReviews={eventObj.reviews} eventId={eventId}/>}
+          {showReviews && <ViewReviews showReviews={showReviews} setShowReviews={setShowReviews} eventReviews={eventInfo.reviews} eventId={eventId}/>}
         </Box>
       </Box>
     </>
