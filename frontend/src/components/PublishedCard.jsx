@@ -88,6 +88,15 @@ const PublishedCard = ({
                 size="small">
                   view
               </Button>
+              {eventObj.soldOut === true ? (
+                <Button 
+                variant ="contained"
+                style={{backgroundColor:'#e93a3a', color: 'white', fontWeight: 'bold',width: "10rem", fontSize: "1.2rem"}}
+                disabled
+                size="small">
+                  Sold Out
+              </Button>
+              ) : null}
             </CardActions>
           </Box>
         </Box>

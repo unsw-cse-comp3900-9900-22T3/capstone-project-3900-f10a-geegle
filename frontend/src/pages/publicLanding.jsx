@@ -50,6 +50,8 @@ const style = {
 const PublicLanding = () => {
   const [allListings, setAllListings] = React.useState([]);
   const [upcomingListings, setUpcomingListings] = React.useState([]);
+  const [soldOut, setSoldOut] = React.useState([]);
+  const [recommended, setRecommended] = React.useState([]);
   const [reviews, setReviews] = React.useState([]);
   const [averageRatingHook, setAverageRating] =React.useState(0);
   const [ratingRatioHook, setRatingRatio] = React.useState(0);
@@ -60,11 +62,8 @@ const PublicLanding = () => {
   const [filteredListings, setFilteredListings] = React.useState([]);
   const navigate = useNavigate();
 
-  console.log('filtered Listings', filteredListings);
-  const handleChange = (event, newAlignment) => {
-    setToggleState(newAlignment);
-    //console.log(newAlignment);
-  };
+  //console.log('filtered Listings', filteredListings);
+ 
   const getReviews = async(eventId) => {
     let json = []
 
@@ -117,7 +116,45 @@ const PublicLanding = () => {
     return allInfo;
   }
 
-
+  const fetchSoldOut = async () => {
+    
+    const response = await fetch(`http://localhost:3000/events/soldOut`, {
+      method: 'GET',
+    })
+    const eventJson = (await response.json()).events;
+      // console.log(json);
+      // const events = []
+      // for (const eve of json.events) {
+      //   const allInfoArray = await getReviews(eve.eventID)
+      //   events.push({
+      //     eachEvent: {
+      //       capacity: eve.capacity,
+      //       endDateTime: eve.endDateTime,
+      //       eventDescription: eve.eventDescription,
+      //       eventID: eve.eventID,
+      //       eventLocation: eve.eventLocation,
+      //       eventName: eve.eventName,
+      //       eventType: eve.eventType,
+      //       eventVenue: eve.eventVenue,
+      //       soldOut: eve.soldOut,
+      //       hostID: eve.hostID,
+      //       image1: eve.image1,
+      //       image2: eve.image2,
+      //       image3: eve.image3,
+      //       published: eve.published,
+      //       startDateTime: eve.startDateTime,
+      //       totalTicketAmount:eve.totalTicketAmount,
+      //       reviews:allInfoArray[0],
+      //       averageRating: allInfoArray[1],
+      //       ratingRatio: allInfoArray[2]
+      //     }
+      //   })
+      // }
+      console.log(eventJson);
+      setSoldOut([...eventJson])
+      //console.log(allListings)
+      // setMyListings(json);
+  }
   const fetchAllEvents = async () => {
     
     const response = await fetch(`http://localhost:3000/events/all`, {
@@ -138,6 +175,7 @@ const PublicLanding = () => {
             eventName: eve.eventName,
             eventType: eve.eventType,
             eventVenue: eve.eventVenue,
+            soldOut: eve.soldOut,
             hostID: eve.hostID,
             image1: eve.image1,
             image2: eve.image2,
@@ -177,6 +215,7 @@ const PublicLanding = () => {
             eventName: eve.eventName,
             eventType: eve.eventType,
             eventVenue: eve.eventVenue,
+            soldOut: eve.soldOut,
             hostID: eve.hostID,
             image1: eve.image1,
             image2: eve.image2,
@@ -190,10 +229,36 @@ const PublicLanding = () => {
           }
         })
       }
-      setUpcomingListings(events)
-      //console.log(upcomingListings)
+      setUpcomingListings(events);
   }
 
+  const fetchRecommended = async() => {
+    const response = await fetch(`http://localhost:3000/events/recommended`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'auth-token': localStorage.getItem('token')
+      },
+
+    })
+    
+    const eventJson = (await response.json()).events;
+    console.log(eventJson);
+    setRecommended([...eventJson]);
+  }
+  const handleChange = (event, newAlignment) => {
+    setToggleState(newAlignment);
+    if (newAlignment === "Upcoming Events") {
+      fetchUpcomingEvents();
+    } else if (newAlignment === "All Events") {
+      fetchAllEvents();
+    } else if (newAlignment === "Sold Out") {
+      fetchSoldOut();
+    } else if (newAlignment === "For You") {
+      fetchRecommended();
+    }
+    
+  };
   const handleUnfilter = () => {
     setFilter(false);
     navigate('/');
@@ -203,7 +268,9 @@ const PublicLanding = () => {
   React.useEffect(() => {
     // fetch bookings if token is available
     fetchAllEvents();
-    fetchUpcomingEvents();
+    //fetchUpcomingEvents();
+    //fetchSoldOut();
+    //fetchRecommend();
   }, []);
   
   return (
@@ -217,7 +284,8 @@ const PublicLanding = () => {
       {openSearch && <SearchFilter openSearch={openSearch} setOpenSearch={setOpenSearch} setFilter={setFilter} setFilteredListings={setFilteredListings}></SearchFilter>}
       <Grid item xs={12}>
         <Box>
-          <ToggleButtonGroup
+          {!filter ? (
+            <ToggleButtonGroup
             color="primary"
             value={toggleState}
             exclusive
@@ -226,7 +294,13 @@ const PublicLanding = () => {
           >
             <ToggleButton value="All Events">All Events</ToggleButton>
             <ToggleButton value="Upcoming Events">Upcoming Events</ToggleButton>
+            <ToggleButton value="Sold Out">Sold Out</ToggleButton>
+            {localStorage.getItem('token') !== null ? (
+              <ToggleButton value="For You">For You</ToggleButton>
+            ):null}
+            
           </ToggleButtonGroup>
+          ): null}
         </Box>
       </Grid>
       <Grid item xs= {12}>
@@ -243,6 +317,18 @@ const PublicLanding = () => {
             upcomingListings.map((obj, idx) => {
             return (
               <PublishedCard eventObj ={obj.eachEvent} idx={idx} />
+            )}
+          )}
+          {(!filter && toggleState === 'Sold Out') && 
+            soldOut.map((obj, idx) => {
+            return (
+              <PublishedCard eventObj ={obj} idx={idx} />
+            )}
+          )}
+          {(!filter && toggleState === 'For You') && 
+            recommended.map((obj, idx) => {
+            return (
+              <PublishedCard eventObj ={obj} idx={idx} />
             )}
           )}
         </Grid>
