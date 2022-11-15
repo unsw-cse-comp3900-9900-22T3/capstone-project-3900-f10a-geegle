@@ -22,10 +22,12 @@ const MyEvents = () => {
   const [myReview, setMyReview] = React.useState('');
   const [editForm, setEditForm] = React.useState(false);
   const [editFormObj, setEditFormObj] = React.useState({});
+  const [reviewFormObj, setReviewFormObj] = React.useState({});
   const [puchasedModal, setPuchasedModal] = React.useState(false);
 
 
-  const handleForm = () => {
+  const handleForm = (obj) => {
+    setReviewFormObj(obj);
     if(openReviewForm) {
       setOpenReviewForm(false);
     } else {
@@ -126,6 +128,7 @@ const MyEvents = () => {
       },
     });
     const json = await response.json();
+    console.log('attending events json',json);
     const allMyEvents = []
     for (const event of json.events) {
       const eventId = event.eventID;
@@ -137,8 +140,8 @@ const MyEvents = () => {
         },
       });
       const eventJson = (await eventInfoRes.json()).event;
-      const allInfoArray = await getReviews(eventId);
-      const editedInfo = await checkReview(eventId);
+      const allInfoArray = await getReviews(event.eventID);
+      const editedInfo = await checkReview(event.eventID);
       console.log('editedInfo', editedInfo)
       console.log(eventJson);
 
@@ -190,7 +193,7 @@ const MyEvents = () => {
       {attendingEvents.map((obj, idx) => {
       return (
       <Grid container item xs={12} >
-        <LeaveReviewForm openReviewForm={openReviewForm} setOpenReviewForm={setOpenReviewForm} obj={obj}></LeaveReviewForm>
+        <LeaveReviewForm openReviewForm={openReviewForm} setOpenReviewForm={setOpenReviewForm} obj={reviewFormObj}></LeaveReviewForm>
         {editForm && <EditReviewForm editForm={editForm} setEditForm={setEditForm} obj={editFormObj}></EditReviewForm>}
         <Card key={idx} style={{display: 'flex', width: '100%', height:'20rem'}} >
           <Box id="card media" width = "40%" >
@@ -273,7 +276,7 @@ const MyEvents = () => {
                 >
                   
                 </Button> */}
-                {!obj.leftReview && <Button onClick={handleForm}>
+                {!obj.leftReview && <Button onClick={()=>handleForm(obj)}>
                   Leave Review
                 </Button>}
                 {/* <Button onClick={handleForm}>

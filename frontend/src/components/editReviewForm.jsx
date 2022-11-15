@@ -5,6 +5,11 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import { Navigate, useNavigate, Link } from 'react-router-dom';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import Grid from '@mui/material/Grid';
 
 const style = {
   position: 'absolute',
@@ -97,7 +102,27 @@ export default function EditReviewForm({editForm, setEditForm, obj}) {
             <Typography id="modal-modal-description" sx={{ mt: 2 }}>
               Your Rating:
             </Typography>
-            <TextField
+            <Grid item xs={12}>
+              <FormControl style={{ width: '35%' }}>
+                <InputLabel id="Event Rating label">Event Rating Equivalent or Higher</InputLabel>
+                <Select
+                  labelId="Event Rating label"
+                  id="Event Rating"
+                  label="Event Rating"
+                  aria-label="Event Rating"
+                  defaultValue={obj.prevReview.rating}
+                  value={rating}
+                  onChange={(e)=>handleRating(e)}
+                >
+                  <MenuItem value={'1'}>1</MenuItem>
+                  <MenuItem value={'2'}>2</MenuItem>
+                  <MenuItem value={'3'}>3</MenuItem>
+                  <MenuItem value={'4'}>4</MenuItem>
+                  <MenuItem value={'5'}>5</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            {/* <TextField
               id="standard-multiline-static"
               label="Rate it out of 5..."
               multiline
@@ -105,7 +130,7 @@ export default function EditReviewForm({editForm, setEditForm, obj}) {
               type='number'
               onChange={(e)=>handleRating(e)}
               defaultValue={obj.prevReview.rating}
-            />
+            /> */}
             <Button onClick={handleSubmit}>
               Submit
             </Button>

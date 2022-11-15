@@ -4,6 +4,11 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import Grid from '@mui/material/Grid';
 
 const style = {
   position: 'absolute',
@@ -22,6 +27,7 @@ export default function LeaveReviewForm({openReviewForm, setOpenReviewForm, obj}
   const [review, setReview] = React.useState('');
   const [rating, setRating] = React.useState('');
   const [ratingError, setRatingError] = React.useState(false);
+  console.log(obj);
   // const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setOpenReviewForm(false);
@@ -29,7 +35,8 @@ export default function LeaveReviewForm({openReviewForm, setOpenReviewForm, obj}
   } 
 
   const handleSubmit = async() => {
-    console.log('submitted')
+    console.log('submitted');
+    console.log('eventId',obj.eventID);
     const response = await fetch(`http://localhost:3000/events/${obj.eventID}/reviews`, {
       method: 'POST',
       headers: {
@@ -86,14 +93,33 @@ export default function LeaveReviewForm({openReviewForm, setOpenReviewForm, obj}
             <Typography id="modal-modal-description" sx={{ mt: 2 }}>
               Your Rating:
             </Typography>
-            <TextField
+            <Grid item xs={12}>
+                <FormControl style={{ width: '35%' }}>
+                  <InputLabel id="Event Rating label">Event Rating Equivalent or Higher</InputLabel>
+                  <Select
+                    labelId="Event Rating label"
+                    id="Event Rating"
+                    label="Event Rating"
+                    aria-label="Event Rating"
+                    value={rating}
+                    onChange={(e)=>handleRating(e)}
+                  >
+                    <MenuItem value={'1'}>1</MenuItem>
+                    <MenuItem value={'2'}>2</MenuItem>
+                    <MenuItem value={'3'}>3</MenuItem>
+                    <MenuItem value={'4'}>4</MenuItem>
+                    <MenuItem value={'5'}>5</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+            {/* <TextField
               id="standard-multiline-static"
               label="Rate it out of 5..."
               multiline
               fullWidth
               type='number'
               onChange={(e)=>handleRating(e)}
-            />
+            /> */}
             <Button onClick={handleSubmit}>
               Submit
             </Button>
