@@ -593,7 +593,7 @@ function CreateEventsForm() {
             {noTicketErr=== true 
             ? (<Alert severity="error">Event must have tickets</Alert>): null}
             {invalidTicketErr=== true 
-            ? (<Alert severity="error">Ticket fields cannot be empty and make sure quanitites and prices are positive numbers and quantities are not decimals</Alert>): null}
+            ? (<Alert severity="error">Ticket fields cannot be empty and make sure quanitites are greater than 0 (decimals are rounded down to the nearest whole number)</Alert>): null}
           </Grid>
         </Grid>
       </form>
