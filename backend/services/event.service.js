@@ -274,6 +274,7 @@ export const getUpcomingEventsService = async(req, res) => {
                     totalTicketAmount: eventList[i].totalticketamount,
                     reviews: reviewRating.reviews,
                     averageRating: reviewRating.rating,
+                    soldOut: false,
                     image1: eventList[i].image1,
                     image2: eventList[i].image2,
                     image3: eventList[i].image3
@@ -535,6 +536,7 @@ export const getSoldOutEventsService = async(req, res) => {
                 totalTicketAmount: eventList[i].totalticketamount,
                 reviews: reviewRating.reviews,
                 eventRating: reviewRating.rating,
+                soldOut: true,
                 image1: eventList[i].image1,
                 image2: eventList[i].image2,
                 image3: eventList[i].image3
