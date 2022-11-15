@@ -57,6 +57,9 @@ const EventCalendar = () => {
         localizer={localizer}
         defaultDate={new Date()}
         defaultView="month"
+        views={{
+          month: true
+        }}
         events={events}
         style={styles}
         onSelectEvent={(e)=>viewEvent(e)}
