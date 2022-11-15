@@ -22,6 +22,7 @@ export default function LeaveReviewForm({openReviewForm, setOpenReviewForm, obj}
   const [review, setReview] = React.useState('');
   const [rating, setRating] = React.useState('');
   const [ratingError, setRatingError] = React.useState(false);
+  console.log(obj);
   // const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setOpenReviewForm(false);
@@ -29,7 +30,8 @@ export default function LeaveReviewForm({openReviewForm, setOpenReviewForm, obj}
   } 
 
   const handleSubmit = async() => {
-    console.log('submitted')
+    console.log('submitted');
+    console.log('eventId',obj.eventID);
     const response = await fetch(`http://localhost:3000/events/${obj.eventID}/reviews`, {
       method: 'POST',
       headers: {
