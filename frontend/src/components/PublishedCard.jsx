@@ -14,7 +14,7 @@ const PublishedCard = ({
   eventObj, 
   idx
 }) => {
-  console.log(eventObj)
+  //console.log(eventObj)
   return (
     <Grid container item xs={12} >
       <Card key={idx} style={{display: 'flex', width: '100%', height:'20rem'}} >
@@ -36,10 +36,10 @@ const PublishedCard = ({
               <Typography variant="body2" color="text.secondary">
                 {eventObj.eventType +' | '+ eventObj.eventVenue+' | '+eventObj.capacity}
               </Typography>
-              {/* <Typography variant="body2" color="text.secondary">
-              {`Description:  ${eventObj.eventDescription}`}
-              </Typography> */}
-              {Array(Math.ceil(eventObj.ratingRatio * 5))
+              <Typography variant="body2" color="text.secondary">
+                {`Description:  ${eventObj.eventDescription}`}
+              </Typography>
+              {Array(Math.ceil(eventObj.averageRating))
                 .fill(0)
                 .map((_, i) => (
                   <svg
@@ -54,7 +54,7 @@ const PublishedCard = ({
                     />
                   </svg>
                 ))}
-              {Array(5 - Math.ceil(eventObj.ratingRatio * 5))
+              {Array(5 - Math.ceil(eventObj.averageRating))
                 .fill(0)
                 .map((_, i) => (
                   <svg
@@ -75,7 +75,7 @@ const PublishedCard = ({
                 Average Rating: {eventObj.averageRating}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Reviews: {eventObj.reviews.length}
+                Reviews: {(eventObj.reviews).length}
               </Typography>
             </CardContent>
           </Box>
@@ -88,7 +88,7 @@ const PublishedCard = ({
                 size="small">
                   view
               </Button>
-          </CardActions>
+            </CardActions>
           </Box>
         </Box>
       </Card> 

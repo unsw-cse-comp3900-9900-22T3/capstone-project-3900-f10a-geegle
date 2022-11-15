@@ -276,7 +276,7 @@ const UserViewPurchasedTix = (
         <Typography variant="h5" color="text.secondary">
           Your Purchased Tickets for {eventInfo.eventName}
         </Typography>
-        <Card style={{padding: '20px'}}>
+        <Card style={{padding: '20px', height:"20%", overflow:"auto"}}>
           <Typography  variant="h6" color="text.secondary" sx={{fontWeight: "bold", lineHeight: "1.2"}}>
             Event Start Date and Time: {(new Date(eventInfo.startDateTime)).toLocaleString("en-AU",dateOptions)}
           </Typography>
@@ -316,7 +316,7 @@ const UserViewPurchasedTix = (
           </Grid>
         </Grid>
          {eventInfo.seatedEvent === true ? (
-          <Box style={{overflow:'auto', height: '45%'}}>
+          <Box style={{overflow:'auto', height: '40%'}}>
             < Grid container spacing={1}>
               {(purchasedTixs).map((ticket, index) => {
                 const SeatComponent = (()=> {
@@ -369,10 +369,9 @@ const UserViewPurchasedTix = (
           </Box>
           
          ) : (
-          <Box style={{overflow:'auto', height: '45%'}}>
+          <Box style={{overflow:'auto', height: '40%'}}>
             < Grid container spacing={1}>
               {purchasedTixs.map((ticket, index) => {
-                //console.log(seatComponent)
                 return (
                   <Grid container spacing = {1} style={{padding:'8px'}} key ={index}>
                     <Grid item xs={3}>

@@ -19,6 +19,6 @@ const FilteredListings = ({filteredListings}) => {
       )})
     }
     </>
-  );
+  )
 };
 export default FilteredListings;

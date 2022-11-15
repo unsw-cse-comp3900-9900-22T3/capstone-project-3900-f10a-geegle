@@ -232,7 +232,7 @@ const PublicLanding = () => {
       </Grid>
       <Grid item xs= {12}>
         <Grid container spacing={6}>
-          {filter && <FilteredListings filteredListings={filteredListings}></FilteredListings>}
+          {filter && <FilteredListings filteredListings={filteredListings}/>}
           {(!filter && toggleState === 'All Events') && (
             allListings.map((obj, idx) => {
               return (
