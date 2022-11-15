@@ -35,6 +35,7 @@ function ChildModal({reviewId, eventId}) {
   };
   const handleClose = () => {
     setOpen(false);
+    setSentReply(false)
   };
 
   const handleSendReply = async() => {
@@ -50,7 +51,8 @@ function ChildModal({reviewId, eventId}) {
       },
       body: jsonString
     })
-    
+    // const json = await response.json();
+    // console.log(json);
     if (response.ok) {
       const json = await response.json()
       let replyObj = JSON.stringify({
@@ -63,6 +65,7 @@ function ChildModal({reviewId, eventId}) {
           user: json.replies.user
         }
       })
+      console.log(replyObj);
       fetchReplies();
       setNewReply("");
       const emailRes = await fetch(`http://localhost:3000/events/${eventId}/reviews/${reviewId}/emailReply`, {
@@ -73,8 +76,11 @@ function ChildModal({reviewId, eventId}) {
         },
         body: replyObj
       })
+      const jsonEmail = await emailRes.json();
+      console.log(jsonEmail);
 
-      setSentEmail(true);
+      setSentReply(true);
+    }
   }
   const fetchReplies = async() => {
     const response = await fetch(`http://localhost:3000/events/${eventId}/reviews/${reviewId}/reply`, {
@@ -171,7 +177,7 @@ function ChildModal({reviewId, eventId}) {
   );
 }
 
-export default function ViewReviews({showReviews, setShowReviews, eventReviews, eventId}) {
+const ViewReviews = ({showReviews, setShowReviews, eventReviews, eventId}) => {
   // const [open, setOpen] = React.useState(false);
   // const handleOpen = () => {
   //   setOpen(true);
@@ -316,14 +322,11 @@ export default function ViewReviews({showReviews, setShowReviews, eventReviews, 
                 </CardActions>
               </Card>
             );
-          })}
-          {/* <h2 id="parent-modal-title">Text in a modal</h2>
-          <p id="parent-modal-description">
-            Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-          </p> */}
-          
+          })}        
         </Box>
       </Modal>
     </div>
   );
 }
+
+export default ViewReviews;
