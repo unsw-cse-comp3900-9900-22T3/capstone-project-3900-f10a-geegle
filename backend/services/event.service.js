@@ -215,7 +215,11 @@ export const getEventService = async(req, res) => {
         if (!userID) userID = 0
         const seating = await isSeatedEventDb(req.params.eventID)
         const reviewRating = await eventRatingScore(event[0].eventid, userID)
-        addPageViewToMetricDb(req.params.eventID, 1, new Date().setHours(0,0,0,0), 0);
+        let currDate = new Date()
+        currDate.setHours(0,0,0,0)
+        const metric = await getEventMetricsDb(req.params.eventID, currDate)
+        await addPageViewToMetricDb(req.params.eventID, metric.length ? metric[0].pageviews : 1, currDate, 
+                                    metric.length ? metric[0].ticketcheckouts : 0)
         
         return {event: {
                     eventID: event[0].eventid,
@@ -818,7 +822,8 @@ export const getEventDataService = async(req, res) => {
 
         // Sorts purchased tickets by date of purchase
         const eventTicketsPurchased = await getTicketPurchaseByEventIdDb(event.eventid);
-        eventTicketsPurchased.sort((a,b) => a.getTime() - b.getTime());
+        // sort from query easier
+        //eventTicketsPurchased.sort((a,b) => new Date(a.ticketpurchasetime) - new Date(b.ticketpurchasetime));
 
         let ticketPurchases = [];
         let ticketRevenue = [];
@@ -834,7 +839,7 @@ export const getEventDataService = async(req, res) => {
             while (ticketDayStart <= currDate) {
                 let purchases = 0;
                 let revenue = 0;
-                let nextDay = new Date (ticketDayStart.setDate(ticketDayStart.getDate() + 1))
+                let nextDay = new Date(ticketDayStart.setDate(ticketDayStart.getDate() + 1))
                 for (let i = 0; i < eventTicketsPurchased.length; i++) {
                     if (eventTicketsPurchased[i].ticketpurchasetime >= ticketDayStart &&
                         eventTicketsPurchased[i].ticketpurchasetime < nextDay) {

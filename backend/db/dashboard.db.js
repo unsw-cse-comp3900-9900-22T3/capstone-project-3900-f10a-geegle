@@ -5,8 +5,8 @@ const addPageViewToMetricDb = async(eventID, pageViews, dataDay, ticketCheckouts
     const result = await db.query (
         "INSERT INTO eventMetrics (eventID, pageViews, dataDay, ticketCheckouts) " +
         "VALUES ($1, $2, $3, $4) ON CONFLICT (eventID, dataDay) DO UPDATE " +
-        "SET pageViews = pageViews + 1 RETURNING *", 
-        [eventID, pageViews, dataDay, ticketCheckouts]
+        "SET pageViews = ($5 + 1) RETURNING *", 
+        [eventID, pageViews, dataDay, ticketCheckouts, pageViews]
     )
     return result.rows[0]
 }
@@ -16,7 +16,7 @@ const addTicketCheckoutsToMetricDb = async(eventID, pageViews, dataDay, ticketCh
     const result = await db.query (
         "INSERT INTO eventMetrics (eventID, pageViews, dataDay, ticketCheckouts) " +
         "VALUES ($1, $2, $3, $4) ON CONFLICT (eventID, dataDay) DO UPDATE " +
-        "SET ticketCheckouts = ticketCheckouts + 1 RETURNING *", 
+        "SET ticketCheckouts = EXCLUDED.ticketCheckouts + 1 RETURNING *", 
         [eventID, pageViews, dataDay, ticketCheckouts]
     )
     return result.rows[0]

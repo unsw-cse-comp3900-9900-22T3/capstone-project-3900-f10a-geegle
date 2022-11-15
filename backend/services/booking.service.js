@@ -346,8 +346,7 @@ export const bookEventService = async(req, res) => {
                                     ticketPurchaseTime: ticketPurchase.ticketpurchasetime })
             
         }
-        const metrics = await getEventMetricsDb(eventID, new Date().setHours(0,0,0,0));
-        addTicketCheckoutsToMetricDb(eventID, metrics[0].pageviews, new Date().setHours(0,0,0,0), 1);
+        
         return { booking: ticketPurchases, statusCode: 200, msg: `Tickets purchased to Event ${eventID}`}
 
     } catch (error) {
@@ -366,6 +365,16 @@ const checkValidCreditCard = (cardNo, ccv, expiryMonth, expiryYear) => {
             regexMonth.test(expiryMonth)   && 
             parseInt(expiryMonth) <= 12     && 
             regexYear.test(expiryYear)) 
+}
+
+const computeSalesMetric = async(eventID) => {
+    let currDate = new Date()
+    currDate.setHours(0,0,0,0)
+    const metric = await getEventMetricsDb(eventID, currDate)
+    await addTicketCheckoutsToMetricDb(eventID, metric.length ? metric[0].pageviews : 0, currDate, 
+                                        metric.length ? metric[0].ticketcheckouts : 1)
+    
+    const tickets = await ticketPurchasedb.getTicketPurchaseByEventIdDb(eventID)
 }
 
 export const getEventTicketsUserPurchasedService = async(req, res) => {

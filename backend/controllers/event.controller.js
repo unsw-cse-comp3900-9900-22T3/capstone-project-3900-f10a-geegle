@@ -374,11 +374,11 @@ export const getRecommendedEventsForUserController = async(req, res) => {
 
 export const getEventDataController = async(req, res) => {
     try {
-        const {event, statusCode, msg} = await getEventDataService(req, res);
-        if (!event) {
+        const {stats, statusCode, msg} = await getEventDataService(req, res);
+        if (!stats) {
             res.status(statusCode).json(msg)
         } else {
-            res.status(statusCode).json({event, msg})
+            res.status(statusCode).json({stats, msg})
         }
     } catch (e) {
         res.status(500).send(e.message)
