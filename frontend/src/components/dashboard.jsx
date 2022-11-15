@@ -301,7 +301,7 @@ export default function Dashboard() {
               {toggleState === "pageView" && <div>
                 <CanvasJSChart options = {pageViewPlot}/>
               </div>}
-              {toggleState === "ricketPurchase" && <div>
+              {toggleState === "ticketPurchase" && <div>
                 <CanvasJSChart options = {ticketPurchasePlot}/>
               </div>}
               {toggleState === "revenue" && <div>
