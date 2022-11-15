@@ -110,6 +110,8 @@ const PurchaseTicket= ({
   const [quantity, setQuantity] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
   const [inputError, setInputError] = useState(false);
+  const [decimalError, setDecimalError] = useState(false);
+  const [negError, setNegError] = useState(false);
   const [exceedError, setExceedError] = useState(false);
   const [ticketTypeExceeded, setTicketTypeExceeded] = useState("");
   const [hasSeats, setHasSeats] = useState(false);
@@ -153,7 +155,19 @@ const PurchaseTicket= ({
       // reset the error states
       setInputError(false);
       setExceedError(false);
-  
+      setDecimalError(false);
+      setNegError(false);
+      // check if there is a decimal 
+      if (quantity.some((val)=> val % 1 !== 0)) {
+        setDecimalError(true)
+        return;
+      }
+
+      // numbers cannot be negative
+      if (quantity.some((val)=> val < 0)) {
+        setNegError(true)
+        return;
+      }
 
       // check if at least one seat is selected (use Input error)
       if (quantity.every((val)=> val === 0)) {
@@ -281,9 +295,13 @@ const PurchaseTicket= ({
     }
   }
   const handleQuantity = (event, index) => {
-    let newQty = event.target.value;
+    let newQty = 0;
+    if (event.target.value !== "") {
+      newQty = parseFloat(event.target.value);
+    }
     let tempQtys = [...quantity];
     tempQtys[index] = newQty;
+    console.log(tempQtys);
     setQuantity(tempQtys);
 
     // updating the total price
@@ -445,9 +463,12 @@ const PurchaseTicket= ({
         {duplicateError === true 
           ? (<Alert severity="error">Error, please make sure chosen seats are not the same seats for your tickets</Alert>) 
           : null}
-        {/* {checkoutSuccess === true 
-          ? (<Alert severity="success">you have successfully purchased your tickets, look out for a confirmation email</Alert>) 
-          : null} */}
+       {decimalError === true 
+          ? (<Alert severity="error">Quanities must be whole numbers</Alert>) 
+          : null} 
+        {negError === true 
+          ? (<Alert severity="error">Quanities must be positive numbers</Alert>) 
+          : null} 
         {checkoutError === true 
           ? (<Alert severity="error">Invalid credit card details, please check that Credit Card Number is 16 digits, CVV is 3 digits, month is in the form of mm and year is in the form of yy</Alert>) 
           : null}

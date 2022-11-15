@@ -405,7 +405,6 @@ const HostEventsPage = () => {
     }
   }
 
-     // upon entering the page
   React.useEffect(() => {
     // fetch bookings if token is available
     fetchHostEvents();

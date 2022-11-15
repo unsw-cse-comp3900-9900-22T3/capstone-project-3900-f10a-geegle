@@ -44,7 +44,7 @@ const TicketTypeCard= ({
         <Typography aria-label="quantity label" sx={{mt: 2}}>
           Quantity:
         </Typography>
-        <FormControl fullWidth>
+        {/* <FormControl fullWidth>
         <InputLabel id="Quantity label">Quantity</InputLabel>
         <Select
           labelId="quantity drop down"
@@ -60,8 +60,8 @@ const TicketTypeCard= ({
           <MenuItem value={4}>4</MenuItem>
           <MenuItem value={5}>5</MenuItem>
         </Select>
-      </FormControl>
-        {/* <TextField
+      </FormControl> */}
+        <TextField
           label="quantity"
           type="number"
           variant="outlined"
@@ -69,7 +69,7 @@ const TicketTypeCard= ({
           defaultValue={0}
           onChange={event=>handleQuantity(event,index)}
           fullWidth
-        />   */}
+        />  
       </FormControl>
     </Card>
   );
