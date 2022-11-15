@@ -5,11 +5,9 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 //import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { width } from '@mui/system';
 import TicketTypeInput from './TicketTypeInput';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import DefaultVenueInfo from './defaultVenueInfo';
-import { SentimentSatisfiedAltSharp } from '@mui/icons-material';
+
 /**
  * https://stackoverflow.com/questions/36280818/how-to-convert-file-to-base64-in-javascript
  *
@@ -40,6 +38,7 @@ function CreateEventsForm() {
   const [thumbnail, setThumbnail] = useState('');
   const [image2, setImage2] = useState('');
   const [image3, setImage3] = useState('');
+  const [ownVenue, setOwnVenue] = useState('');
   const [other, setOther] = useState(false);
   const [seat, setSeat] = useState(true);
   const [ticketInfo, setTicketInfo] = useState({
@@ -51,9 +50,26 @@ function CreateEventsForm() {
   const [allTicketTypes, setAllTicketTypes] = useState([ticketInfo]);
   // error check variables 
   const [endTimeError, setEndTimeError] = useState(false); // End time before start time error
-  const [negCapacityError, setNegCapacityError] = useState(false); // capacity < 0
+  const [eventCapacityError, setEventCapacityError] = useState(false); // capacity < 0
   const [startTimeError, setStartTimeError] = useState(false); // start time is before the current time 
-  const [insufCapacityError, setInsufCapacityError] = useState(false); // venue capacity < total tickets
+  const [insufCapacityError, setInsufCapacityError] = useState(false); // event capacity venue capacity < total tickets
+
+  const [venueCapacityError, setVenueCapacityError] = useState(false); // venue capacity < Event Capacity
+  const [noTicketErr, setNoTicketErr] = useState(false); // the event must at least have 1 ticket type group
+  const [eventNameError, setEventNameError]= useState(false); // eventName cannot be empty
+  const [eventDesErr, setEventDesErr] = useState(false); // event description cannot be empty
+  // invalid ticket, ticket type must not be empty string, ticket quantity < 0 or ticket quantity cannot be decimal,
+  // ticket price < 0
+  const [invalidTicketErr, setInvalidTicketErr] = useState(false);  
+
+
+  const [thumbnailErr, setThumbnailErr] = useState(false); // event needs to have a thumbnail
+  const [venueError, setVenueError] = useState(false); // venue must be specified 
+  const [locationError, setLocationError] = useState(false); // location must be specifield
+  const [empEventCapErr, setEmpEventCapErr] = useState(false); // event capacity cannot be empty
+  const [empVenueCapErr, setEmpVenueCapErr] = useState(false); // venue capacity cannot be empty
+  const [eventTypeErr, setEventTypeErr] = useState(false); // event type must be defined
+
 
   const [ticketInput, setTicketInput] = useState(1);
   const navigate = useNavigate();
@@ -153,9 +169,45 @@ function CreateEventsForm() {
   const handleSubmit = async () => {
     // setting errors back to default
     setEndTimeError(false); // End time before start time error
-    setNegCapacityError(false); // capacity < 0
+    setEventCapacityError(false); // capacity < 0 or if capacity is a decimal 
     setStartTimeError(false); // start time is before the current time 
     setInsufCapacityError(false); // venue capacity < total tickets
+
+    setVenueCapacityError(false); // venue capacity < Event Capacity
+    setNoTicketErr(false); // the event must at least have 1 ticket type group
+    setEventNameError(false); // eventName cannot be empty
+    setEventDesErr(false); // event description cannot be empty
+    setInvalidTicketErr(false);  // qty and price is neg or dec or an empty field in ticket type
+
+    setThumbnailErr(false); // event needs to have a thumbnail
+    setVenueError(false); // venue must be specified 
+    setLocationError(false); // location must be specifield
+    setEmpEventCapErr(false); // event capacity cannot be empty
+    setEmpVenueCapErr(false); // venue capacity cannot be empty
+    setEventTypeErr(false); // eventType must be defined
+
+    if (thumbnail === "") {
+      setThumbnailErr(true);
+      return
+    } else if (!other && venue === "") {
+      setVenueError(true);
+      return
+    } else if (other && ownVenue === "") {
+      setVenueError(true);
+    } else if (other && eventLocation === "") {
+      setLocationError(true);
+      return
+    } else if (capacity === "") {
+      setEmpEventCapErr(true);
+      return
+    } else if (other && venueCapacity === "") {
+      setEmpVenueCapErr(true);
+      return
+    } else if (eventType === "") {
+      setEventTypeErr(true);
+      return
+    }
+
     console.log(thumbnail);
     console.log(localStorage.getItem('token'));
     console.log(allTicketTypes);
@@ -170,7 +222,7 @@ function CreateEventsForm() {
           eventDescription: eventDescription,
           eventType: eventType,
           eventLocation: eventLocation,
-          eventVenue: venue,
+          eventVenue: ownVenue,
           venueCapacity: venueCapacity,
           capacity: capacity,
           image1: thumbnail,
@@ -213,16 +265,26 @@ function CreateEventsForm() {
       console.log(json);
       navigate('/');
     } else if (r.status === 400) {
-      // alert the error code and the 
       if (json === "Invalid Starting and Finishing Times" ) {
         setEndTimeError(true)
       } else if (json === "Invalid Capacity" ) {
-        setNegCapacityError(true);
+        setEventCapacityError(true);
       } else if (json === "Invalid Event Date") {
         setStartTimeError(true);
       } else if (json === "Capacity not sufficient") {
         setInsufCapacityError(true);
+      } else if (json === "Venue capacity not sufficient for event") {
+        setVenueCapacityError(true)
+      } else if (json === "Event name cannot be empty") {
+        setEventNameError(true);
+      } else if (json === "Event description cannot be empty") {
+        setEventDesErr(true);
+      } else if (json === "Event must have tickets") {
+        setNoTicketErr(true); 
+      } else if (json === "Invalid ticket") {
+        setInvalidTicketErr(true)
       }
+      
     } 
 
   }
@@ -334,18 +396,6 @@ function CreateEventsForm() {
             </Grid>
           </>)}
           {!other && (<>
-            {/* <Grid item xs={12}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    defaultChecked
-                    onChange={(e) => handleSeat(e.target.checked)}
-                  />
-                }
-                label="Seating Available"
-              />
-              {}
-            </Grid> */}
             <DefaultVenueInfo venue={venue}/>
             <Grid item xs={12}>
               <Typography variant="h6" component="div">
@@ -357,7 +407,7 @@ function CreateEventsForm() {
                 id="Event Capacity"
                 label="Event Capacity"
                 aria-label="Event Capacity"
-                type="text"
+                type="number"
                 variant="outlined"
                 onChange={(e) => setCapacity(e.target.value)}
                 fullWidth
@@ -375,7 +425,7 @@ function CreateEventsForm() {
                     aria-label="Venue"
                     type="text"
                     variant="outlined"
-                    onChange={(e) => setVenue(e.target.value)}
+                    onChange={(e) => setOwnVenue(e.target.value)}
                     fullWidth
                   />
                 </Grid>
@@ -395,7 +445,7 @@ function CreateEventsForm() {
                     id="Capacity"
                     label="Venue Capacity"
                     aria-label="Capacity"
-                    type="text"
+                    type="number"
                     variant="outlined"
                     onChange={(e) => setVenueCapacity(e.target.value)}
                     fullWidth
@@ -411,7 +461,7 @@ function CreateEventsForm() {
                     id="Event Capacity"
                     label="Event Capacity"
                     aria-label="Event Capacity"
-                    type="text"
+                    type="number"
                     variant="outlined"
                     onChange={(e) => setCapacity(e.target.value)}
                     fullWidth
@@ -419,19 +469,9 @@ function CreateEventsForm() {
                 </Grid>
                 
                 <Grid item xs={12}>
-                {/* <FormControlLabel
-                  control={
-                    <Checkbox
-                      disabled
-                      onChange={(e) => handleSeat(e.target.checked)}
-                    />
-                  }
-                  label="Seating Available"
-                /> */}
-                <Typography variant="h6" component="div" color='red'>
-                  Seating Unavailable
-                </Typography>
-
+                  <Typography variant="h6" component="div" color='red'>
+                    Seating Unavailable
+                  </Typography>
                 </Grid>
               </>
             )}
@@ -526,12 +566,34 @@ function CreateEventsForm() {
           <Grid item xs = {12}>
             {endTimeError === true
             ? (<Alert severity="error">Error, the End time before start time error</Alert>):null}
-            {negCapacityError === true
-            ? (<Alert severity="error">Error, the event capacity cannot be smaller than 0</Alert>):null}
+            {eventCapacityError === true
+            ? (<Alert severity="error">Error, the event capacity cannot be smaller than 0 or a decimal</Alert>):null}
             {startTimeError=== true
             ? (<Alert severity="error">Error, the event start time cannot be before the current time</Alert>):null}
             {insufCapacityError=== true
-            ? (<Alert severity="error">Error, venue capacity is smaller than the tickets available</Alert>):null}
+            ? (<Alert severity="error">Error, event capacity is smaller than the tickets available</Alert>):null}
+            {thumbnailErr === true 
+            ? (<Alert severity="error">event must have a thumbnail</Alert>): null}
+            {venueError === true 
+            ? (<Alert severity="error">event must have a venue</Alert>): null}
+            {locationError === true 
+            ? (<Alert severity="error">event must have a location</Alert>): null}
+            {empEventCapErr === true 
+            ? (<Alert severity="error">event must have an event capacity</Alert>): null}
+            {empVenueCapErr === true 
+            ? (<Alert severity="error">event must have a venue capacity</Alert>): null}
+            {eventTypeErr === true 
+            ? (<Alert severity="error">event must have an event type</Alert>): null}
+            {venueCapacityError === true 
+            ? (<Alert severity="error">Error, venue capacity not sifficient for the event, please specify a larger venue capacity</Alert>): null}
+            {eventNameError=== true 
+            ? (<Alert severity="error">Please specify an event name</Alert>): null}
+            {eventDesErr=== true 
+            ? (<Alert severity="error">Event must have a description</Alert>): null}
+            {noTicketErr=== true 
+            ? (<Alert severity="error">Event must have tickets</Alert>): null}
+            {invalidTicketErr=== true 
+            ? (<Alert severity="error">Ticket fields cannot be empty and make sure quanitites and prices are positive numbers and quantities are not decimals</Alert>): null}
           </Grid>
         </Grid>
       </form>
