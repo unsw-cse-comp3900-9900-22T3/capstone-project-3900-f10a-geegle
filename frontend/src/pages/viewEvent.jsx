@@ -111,6 +111,7 @@ const ViewEvent= () => {
     image1: '',
     image2: '',
     image3: '',
+    soldOut: false,
     published: '',
     startDateTime: '',
     totalTicketAmount:'',
@@ -295,6 +296,7 @@ const ViewEvent= () => {
         eventVenueId: eventJson.eventVenueId,
         hostEmail: eventJson.hostEmail,
         seatedEvent: eventJson.seatedEvent,
+        soldOut: eventJson.soldOut,
         hostID: eventJson.hostID,
         hostName: eventJson.hostName,
         image1: eventJson.image1,
@@ -353,13 +355,23 @@ const ViewEvent= () => {
               </Typography>
             </Box>
             <Box id="button container" style={{display: "flex", justifyContent: "center", alignItems: "center", marginLeft: "35%"}}>
-              <Button
-                variant ='outlined'
-                id = 'Purchase Ticket Button'
-                size='large'
-                onClick = {() => handleTicketModal()}
-              > Buy Tickets
+              {eventInfo.soldOut === true ? (
+                <Button 
+                variant ="contained"
+                style={{backgroundColor:'#e93a3a', color: 'white', fontWeight: 'bold',width: "10rem", fontSize: "1.2rem"}}
+                disabled
+                size="large">
+                  Sold Out
               </Button>
+              ) : (
+                <Button
+                  variant ='outlined'
+                  id = 'Purchase Ticket Button'
+                  style = {{fontWeight: 'bold',width: "11rem", fontSize: "1.2rem"}}
+                  size='large'
+                  onClick = {() => handleTicketModal()}
+                > Buy Tickets
+                </Button>)}
               {ticketModal === true ? (
                 <PurchaseTicket 
                   eventInfo = {eventInfo} 
