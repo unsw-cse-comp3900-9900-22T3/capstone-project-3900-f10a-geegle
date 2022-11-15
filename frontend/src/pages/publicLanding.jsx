@@ -160,38 +160,38 @@ const PublicLanding = () => {
     const response = await fetch(`http://localhost:3000/events/all`, {
       method: 'GET',
     })
-    const json = await response.json();
-      console.log(json);
-      const events = []
-      for (const eve of json.events) {
-        const allInfoArray = await getReviews(eve.eventID)
-        events.push({
-          eachEvent: {
-            capacity: eve.capacity,
-            endDateTime: eve.endDateTime,
-            eventDescription: eve.eventDescription,
-            eventID: eve.eventID,
-            eventLocation: eve.eventLocation,
-            eventName: eve.eventName,
-            eventType: eve.eventType,
-            eventVenue: eve.eventVenue,
-            soldOut: eve.soldOut,
-            hostID: eve.hostID,
-            image1: eve.image1,
-            image2: eve.image2,
-            image3: eve.image3,
-            published: eve.published,
-            startDateTime: eve.startDateTime,
-            totalTicketAmount:eve.totalTicketAmount,
-            reviews:allInfoArray[0],
-            averageRating: allInfoArray[1],
-            ratingRatio: allInfoArray[2]
-          }
-        })
-      }
+    const json = (await response.json()).events;
+      // console.log(json);
+      // const events = []
+      // for (const eve of json.events) {
+      //   const allInfoArray = await getReviews(eve.eventID)
+      //   events.push({
+      //     eachEvent: {
+      //       capacity: eve.capacity,
+      //       endDateTime: eve.endDateTime,
+      //       eventDescription: eve.eventDescription,
+      //       eventID: eve.eventID,
+      //       eventLocation: eve.eventLocation,
+      //       eventName: eve.eventName,
+      //       eventType: eve.eventType,
+      //       eventVenue: eve.eventVenue,
+      //       soldOut: eve.soldOut,
+      //       hostID: eve.hostID,
+      //       image1: eve.image1,
+      //       image2: eve.image2,
+      //       image3: eve.image3,
+      //       published: eve.published,
+      //       startDateTime: eve.startDateTime,
+      //       totalTicketAmount:eve.totalTicketAmount,
+      //       reviews:allInfoArray[0],
+      //       averageRating: allInfoArray[1],
+      //       ratingRatio: allInfoArray[2]
+      //     }
+      //   })
+      // }
       console.log(allListings);
-      setAllListings(events)
-      return events;
+      setAllListings([...json])
+      //return events;
       //console.log(allListings)
       // setMyListings(json);
   }
@@ -201,35 +201,8 @@ const PublicLanding = () => {
     const response = await fetch(`http://localhost:3000/events/upcoming`, {
       method: 'GET'
     })
-    const json = await response.json();
-      const events = []
-      for (const eve of json.events) {
-        const allInfoArray = await getReviews(eve.eventID)
-        events.push({
-          eachEvent: {
-            capacity: eve.capacity,
-            endDateTime: eve.endDateTime,
-            eventDescription: eve.eventDescription,
-            eventID: eve.eventID,
-            eventLocation: eve.eventLocation,
-            eventName: eve.eventName,
-            eventType: eve.eventType,
-            eventVenue: eve.eventVenue,
-            soldOut: eve.soldOut,
-            hostID: eve.hostID,
-            image1: eve.image1,
-            image2: eve.image2,
-            image3: eve.image3,
-            published: eve.published,
-            startDateTime: eve.startDateTime,
-            totalTicketAmount:eve.totalTicketAmount,
-            reviews:allInfoArray[0],
-            averageRating: allInfoArray[1],
-            ratingRatio: allInfoArray[2]
-          }
-        })
-      }
-      setUpcomingListings(events);
+    const json = (await response.json()).events;
+    setUpcomingListings(json);
   }
 
   const fetchRecommended = async() => {
@@ -246,6 +219,7 @@ const PublicLanding = () => {
     console.log(eventJson);
     setRecommended([...eventJson]);
   }
+
   const handleChange = (event, newAlignment) => {
     setToggleState(newAlignment);
     if (newAlignment === "Upcoming Events") {
@@ -266,11 +240,7 @@ const PublicLanding = () => {
   }
   // upon entering the page
   React.useEffect(() => {
-    // fetch bookings if token is available
     fetchAllEvents();
-    //fetchUpcomingEvents();
-    //fetchSoldOut();
-    //fetchRecommend();
   }, []);
   
   return (
@@ -309,14 +279,14 @@ const PublicLanding = () => {
           {(!filter && toggleState === 'All Events') && (
             allListings.map((obj, idx) => {
               return (
-                <PublishedCard eventObj ={obj.eachEvent} idx={idx} />
+                <PublishedCard eventObj ={obj} idx={idx} />
               )
             })
           )}
           {(!filter && toggleState === 'Upcoming Events') && 
             upcomingListings.map((obj, idx) => {
             return (
-              <PublishedCard eventObj ={obj.eachEvent} idx={idx} />
+              <PublishedCard eventObj ={obj} idx={idx} />
             )}
           )}
           {(!filter && toggleState === 'Sold Out') && 
