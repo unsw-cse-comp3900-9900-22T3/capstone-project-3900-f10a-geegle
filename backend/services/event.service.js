@@ -14,7 +14,7 @@ import { getAllLPTORankings } from '../utils/lpto.ranking.js'
 import { getEventSimilarityById } from '../db/similarity.db.js'
 import { getEventTicketTypesController } from '../controllers/booking.controller.js'
 import { updateAllEventSimilarity } from '../utils/event.similarity.js'
-import { addEventGoalMetricsDb, addPageViewToMetricDb, getEventGoalMetricsDb, getEventMetricsDb, updateEventGoalMetricsDb } from '../db/dashboard.db.js'
+import { addEventGoalMetricsDb, addEventTaskDb, addPageViewToMetricDb, deleteTaskByTaskIDDb, getEventGoalMetricsDb, getEventMetricsDb, getEventTaskByEventIDDb, getEventTaskByTaskIDDb, updateEventGoalMetricsDb, updateTaskByTaskIDDb } from '../db/dashboard.db.js'
 
 
 /*  Request
@@ -77,16 +77,19 @@ export const createEventsService = async(req, res) => {
         let seatingAvailable = false
         if (venue.length === 0) {
             const { eventVenue, eventLocation, venueCapacity } = events
+            if (Number(venueCapacity) <= 0) 
+                return {events: null, statusCode : 400, msg: 'Venue capacity cannot be less than 0'}
+            if (Number(venueCapacity) < Number(capacity))
+                return {events: null, statusCode : 400, msg: 'Venue capacity not sufficient for event'}
             venue = await addEventVenueDb(eventVenue, eventLocation, venueCapacity)
         } else {
             venue = venue[0]
+            if (venue.maxcapacity < capacity) {
+                return {events: null, statusCode : 400, msg: 'Venue capacity not sufficient for event'}
+            }
             const venueSeats = await isVenueSeatingAvailableDb(venue.venueid)
             seatingAvailable = parseInt(venueSeats.count) ? true : false
         } 
-
-        if (venue.maxcapacity < capacity) {
-            return {events: null, statusCode : 400, msg: 'Venue capacity not sufficient for event'}
-        }
 
         const newEvent = await addEventDb(eventName, req.userID, new Date(startDateTime), new Date(endDateTime), eventDescription,
                 eventType, venue.venueid, Number(capacity), totalTickets, image1, image2, image3)
@@ -960,6 +963,76 @@ export const getEventDataService = async(req, res) => {
             ticketsSold: eventTicketsPurchased.length,
             milestones: milestones
         }, statusCode: 200, msg: "Dashboard Stats Generated"});
+    } catch (e) {
+        throw e
+    }
+}
+
+export const getEventTodoService = async(req, res) => {
+    try {
+        const todo = await getEventTaskByEventIDDb(req.params.eventID)
+
+        for (const t of todo) {
+            t['taskID'] = t['taskid']
+            delete t['taskid']
+            t['eventID'] = t['eventid']
+            delete t['eventid']
+            t['taskDescription'] = t['taskdescription']
+            delete t['taskdescription']
+            t['taskCompleted'] = t['taskCompleted']
+            delete t['taskcompleted']
+        }
+
+        return {todo: todo, statusCode: 200, msg: "Event todo list"}
+
+    } catch (e) {
+        throw e
+    }
+}
+
+export const addEventTodoService = async(req, res) => {
+    try {
+        const todoList = await getEventTaskByEventIDDb(req.params.eventID)
+        if (todoList.length === 5)
+            return {todo: null, statusCode: 400, msg: "Todo list max items reached"}
+
+        const { taskDescription, taskCompleted } = req.body
+        const result = await addEventTaskDb(req.params.eventID, taskDescription, taskCompleted)
+
+        return {todo: result, statusCode: 200, msg: "New todo item added"}
+        
+    } catch (e) {
+        throw e
+    }
+}
+
+export const updateEventTodoService = async(req, res) => {
+    try {
+        const task = await getEventTaskByTaskIDDb(req.params.taskID)
+        if (task.length === 0) {
+            return {todo: null, statusCode: 400, msg: "Task does not exist"}
+        }
+        const { taskCompleted } = req.body
+        const result = await updateTaskByTaskIDDb(req.params.taskID, taskCompleted)
+
+        return {todo: result, statusCode: 200, msg: `Todo item ${req.params.taskID} updated`}
+        
+    } catch (e) {
+        throw e
+    }
+}
+
+export const deleteEventTodoService = async(req, res) => {
+    try {
+        const task = await getEventTaskByTaskIDDb(req.params.taskID)
+        if (task.length === 0) {
+            return {todo: null, statusCode: 400, msg: "Task does not exist"}
+        }
+
+        await deleteTaskByTaskIDDb(req.params.taskID)
+
+        return {statusCode: 200, msg: "Task deleted"}
+        
     } catch (e) {
         throw e
     }

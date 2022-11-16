@@ -8,17 +8,28 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { Grid } from '@mui/material';
 import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
 
 
 const PublishedCard = ({
   eventObj, 
   idx
 }) => {
-  //console.log(eventObj)
+  const [dispDescription, setDispDescription] = useState("");
+  useEffect(()=>{
+    const words = eventObj.eventDescription.split(' ');
+    const wordsLen = words.length;
+    if (wordsLen > 30) {
+      const tempDescription = `${(eventObj.eventDescription).substr(0,300)}...`;
+      setDispDescription(tempDescription);
+    } else {
+      setDispDescription(eventObj.eventDescription);
+    }
+  },[])
   return (
-    <Grid container item xs={12} >
-      <Card key={idx} style={{display: 'flex', width: '100%', height:'20rem'}} >
-        <Box id="card media" width = "40%" >
+    <Grid container item xs={3} >
+      <Card key={idx} style={{display: 'flex', width: '100%', height:'40rem', display: "flex", flexDirection:"column"}} >
+        <Box id="card media" width = "100%" height="40%">
           <CardMedia
               component="img"
               height="100%"
@@ -27,17 +38,17 @@ const PublishedCard = ({
               style={{overflow:"auto"}}
           />
         </Box>
-        <Box id="card contend and action container" style={{display:'flex', flexDirection: 'column', width:'60%'}}>
+        <Box id="card contend and action container" style={{display:'flex', flexDirection: 'column', height:'60%'}}>
           <Box id="card content" style={{height:'90%', overflow:'auto'}}>
             <CardContent>
               <Typography gutterBottom variant="h5" component="div">
                 {eventObj.eventName}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                {eventObj.eventType +' | '+ eventObj.eventVenue+' | '+eventObj.capacity}
+                {`Event Type: ${eventObj.eventType} | Venue: ${eventObj.eventVenue} | Event Capacity: ${eventObj.capacity}`}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                {`Description:  ${eventObj.eventDescription}`}
+                {`Description:  ${dispDescription}`}
               </Typography>
               {Array(Math.ceil(eventObj.averageRating))
                 .fill(0)

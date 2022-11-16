@@ -415,15 +415,18 @@ const PurchaseTicket= ({
       aria-describedby="purchasing ticket form"
     >
       <Box sx={style}>
-        <Typography aria-label="event name" id="modal-modal-title" variant="h6">
-          {eventInfo.eventName}
-        </Typography>
-        <Typography aria-label="event location" id="modal-modal-description">
-          {`Location ${eventInfo.eventVenue}, ${eventInfo.eventLocation}`}
-        </Typography>
-        <Typography aria-label="event dates" id="modal-modal-description">
-          {`Date: ${(new Date(eventInfo.startDateTime)).toLocaleString('en-AU',dateOptions)} to ${(new Date(eventInfo.endDateTime)).toLocaleString('en-AU',dateOptions)}`}
-        </Typography>
+        <Box id="header container" style={{backgroundColor:"#8666e7", padding:"10px"}}>
+          <Typography aria-label="event name" style={{color:"white"}} variant="h6" >
+            {eventInfo.eventName}
+          </Typography>
+          <Typography aria-label="event location" style={{color:"white"}} id="modal-modal-description">
+            {`Location ${eventInfo.eventVenue}, ${eventInfo.eventLocation}`}
+          </Typography>
+          <Typography aria-label="event dates" style={{color:"white"}} id="modal-modal-description">
+            {`Date: ${(new Date(eventInfo.startDateTime)).toLocaleString('en-AU',dateOptions)} to ${(new Date(eventInfo.endDateTime)).toLocaleString('en-AU',dateOptions)}`}
+          </Typography>
+        </Box>
+        
         {pageControl()}
         
         <Box id="navigation buttons">

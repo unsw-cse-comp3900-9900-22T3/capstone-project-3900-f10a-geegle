@@ -90,6 +90,14 @@ const getEventTaskByEventIDDb = async(eventID) => {
     return result.rows
 }
 
+// READ
+const getEventTaskByTaskIDDb = async(taskID) => {
+    const result = await db.query (
+        "SELECT * FROM eventTaskList WHERE taskID = $1", [taskID]
+    )
+    return result.rows
+}
+
 // UPDATE
 const updateTaskByTaskIDDb = async(taskID, taskCompleted) => {
     const result = await db.query (
@@ -97,6 +105,14 @@ const updateTaskByTaskIDDb = async(taskID, taskCompleted) => {
         [taskCompleted, taskID]
     )
     return result.rows[0]
+}
+
+// UPDATE
+const deleteTaskByTaskIDDb = async(taskID) => {
+    await db.query (
+        "DELETE FROM eventTaskList where taskID = $1",
+        [taskID]
+    )
 }
 
 export {
@@ -107,5 +123,8 @@ export {
     updateEventGoalMetricsDb,
     addEventGoalMetricsDb,
     addEventTaskDb,
-    getEventTaskByEventIDDb
+    getEventTaskByEventIDDb,
+    getEventTaskByTaskIDDb,
+    updateTaskByTaskIDDb,
+    deleteTaskByTaskIDDb
 }

@@ -199,7 +199,7 @@ CREATE TABLE eventGoalMetrics (
 );
 
 CREATE TABLE eventTaskList (
-    taskID integer NOT NULL,
+    taskID SERIAL,
     eventID integer NOT NULL,
     taskDescription text NOT NULL,
     taskCompleted boolean DEFAULT FALSE,
