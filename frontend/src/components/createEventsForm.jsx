@@ -178,6 +178,17 @@ function CreateEventsForm() {
   };
 
   /**
+   * Function that handles deleting a ticket
+   */
+   const handleTicketDelete = (index, e) => {
+    const allNewTicketTypes = [...allTicketTypes];
+    console.log("before deletion", allTicketTypes);
+    console.log("delete index", index);
+    const updatedTickets = allNewTicketTypes.filter((value,idx) => idx !== index)
+    console.log("after deletion", updatedTickets);
+    setAllTicketTypes(updatedTickets);
+  };
+  /**
    *  Function that handles venue changes from the drop down
    */
   const handleVenue = (event) => {
@@ -578,6 +589,8 @@ function CreateEventsForm() {
                     handleTicketSeatSection={handleTicketSeatSection}
                     index={index}
                     venue={venue}
+                    handleTicketDelete = {handleTicketDelete}
+                    allTicketTypes = {allTicketTypes}
                   />
                 </div>
               );

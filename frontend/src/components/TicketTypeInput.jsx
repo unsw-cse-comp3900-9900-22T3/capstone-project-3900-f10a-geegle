@@ -7,6 +7,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { width } from '@mui/system';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import ClearIcon from '@mui/icons-material/Clear';
 import PropTypes from 'prop-types';
 
 
@@ -16,7 +17,9 @@ function TicketTypeInput( {
   handleTicketPrice,
   handleTicketSeatSection,
   index,
-  venue
+  venue,
+  handleTicketDelete,
+  allTicketTypes
 }) {
   const [eventSeatSection, setEventSeatSection] = useState([]);
   const fetchSeatSection = async () => {
@@ -58,6 +61,7 @@ return (
       aria-label="Quantity"
       type="number"
       variant="outlined"
+      value = {allTicketTypes[index].quantity}
       onChange={(e) => handleAmount(index, e)}
       fullWidth
     />
@@ -71,8 +75,21 @@ return (
       variant="outlined"
       onChange={(e) => handleTicketPrice(index, e)}
       fullWidth
-    />
+      />
     </Grid>
+    {index !== 0 ? (
+      <Grid item xs = {3}>
+        <Button 
+          style={{marginRight: "15px",width: "8rem", fontSize: "1.3rem", backgroundColor: "#9579e7"}}
+          variant="contained"
+          size="large"
+          onClick ={(e) => handleTicketDelete(index, e)}
+          >
+            Delete
+          </Button>
+      </Grid>
+    ) : null}
+    
     <Grid item xs = {12}>
       {eventSeatSection.map((elem, idx) => {
         return (
