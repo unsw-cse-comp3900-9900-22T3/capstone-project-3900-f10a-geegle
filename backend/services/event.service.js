@@ -77,16 +77,19 @@ export const createEventsService = async(req, res) => {
         let seatingAvailable = false
         if (venue.length === 0) {
             const { eventVenue, eventLocation, venueCapacity } = events
+            if (Number(venueCapacity) <= 0) 
+                return {events: null, statusCode : 400, msg: 'Venue capacity cannot be less than 0'}
+            if (Number(venueCapacity) < Number(capacity))
+                return {events: null, statusCode : 400, msg: 'Venue capacity not sufficient for event'}
             venue = await addEventVenueDb(eventVenue, eventLocation, venueCapacity)
         } else {
             venue = venue[0]
+            if (venue.maxcapacity < capacity) {
+                return {events: null, statusCode : 400, msg: 'Venue capacity not sufficient for event'}
+            }
             const venueSeats = await isVenueSeatingAvailableDb(venue.venueid)
             seatingAvailable = parseInt(venueSeats.count) ? true : false
         } 
-
-        if (venue.maxcapacity < capacity) {
-            return {events: null, statusCode : 400, msg: 'Venue capacity not sufficient for event'}
-        }
 
         const newEvent = await addEventDb(eventName, req.userID, new Date(startDateTime), new Date(endDateTime), eventDescription,
                 eventType, venue.venueid, Number(capacity), totalTickets, image1, image2, image3)
