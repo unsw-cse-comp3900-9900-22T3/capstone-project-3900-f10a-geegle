@@ -5,7 +5,7 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import Grid from '@mui/material/Grid';
-import { styled } from '@mui/material/styles';
+import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 import { Navigate, useNavigate, Link, useParams, useLocation } from 'react-router-dom';
 import Stepper from '@mui/material/Stepper';
@@ -14,6 +14,18 @@ import StepButton from '@mui/material/StepButton';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import CanvasJSReact from '../canvasjs.react';
+import AddIcon from '@mui/icons-material/Add';
+import InputBase from '@mui/material/InputBase';
+import IconButton from '@mui/material/IconButton';
+import { SettingsBackupRestoreRounded } from '@mui/icons-material';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Checkbox from '@mui/material/Checkbox';
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
+
 var CanvasJS = CanvasJSReact.CanvasJS;
 var CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
@@ -38,9 +50,32 @@ const Item = styled(Paper)(({ theme }) => ({
   textAlign: 'center',
   // color: theme.palette.text.secondary,
   color: 'purple',
-  height: '20vh',
+  height: '10vh',
   fontSize: '5vh',
 }));
+
+const stepperTheme = createTheme({
+  components: {
+    MuiStepIcon: {
+      styleOverrides: {
+        root: {
+          '&.Mui-active':{
+            color: "purple",
+          }
+        },
+      },
+    },
+  },
+});
+
+const buttonStyle = {
+  display: "inline-block",
+  backgroundColor: "white",
+  color: "purple",
+  borderRadius: "25px",
+  border: "2px solid purple",
+};
+
 
 export default function Dashboard() {
   const { eventId} = useParams();
@@ -53,171 +88,135 @@ export default function Dashboard() {
   const [pageViewPlot, setPageViewPlot] = React.useState({});
   const [ticketPurchasePlot, setTicketPurchasePlot] = React.useState({});
   const [revenuePlot, setRevenuePlot] = React.useState({});
+  const [steps, setSteps] = React.useState(['No Milestones Reached']);
+  const [conversionRate, setConversionRate] = React.useState('0');
+  const [revenue, setRevenue] = React.useState('0');
+  const [ticketSold, setTicketSold] = React.useState('0');
+  const [showTextInput, setShowTextInput] = React.useState(false);
+  const [taskName, setTaskName] = React.useState('');
+  const [tasks, setTasks] = React.useState([]);
+  const [tastErr, setTaskErr] = React.useState(false);
 
   const handleChange = (event, newAlignment) => {
     setToggleState(newAlignment);
     console.log(event);
     console.log(newAlignment);
-    if (newAlignment ===  'pageView') {
-      console.log('here');
-      fetchPageViewPlot();
-    }
-    if (newAlignment ===  'ticketPurchase') {
-      console.log('here');
-      fetchTicketPurchasePlot();
-    }
-    if (newAlignment ===  'revenue') {
-      console.log('here');
-      fetchRevenuePlot();
-    }
+    // if (newAlignment ===  'pageView') {
+    //   console.log('here');
+    //   fetchPageViewPlot();
+    // }
+    // if (newAlignment ===  'ticketPurchase') {
+    //   console.log('here');
+    //   fetchTicketPurchasePlot();
+    // }
+    // if (newAlignment ===  'revenue') {
+    //   console.log('here');
+    //   fetchRevenuePlot();
+    // }
   };
 
-  const steps = ['Select campaign settings', 'Create an ad group', 'Create an ad'];
   
-  const fetchPageViewPlot = () => {
+  
+  const fetchPageViewPlot = async (data) => {
+    // pass a function to map
+    // const newData = data.map(dp =>{ 
+    //   delete data.x;
+    // });
+
+    const updatedDate = data.map(({ pageViews, date }) => ({
+      ["y"]:pageViews,
+      ["x"]:new Date(date)
+    }))
+
+    console.log(data);
     setPageViewPlot({
       animationEnabled: true,
       exportEnabled: true,
       theme: "light2", // "light1", "dark1", "dark2"
       title:{
-        text: "Bounce Rate by Week of Year"
+        text: "Page views"
       },
       axisY: {
-        title: "Bounce Rate",
-        suffix: "%"
+        title: "Page Views/Day",
       },
       axisX: {
-        title: "Week of Year",
-        prefix: "W",
-        interval: 2
+        title: "per day",
+        //interval: 1
       },
       data: [{
         type: "line",
-        toolTipContent: "Week {x}: {y}%",
-        dataPoints: [
-          { x: 1, y: 64 },
-          { x: 2, y: 61 },
-          { x: 3, y: 64 },
-          { x: 4, y: 62 },
-          { x: 5, y: 64 },
-          { x: 6, y: 60 },
-          { x: 7, y: 58 },
-          { x: 8, y: 59 },
-          { x: 9, y: 53 },
-          { x: 10, y: 54 },
-          { x: 11, y: 61 },
-          { x: 12, y: 60 },
-          { x: 13, y: 55 },
-          { x: 14, y: 60 },
-          { x: 15, y: 56 },
-          { x: 16, y: 60 },
-          { x: 17, y: 59.5 },
-          { x: 18, y: 63 },
-          { x: 19, y: 58 },
-          { x: 20, y: 54 },
-          { x: 21, y: 59 },
-          { x: 22, y: 64 },
-          { x: 23, y: 59 }
-        ]
+        // xValueType: "dateTime",
+        toolTipContent: "Week {date}: {pageViews}%",
+        dataPoints: updatedDate
       }]})
     }
 
-    const fetchTicketPurchasePlot = () => {
+    const fetchTicketPurchasePlot = async(data) => {
+          // pass a function to map
+      // const newData = data.map(dp =>{ 
+      //   delete data.x;
+      // });
+
+      console.log('here');
+      console.log(data);
+      const updatedDate = data.map(({ ticketPurchases, date }) => ({
+        ["y"]:ticketPurchases,
+        ["x"]:new Date(date)
+      }));
+
+      console.log("here");
       setTicketPurchasePlot({
         animationEnabled: true,
         exportEnabled: true,
         theme: "light2", // "light1", "dark1", "dark2"
         title:{
-          text: "Bounce Rate by Week of Year"
+          text: "Ticket Purchases"
         },
         axisY: {
-          title: "Bounce Rate",
-          suffix: "%"
+          title: "Amount of ticket purchase",
         },
         axisX: {
-          title: "Week of Year",
-          prefix: "W",
-          interval: 2
+          title: "Per Day",
         },
         data: [{
           type: "line",
-          toolTipContent: "Week {x}: {y}%",
-          dataPoints: [
-            { x: 1, y: 64 },
-            { x: 2, y: 61 },
-            { x: 3, y: 64 },
-            { x: 4, y: 62 },
-            { x: 5, y: 64 },
-            { x: 6, y: 60 },
-            { x: 7, y: 58 },
-            { x: 8, y: 59 },
-            { x: 9, y: 53 },
-            { x: 10, y: 54 },
-            { x: 11, y: 61 },
-            { x: 12, y: 60 },
-            { x: 13, y: 55 },
-            { x: 14, y: 60 },
-            { x: 15, y: 56 },
-            { x: 16, y: 60 },
-            { x: 17, y: 59.5 },
-            { x: 18, y: 63 },
-            { x: 19, y: 58 },
-            { x: 20, y: 54 },
-            { x: 21, y: 59 },
-            { x: 22, y: 64 },
-            { x: 23, y: 59 }
-          ]
-        }]})
+          toolTipContent: "Week {date}: {ticketPurchases}%",
+          dataPoints: updatedDate
+        }]
+      })
     }
 
     
-    const fetchRevenuePlot = () => {
+    const fetchRevenuePlot = async(data) => {
+
+      console.log('here');
+      const updatedDate = data.map(({ ticketRevenue, date }) => ({
+        ["y"]:ticketRevenue,
+        ["x"]:new Date(date)
+      }));
+
+      
       setRevenuePlot({
         animationEnabled: true,
         exportEnabled: true,
         theme: "light2", // "light1", "dark1", "dark2"
         title:{
-          text: "Bounce Rate by Week of Year"
+          text: "Revenue"
         },
         axisY: {
-          title: "Bounce Rate",
-          suffix: "%"
+          title: "Revenue",
         },
         axisX: {
-          title: "Week of Year",
-          prefix: "W",
-          interval: 2
+          title: "Per Day",
         },
         data: [{
           type: "line",
-          toolTipContent: "Week {x}: {y}%",
-          dataPoints: [
-            { x: 1, y: 64 },
-            { x: 2, y: 61 },
-            { x: 3, y: 64 },
-            { x: 4, y: 62 },
-            { x: 5, y: 64 },
-            { x: 6, y: 60 },
-            { x: 7, y: 58 },
-            { x: 8, y: 59 },
-            { x: 9, y: 53 },
-            { x: 10, y: 54 },
-            { x: 11, y: 61 },
-            { x: 12, y: 60 },
-            { x: 13, y: 55 },
-            { x: 14, y: 60 },
-            { x: 15, y: 56 },
-            { x: 16, y: 60 },
-            { x: 17, y: 59.5 },
-            { x: 18, y: 63 },
-            { x: 19, y: 58 },
-            { x: 20, y: 54 },
-            { x: 21, y: 59 },
-            { x: 22, y: 64 },
-            { x: 23, y: 59 }
-          ]
-        }]})
-      }
+          toolTipContent: "Week {date}: {revenue}%",
+          dataPoints: updatedDate
+        }]
+      })
+    }
+    
 
   const navigate = useNavigate();
   // const handleOpen = () => setOpen(true);
@@ -226,91 +225,223 @@ export default function Dashboard() {
     navigate(`/events/host`);
   } 
 
+  const addInput = () => {
+    if(showTextInput) {
+      setShowTextInput(false);
+    } else {
+      setShowTextInput(true);
+    }
+  }
+  const fetchDashboardData = async() => {
+    const response = await fetch(`http://localhost:3000/events/dashboard/${eventId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'auth-token': localStorage.getItem('token'),
+        },
+        // body: JSON.stringify({userID:userID }),
+      })
+      if (response.ok) {
+        const json = await response.json();
+        console.log('json', json);
+        const mileStone = [];
+        await fetchPageViewPlot(json.stats.pageViewChart);
+        await fetchTicketPurchasePlot(json.stats.ticketPurchaseChart);
+        await fetchRevenuePlot(json.stats.ticketRevenueChart);
+        await setConversionRate(json.stats.conversionRate);
+        await setRevenue(json.stats.revenue);
+        await setTicketSold(json.stats.ticketsSold);
+        for (const ms of json.stats.milestones) {
+          if (ms.achieved) {
+            mileStone.push(ms.goal);
+          }
+        }
+        if(mileStone.length !== 0) {
+          setSteps(mileStone)
+        }
+      } else if (response.status === 404) {
+        console.log('invalid id');
+      } else if (response.status === 403) {
+        console.log('you are not allowed to access this event');
+      }
+  }
 
+  const fetchTasks = async() => {
+    const response = await fetch(`http://localhost:3000/events/${eventId}/todo`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'auth-token': localStorage.getItem('token'),
+      },
+      // body: JSON.stringify({userID:userID }),
+    })
+
+    if (response.ok) {
+      const json = await response.json();
+      setTasks(json.todo);
+      setTaskErr(false);
+    } 
+  }
+
+  const addTasks = async(task) => {
+    const response = await fetch(`http://localhost:3000/events/${eventId}/todo`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'auth-token': localStorage.getItem('token'),
+      },
+      body: JSON.stringify({
+        taskDesciption: task,
+        taskCompleted: false
+      }),
+    })
+
+    if (response.ok) {
+      const json = await response.json();
+      setTasks(json.todo);
+      setTaskErr(false);
+    } else if (response.status === 400) {
+      setTaskErr(true);
+    }
+  }
+
+  React.useEffect(()=> {
+    fetchDashboardData();
+    fetchTasks();
+  }, [tasks])
 
   return (
-    <div>
-      {/* <Button onClick={handleOpen}>Open modal</Button> */}
-      <Modal
-        open={open}
-        onClose={()=>handleClose()}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <Typography gutterBottom variant="h5" component="div">
-            Dashboard For {eventObj.eventName}
-          </Typography>
-          <Typography gutterBottom variant="h6" component="div" color="purple">
-            Metrics: 
-          </Typography>
-          <Grid container spacing={2}>
-            <Grid item xs={4}>
-              <Typography gutterBottom variant="body1" component="div" color="text.primary" align='center'>
-                Conversion Rate
-              </Typography>
-              <Item>xs=8</Item>
+    <ThemeProvider theme={stepperTheme}>
+      <div>
+        {/* <Button onClick={handleOpen}>Open modal</Button> */}
+        <Modal
+          open={open}
+          onClose={()=>handleClose()}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={style}>
+            <Typography gutterBottom variant="h5" component="div">
+              Dashboard For {eventObj.eventName}
+            </Typography>
+            <Typography gutterBottom variant="h6" component="div" color="purple">
+              Metrics: 
+            </Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={4}>
+                <Typography gutterBottom variant="body1" component="div" color="text.primary" align='center'>
+                  Conversion Rate
+                </Typography>
+                <Item>{parseFloat(conversionRate).toFixed(2)}</Item>
+              </Grid>
+              <Grid item xs={4}>
+                <Typography gutterBottom variant="body1" component="div" color="text.primary" align='center'>
+                  Total Revenue
+                </Typography>
+                <Item>${revenue}</Item>
+              </Grid>
+              <Grid item xs={4}>
+                <Typography gutterBottom variant="body1" component="div" color="text.primary" align='center'>
+                  Tickets Sold
+                </Typography>
+                <Item>{ticketSold}</Item>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography gutterBottom variant="body1" component="div" color="text.primary" align='center'>
+                  To-Do <button style={buttonStyle} onClick={()=>addInput()}>+</button>
+                </Typography>
+                <Item sx={{height: '20vh'}}> 
+                  {tasks.map((t,idx)=> {
+                    return (
+                    <ListItem
+                      key={t.taskDesciption}
+                      secondaryAction={
+                        <IconButton edge="end" aria-label="comments">
+                          <RemoveCircleOutlineIcon/>
+                        </IconButton>
+                      }
+                      disablePadding
+                      >
+                      <ListItemButton role={undefined} dense>
+                        <ListItemIcon>
+                          <Checkbox
+                            edge="start"
+                            checked={t.taskCompleted}
+                            tabIndex={-1}
+                            disableRipple
+                            inputProps={{ 'aria-labelledby': idx}}
+                          />
+                        </ListItemIcon>
+                        <ListItemText id={idx} primary={`${t.taskDesciption}`} />
+                      </ListItemButton>
+                    </ListItem>
+                    );
+                  })}
+                  {showTextInput && <>
+                    <Paper sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: '20vw' , height: '5vh', position: "relative", top: "70%", left: "27%"}}>
+                      <InputBase
+                        sx={{ ml: 1, flex: 1 }}
+                        placeholder="Add a task ...."
+                        inputProps={{ 'aria-label': 'Add tasks to your to do list' }}
+                        onChange={(e) => setTaskName(e.target.value)}
+                      />
+                      <IconButton type="button" sx={{ p: '10px' }} aria-label="addTaskButton" onClick={()=>addTasks(taskName)}>
+                        <AddIcon />
+                      </IconButton>
+                    </Paper >
+                  </>}
+                </Item>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography gutterBottom variant="h6" component="div" color="purple">
+                  Milestones Reached 
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Stepper nonLinear>
+                  {steps.map((label, index) => (
+                    <Step key={label} active = {true}>
+                      <StepButton expanded={true}>
+                        {label}
+                      </StepButton>
+                    </Step>
+                  ))}
+                </Stepper>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography gutterBottom variant="h6" component="div" color="purple">
+                  Live Plots
+                </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <ToggleButtonGroup
+                  color="primary"
+                  value={toggleState}
+                  exclusive
+                  onChange={handleChange}
+                  aria-label="Platform"
+                >
+                  <ToggleButton value="pageView">Page Views</ToggleButton>
+                  <ToggleButton value="ticketPurchase">Ticket Purchases</ToggleButton>
+                  <ToggleButton value="revenue">Revenue</ToggleButton>
+                </ToggleButtonGroup>
+              </Grid>
+              <Grid item xs={12}>
+                {toggleState === "pageView" && <div>
+                  <CanvasJSChart options = {pageViewPlot}/>
+                </div>}
+                {toggleState === "ticketPurchase" && <div>
+                  <CanvasJSChart options = {ticketPurchasePlot}/>
+                </div>}
+                {toggleState === "revenue" && <div>
+                  <CanvasJSChart options = {revenuePlot}/>
+                </div>}
+              </Grid>
             </Grid>
-            <Grid item xs={4}>
-              <Typography gutterBottom variant="body1" component="div" color="text.primary" align='center'>
-                Total Revenue
-              </Typography>
-              <Item>xs=8</Item>
-            </Grid>
-            <Grid item xs={4}>
-              <Typography gutterBottom variant="body1" component="div" color="text.primary" align='center'>
-                To-Do <button style={{display:'inline-block'}}>+</button>
-              </Typography>
-              <Item>xs=8</Item>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography gutterBottom variant="h6" component="div" color="purple">
-                Milestones Reached 
-              </Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <Stepper nonLinear>
-                {steps.map((label, index) => (
-                  <Step key={label}>
-                    <StepButton color="inherit">
-                      {label}
-                    </StepButton>
-                  </Step>
-                ))}
-              </Stepper>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography gutterBottom variant="h6" component="div" color="purple">
-                Live Plots
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <ToggleButtonGroup
-                color="primary"
-                value={toggleState}
-                exclusive
-                onChange={handleChange}
-                aria-label="Platform"
-              >
-                <ToggleButton value="pageView">Page Views</ToggleButton>
-                <ToggleButton value="ticketPurchase">Ticket Purchases</ToggleButton>
-                <ToggleButton value="revenue">Revenue</ToggleButton>
-              </ToggleButtonGroup>
-            </Grid>
-            <Grid item xs={12}>
-              {toggleState === "pageView" && <div>
-                <CanvasJSChart options = {pageViewPlot}/>
-              </div>}
-              {toggleState === "ticketPurchase" && <div>
-                <CanvasJSChart options = {ticketPurchasePlot}/>
-              </div>}
-              {toggleState === "revenue" && <div>
-                <CanvasJSChart options = {revenuePlot}/>
-              </div>}
-            </Grid>
-          </Grid>
-        </Box>
-      </Modal>
-    </div>
+          </Box>
+        </Modal>
+      </div>
+    </ThemeProvider>
   );
+    
 }
