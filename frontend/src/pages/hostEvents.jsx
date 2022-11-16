@@ -508,7 +508,6 @@ const HostEventsPage = () => {
                         size="small">
                           Dashboard
                       </Button>
-                      {!obj.published && <Button size="small" onClick={e=>handlePublish(obj, idx)}>Publish</Button>}
                       {!obj.published && <Button size="small" onClick={()=>openDeletePrompt(obj,idx)}>Delete</Button>}
                     </CardActions>
                   </Box>
