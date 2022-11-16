@@ -1,12 +1,8 @@
 import * as React from 'react';
 import Paper from '@mui/material/Paper';
 import InputBase from '@mui/material/InputBase';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
-import DirectionsIcon from '@mui/icons-material/Directions';
-import { Navigate, useNavigate, Link, useParams, useLocation } from 'react-router-dom';
+import { useNavigate} from 'react-router-dom';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -14,7 +10,6 @@ import Checkbox from '@mui/material/Checkbox';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import dayjs, { Dayjs } from 'dayjs';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -39,8 +34,13 @@ const style = {
   p: 4,
 };
 
+/**
+ * Functional component that renders out a form on the public landing page so 
+ * that users can filter and search their required events
+ * search - user's can search on key word, such as description, event name and event type
+ * user's can filter on startDate, endDate, venue, event rating, event type, cost
+ */
 const SearchFilter = ({openSearch, setOpenSearch, setFilter, setFilteredListings}) => {
-  //const [open, setOpen] = React.useState(true);
   const [openStartDate, setOpenStartDate] = React.useState(false);
   const[openEndDate, setOpenEndDate] = React.useState(false);
   const [openEventCat, setOpenEventCat] = React.useState(false);
@@ -56,9 +56,9 @@ const SearchFilter = ({openSearch, setOpenSearch, setFilter, setFilteredListings
   const [keyword, setKeyword] = React.useState('');
   const [searchString,setSearchString] = React.useState([false,false,false,false,false,false,false]);
   const navigate = useNavigate();
+
   const handleClose = () => {
     navigate('/');
-    //navigate(`/event/view/${eventId}`);
     setOpenSearch(false);
   };
   const handleStartOpen = (event) => {
@@ -103,15 +103,14 @@ const SearchFilter = ({openSearch, setOpenSearch, setFilter, setFilteredListings
       setEventCost(parseInt(event.target.value))
     }
   }
-
+  
+  // code reference to
   // check if a string is only spaces https://bobbyhadz.com/blog/javascript-check-if-string-contains-only-spaces
   const onlySpaces=(str) => {
     return str.trim().length === 0;
   }
 
   const handleKeyword = (e) => {
-    console.log('here');
-    console.log('keyword', keyword);
     setKeyword(e.target.value);
     let updatedList = [...searchString];
     if(!onlySpaces(e.target.value)) {
@@ -124,11 +123,8 @@ const SearchFilter = ({openSearch, setOpenSearch, setFilter, setFilteredListings
 
   const handleSubmit = async(e) => {
     e.preventDefault();
-    console.log('submitted!');
-    // add an if statement to check if fields are filled in
     let combinedStr = '';
     let concatStr = '';
-    console.log(searchString);
     searchString.forEach((elem, idx) => {
       if(elem) {
         switch(idx) {
@@ -157,12 +153,12 @@ const SearchFilter = ({openSearch, setOpenSearch, setFilter, setFilteredListings
         combinedStr=combinedStr+concatStr+'&'
       }
     })
+
     // check last character is it's and &
     if (combinedStr.length !== 0) {
-      console.log('here')
       combinedStr=combinedStr.slice(0, -1);
     }
-    console.log(combinedStr);
+
     // calling api
     if(!localStorage.getItem('token')) {
       const response = await fetch(`http://localhost:3000/events/find?${combinedStr}`, {
@@ -170,7 +166,6 @@ const SearchFilter = ({openSearch, setOpenSearch, setFilter, setFilteredListings
     })
       const json = await response.json();
       if (response.ok) {
-        console.log('result', json);
         handleClose();
         setFilter(true);
         setFilteredListings(json.events);
@@ -184,7 +179,6 @@ const SearchFilter = ({openSearch, setOpenSearch, setFilter, setFilteredListings
       }})
       const json = await response.json();
       if (response.ok) {
-        console.log('result', json);
         handleClose();
         setFilter(true);
         setFilteredListings(json.events);
@@ -193,11 +187,6 @@ const SearchFilter = ({openSearch, setOpenSearch, setFilter, setFilteredListings
     }
   }
   
-
-  console.log(startDate);
-  console.log(endDate);
-  console.log(eventType);
-  // console.log(filteredListings);
   return (
     <>
       <Modal
@@ -279,7 +268,6 @@ const SearchFilter = ({openSearch, setOpenSearch, setFilter, setFilteredListings
                     value={eventType}
                     onChange={(e) => setEventType(e.target.value)}
                   >
-                    {/* do we need event types stored in the back end (maybe we need to when we filter?) */}
                     <MenuItem value={'Concert'}>Concert</MenuItem>
                     <MenuItem value={'Festival'}>Festival</MenuItem>
                     <MenuItem value={'Conference'}>Conference</MenuItem>
@@ -301,7 +289,6 @@ const SearchFilter = ({openSearch, setOpenSearch, setFilter, setFilteredListings
                     value={eventLocation}
                     onChange={(e) => setEventLocation(e.target.value)}
                   >
-                    {/* do we need event types stored in the back end (maybe we need to when we filter?) */}
                     <MenuItem value={'Accor Stadium'}>Accor Stadium</MenuItem>
                     <MenuItem value={'ICC Sydney'}>ICC Sydney</MenuItem>
                     <MenuItem value={'Ivy Precinct'}>Ivy Precinct</MenuItem>

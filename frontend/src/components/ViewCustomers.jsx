@@ -8,6 +8,10 @@ import CustomerTickets from '../components/CustomerTickets';
 import CustomiseEmail from '../components/CustomiseEmail';
 import { useNavigate } from 'react-router-dom';
 
+/**
+ *  Component that renders customers that has bought ticketsto their selected event,
+ * this component is rendered when host clicked on "view customers" on host events page
+ */
 const ViewCustomers= ({
   customerModal, 
   clickedEventInfo, 
@@ -30,7 +34,6 @@ const ViewCustomers= ({
   const [viewTicketModal, setViewTicketModal] = useState(false);
   const [emailModal, setEmailModal] = useState(false);
   const [clickedCustomer, setClickedCustomer] = useState({});
-  const navigate = useNavigate();
   const fetchCustomers = async() => {
     const response = await fetch(`http://localhost:3000/events/${clickedEventInfo.eventID}/guest`, {
       method: 'GET',

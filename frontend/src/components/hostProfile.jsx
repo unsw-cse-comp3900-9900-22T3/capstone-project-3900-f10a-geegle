@@ -1,22 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
-import Carousel from "react-multi-carousel";
-import "react-multi-carousel/lib/styles.css";
-import TextField from '@mui/material/TextField';
 import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import CardHeader from '@mui/material/CardHeader';
-import { FormControl } from '@mui/material';
-import { Navigate, useNavigate, Link, useParams, useLocation } from 'react-router-dom';
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import { Grid } from '@mui/material';
-import Stack from '@mui/material/Stack';
-import { GifBoxOutlined } from '@mui/icons-material';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import Modal from '@mui/material/Modal';
 
 const style = {
@@ -32,6 +19,12 @@ const style = {
   overflow: 'scroll',
   p: 4,
 };
+
+/**
+ *  Functional component that renders 
+ *  the profile of the host which would show host name, host email,
+ *   average rating, and all events hosted/hosting (published events)
+ */
 const HostProfile=()=> {
 
   const [open, setOpen] = useState(true);
@@ -45,33 +38,39 @@ const HostProfile=()=> {
   const {hostId} = useParams();
   const state = useLocation();
   const eventId = state.state;
-  // console.log(eventObj);
-  console.log('eventId', eventId);
-  console.log('hostId', hostId);
 
+
+  /**
+   * Function that closes the host profile when user
+   * want to close host profile
+   */
   const handleClose = () => {
     navigate(`/event/view/${eventId}`);
     setOpen(false);
   };
 
+  /**
+   * Fetching host information
+   */
   const fetchHostInfo = async() => {
-    console.log('here')
+    
     const response = await fetch(`http://localhost:3000/events/host/details/${hostId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
-      //body: JSON.stringify({hostID:hostId})
     })
     const json = await response.json();
     setHostInfo(json)
     const allEvents = json.events;
     const hostPublishedEvent = allEvents.filter((ele,idx) => ele.published === true);
-    console.log(hostPublishedEvent);
     setHostEvents(json.events);
-    console.log(json)
   }
 
+  /**
+   *  This useEffect renders host information as soon as user lands on the host
+   *  profile's page
+   */
   useEffect(() => {
     fetchHostInfo();
   }, [])

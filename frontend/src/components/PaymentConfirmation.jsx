@@ -1,20 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import CardHeader from '@mui/material/CardHeader';
 import { FormControl,Box, TextField, FormLabel, RadioGroup, Radio, FormControlLabel, Alert } from '@mui/material';
-import { Navigate, useNavigate, Link, useParams } from 'react-router-dom';
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import { Grid } from '@mui/material';
-import AccorStadium from './AccorStadium';
-import DoltonHouse from './DoltonHouse';
 
 
+/**
+ *  This functional component renders the payment details form 
+ *  when user purchases a ticket. The user can specify whether they want
+ *  to used their saved credit card or a new credit card to pay for their ticket
+ */
 const PaymentConfirmation= ({
   paymentOption,
   setPaymentOption,
@@ -27,14 +20,17 @@ const PaymentConfirmation= ({
   availTicketTypes,
   setChosenSeats
   }) => {
-  const handlePaymentChange = (event) => {
-    setPaymentOption(event.target.value);
-  }
-
+  
   const [creditCardNum, setCreditCardNum] = useState('');
   const [month, setMonth] = useState('');
   const [year, setYear] = useState('');
   const [noSavedPayment, setNoSavedPayment] = useState(false);
+
+
+  const handlePaymentChange = (event) => {
+    setPaymentOption(event.target.value);
+  }
+
   const fetchCardDetails = async () => {
     if (localStorage.getItem('token')) {
       const response = await fetch(`http://localhost:3000/user/profile/${localStorage.getItem('userId')}`, {
@@ -46,7 +42,6 @@ const PaymentConfirmation= ({
       });
       const json = await response.json();
       
-      console.log('json',json);
       if (json.user.creditCard !== undefined) {
         const unencryptedNum = json.user.creditCard.creditCardNum;
         const encryptedNum = `xxxxxxxxxxxx${unencryptedNum.substr(unencryptedNum.length-4)}`
@@ -60,12 +55,18 @@ const PaymentConfirmation= ({
       
     }
   }
+
+  /**
+   *  This useEffect is used to check whether user came from a seat selection page or from 
+   *  the initial ticket selection page. If user came from the initial ticket selection page
+   *  then chosenSeatsArray needs to populated.
+   */
   useEffect(()=> {
     fetchCardDetails();
     if (hasSeats === false) {
       // initialise chosenSeats array
       let chosenSeatsArray = [];
-      quantity.map((q, ticketTypeIdx) => {
+      quantity.forEach((q, ticketTypeIdx) => {
         for(let ticketNum=0; ticketNum< q; ticketNum++) {
           const newSeatInfo = {
           ticketType: availTicketTypes[ticketTypeIdx].ticketType,
@@ -75,7 +76,6 @@ const PaymentConfirmation= ({
           chosenSeatsArray.push(newSeatInfo);   
         }
       })
-      console.log("chosen seats array",chosenSeatsArray);
       setChosenSeats(chosenSeatsArray);
     }
   },[])

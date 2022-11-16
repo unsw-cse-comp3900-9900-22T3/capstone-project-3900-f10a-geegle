@@ -167,7 +167,7 @@ function ChildModal({reviewId, eventId}) {
                 Replied and Email has been sent to review authur!
               </Typography>}
               {loginErr && <Typography variant="h6" component="div" color='red'>
-                Please login to leave a reply!
+                Please login to leave a review
               </Typography>}
             </FormControl>
           </Box>

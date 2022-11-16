@@ -1,26 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Grid,
   TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Card,
-  Typography,
-  Button,
-  Checkbox,
-  Stack,
-  Paper,
+  Typography
 } from '@mui/material';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers';
-//import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { width } from '@mui/system';
-import TicketTypeInput from './TicketTypeInput';
-import FormControlLabel from '@mui/material/FormControlLabel';
+
+
 const DefaultVenueInfo = (venue) => {
   const [venueLocation, setVenueLocation] = useState('');
   const [venueCapacity, setVenueCapacity] = useState('');
@@ -57,7 +42,6 @@ const DefaultVenueInfo = (venue) => {
         <TextField
           disabled
           id="Event Location"
-          // label="Event Location"
           aria-label="Event Location"
           type="text"
           variant="filled"
@@ -74,7 +58,6 @@ const DefaultVenueInfo = (venue) => {
         <TextField
           disabled
           id="Capacity"
-          // label="Capacity"
           aria-label="Capacity"
           type="text"
           variant="filled"

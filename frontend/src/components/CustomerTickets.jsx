@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Button from '@mui/material/Button';
@@ -8,8 +8,7 @@ import { Grid } from '@mui/material';
 /**
  * Function that renders modal to view ticket purchases of a customer
  * for a specifield event
- * @param {*} param0 
- * @returns 
+ *
  */
 const CustomerTickets = ({
   customerTicketInfo, 
@@ -29,9 +28,7 @@ const CustomerTickets = ({
     boxShadow: 24,
     p: 4,
   };
-  // console.log('in function');
-  console.log('customer ticket info',  customerTicketInfo);
-  console.log('eventInfo',  eventInfo);
+
   return (
     <Modal
       hideBackdrop
@@ -75,9 +72,7 @@ const CustomerTickets = ({
           <Box style={{overflow:'auto', height: '80%'}}>
             < Grid container spacing={1}>
               {(customerTicketInfo.tickets).map((c, index) => {
-                //console.log('c', c);
                 const SeatComponent = (()=> {
-                  //console.log("in function function");
                   if(c.seat.seatRow !== null) {
                     return (
                       <Typography variant="h6" color="text.secondary">
@@ -92,7 +87,6 @@ const CustomerTickets = ({
                     )
                   }  
                 })
-                //console.log(seatComponent)
                 return (
                   <Grid container spacing = {1} style={{padding:'8px'}} key ={index}>
                     <Grid item xs={3}>
@@ -123,7 +117,6 @@ const CustomerTickets = ({
           <Box style={{overflow:'auto', height: '80%'}}>
             < Grid container spacing={1}>
               {(customerTicketInfo.tickets).map((c, index) => {
-                //console.log(seatComponent)
                 return (
                   <Grid container spacing = {1} style={{padding:'8px'}} key ={index}>
                     <Grid item xs={3}>

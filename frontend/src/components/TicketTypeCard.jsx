@@ -1,19 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import Box from '@mui/material/Box';
-import Modal from '@mui/material/Modal';
 import TextField from '@mui/material/TextField';
 import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import CardHeader from '@mui/material/CardHeader';
-import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { FormControl } from '@mui/material';
 
 
 /**
- * Function that renders non-sold out ticket groups
+ * Function that renders non-sold out ticket groups for the PurchseTicket component.
+ * It renders available tickets that user's can select to purchase.
  */
 const TicketTypeCard= ({
   eventInfo, 

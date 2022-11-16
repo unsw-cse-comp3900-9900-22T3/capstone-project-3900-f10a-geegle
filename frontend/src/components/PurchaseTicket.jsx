@@ -9,6 +9,9 @@ import TicketTypeCard from '../components/TicketTypeCard';
 import SeatAllocation from '../components/SeatAllocation';
 import PaymentConfirmation from '../components/PaymentConfirmation';
 
+/**
+ * Functional component for when checkout was successful 
+ */
 const PurchaseSuccessModal = ({
   setCheckoutSuccess,
   checkoutSuccess,
@@ -61,6 +64,14 @@ const PurchaseSuccessModal = ({
   </Modal>
 )
 }
+/**
+ *  This functional component controls the ticket purchasing form when the user clicks
+ *  "buy" ticket on the view event page. The pages are
+ *  1. selected ticket type 
+ *  2. seat allocation if seats are available 
+ *  3. payment details and confirmation 
+ * 
+ */
 const PurchaseTicket= ({
   getEventInfo,
   eventInfo, 
@@ -125,16 +136,18 @@ const PurchaseTicket= ({
   const [newYear, setNewYear] = useState('');
   
 
-
+  // closing this component
   const closeTicketModal = () => {
     setTicketModal(false);
   }
+
   /**
    * handleNextPage error checks the current page before
    * going to the next page
    */
   const handleNextPage = () => {
-    // check for input error 
+    // check for errors before processing to the next page
+
     if (currentPage === 1) {
       // reset the error states
       setInputError(false);
@@ -169,7 +182,7 @@ const PurchaseTicket= ({
         }
         idx++;
       }
-      // when there are no errors then we allow the use to go to the 
+      // when there are no errors then we allow the user to go to the 
       // go to page 2 for seat allocations if event is seated
       // go to page 3 for payment details if event is not seated
       if (hasSeats === true) {
@@ -207,11 +220,14 @@ const PurchaseTicket= ({
      
     }
   }
+
+  /**
+   *  functional that actiavtes when checkout button is clciked. The button only
+   *  appears on the payment confirmation page.
+   */
   const handleCheckout = async(event, index) => {
 
-    // convert chosenSeats key into an array
-    // the below arrays are related by their index
-    // index represent's the particular ticket
+    // converting chosenSeats keys into 3 arrays
     setCheckoutSuccess(false);
     setCheckoutError(false);
     const tickets = chosenSeats.map((obj, index)=> obj.ticketType);
@@ -278,6 +294,10 @@ const PurchaseTicket= ({
       
     }
   }
+
+  /**
+   *  Function that handles when user selects new quantities on page 1 (ticket selection)
+   */
   const handleQuantity = (event, index) => {
     let newQty = 0;
     if (event.target.value !== "") {
@@ -301,7 +321,8 @@ const PurchaseTicket= ({
     
   }
 
-  // get available ticket types
+  // get available ticket types to show on page 1 (ticket selection) for the user
+  // if ticket type is sold out, it will not show
   const getAvailTicketTypes = async() => {
     const response = await fetch(`http://localhost:3000/events/${eventInfo.eventID}/availableTicketGroup`, {
       method: 'GET',
@@ -329,6 +350,8 @@ const PurchaseTicket= ({
       setHasSeats(false);
     }
   }
+
+  // Function that renders which page to navigate the user
   const pageControl = () => {
     if (currentPage === 1) {
       return (
@@ -380,6 +403,7 @@ const PurchaseTicket= ({
       )
     }
   }
+
   const nextOrCheckoutButton = () => {
     if (currentPage === 1 || currentPage === 2) {
       return (
