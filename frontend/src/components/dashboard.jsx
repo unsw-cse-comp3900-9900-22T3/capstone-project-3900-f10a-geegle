@@ -90,7 +90,7 @@ const ticketsSoldText = `
 The total number of tickets sold for this event
 `;
 const addTaskText = `
-click this button to start adding tasks to your to-do list!!
+click this button to start adding tasks to your to-do list (max 5)!!
 `;
 export default function Dashboard() {
   const { eventId} = useParams();
