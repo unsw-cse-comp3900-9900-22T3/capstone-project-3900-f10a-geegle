@@ -1,3 +1,4 @@
+/* eslint-disable */ 
 import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Carousel from "react-multi-carousel";
@@ -10,6 +11,10 @@ import Stack from '@mui/material/Stack';
 import ViewReviews from './viewReviews';
 import PurchaseTicket from '../components/PurchaseTicket';
 
+/**
+ * Prmpt that tells user to login or register purchase tickets when they 
+ * click the buy ticket button
+ */
 const LogInPurchaseModal=(
   {
     logInPrompt,

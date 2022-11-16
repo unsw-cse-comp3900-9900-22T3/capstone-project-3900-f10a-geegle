@@ -1,3 +1,4 @@
+/* eslint-disable */ 
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -20,6 +21,9 @@ const style = {
   p: 4,
 };
 
+/**
+ * displays my account information and allows user to edit their details
+ */
 const MyAccount = () => {
   const [open, setOpen] = React.useState(true);
   const [edit, setEdit] = React.useState(false);

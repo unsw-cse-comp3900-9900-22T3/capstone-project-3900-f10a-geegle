@@ -1,9 +1,10 @@
+/* eslint-disable */ 
 import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import { BrowserRouter as Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Link, Routes } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
 
@@ -13,13 +14,6 @@ import { useNavigate } from 'react-router-dom';
  */
 const NavBar = ({setLoggedIn}) => {
   const navigate = useNavigate();
-
-  const styles = {
-    appBar: {
-      padding: '0',
-      backgroundColor: '#9662f0'
-    }
-  }
 
   const handleLogout = (e) => {
     localStorage.removeItem('token')

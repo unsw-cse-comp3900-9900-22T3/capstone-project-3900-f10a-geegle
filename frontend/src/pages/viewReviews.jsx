@@ -1,3 +1,4 @@
+/* eslint-disable */ 
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
@@ -52,8 +53,7 @@ function ChildModal({reviewId, eventId}) {
       },
       body: jsonString
     })
-    // const json = await response.json();
-    // console.log(json);
+  
     if (response.ok) {
       setLoginErr(false);
       const json = await response.json()
@@ -67,7 +67,6 @@ function ChildModal({reviewId, eventId}) {
           user: json.replies.user
         }
       })
-      console.log(replyObj);
       fetchReplies();
       setNewReply("");
       const emailRes = await fetch(`http://localhost:3000/events/${eventId}/reviews/${reviewId}/emailReply`, {
@@ -95,7 +94,6 @@ function ChildModal({reviewId, eventId}) {
     })
     const json = await response.json();
     const allReplies = []
-    console.log(json);
     if (json.replies.length !== 0) {
       for (const rep of json.replies) {
         allReplies.push(rep);
@@ -171,12 +169,6 @@ function ChildModal({reviewId, eventId}) {
               </Typography>}
             </FormControl>
           </Box>
-          
-          
-          {/* <h2 id="parent-modal-title">Text in a modal</h2>
-          <p id="parent-modal-description">
-            Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-          </p> */} 
           <Button onClick={handleClose}>Back</Button>
         </Box>
       </Modal>
@@ -185,35 +177,9 @@ function ChildModal({reviewId, eventId}) {
 }
 
 const ViewReviews = ({showReviews, setShowReviews, eventReviews, eventId,getEventInfo}) => {
-  // const [open, setOpen] = React.useState(false);
-  // const handleOpen = () => {
-  //   setOpen(true);
-  // };
-  // const handleClose = () => {
-  //   setOpen(false);                                              
-  // };
-  //const { eventId} = useParams();
   const [reviews, setReviews] = React.useState(eventReviews);
   const [loginErr, setloginErr] = React.useState(false);
-  //const [object, setObject] = React.useState({});
-
-  // const updateLikes = async(eventId) => {
-  //   const response = await fetch(`http://localhost:3000/events/${eventId}/reviews/`, {
-  //     method: 'GET',
-  //     headers: {
-  //       'Content-Type': 'application/json'
-  //     },
-  //   })
-  //   const json = await response.json();
-  //   const allReplies = []
-  //   console.log(json);
-  //   if (json.replies.length !== 0) {
-  //     for (const rep of json.replies) {
-  //       allReplies.push(rep);
-  //     }
-  //     //setReplies(allReplies)
-  //   }
-  // }
+ 
 
   const likeReview = async(reviewId, eventId) => {
     console.log('reviewId', reviewId);
@@ -227,21 +193,17 @@ const ViewReviews = ({showReviews, setShowReviews, eventReviews, eventId,getEven
     })
     if (response.ok) {
       setloginErr(false);
-      console.log(reviews, 'reviews')
       const jsonReviewLiked = await (response.json());
       console.log('jsonReviewLiked', jsonReviewLiked);
       await fetchReviews(eventId);
       await getEventInfo();
     } else if (response.status === 401){
-      console.log('here');
       setloginErr(true);
 
     }
   }
   const fetchReviews = async(eventId) => {
     let json = []
-
-      console.log('here');
       if (localStorage.getItem('token')) { 
         const response = await fetch(`http://localhost:3000/events/${eventId}/reviews/user`, {
           method: 'GET',
@@ -249,7 +211,6 @@ const ViewReviews = ({showReviews, setShowReviews, eventReviews, eventId,getEven
             'Content-Type': 'application/json',
             'auth-token': localStorage.getItem('token'),
           },
-          // body: JSON.stringify({userID:userID }),
         })
         if (response.ok) {
           json = await response.json();
@@ -261,11 +222,9 @@ const ViewReviews = ({showReviews, setShowReviews, eventReviews, eventId,getEven
           headers: {
             'Content-Type': 'application/json',
           },
-          // body: JSON.stringify({userID:userID }),
         })
         if (response.ok){
           json = await response.json();
-          console.log('reviews',json);
         }
       }
       setReviews(json.reviews);
@@ -282,8 +241,6 @@ const ViewReviews = ({showReviews, setShowReviews, eventReviews, eventId,getEven
     })
     if (response.ok) {
       setloginErr(false);
-      // const json = await response.json();
-      // console.log(reviews, 'reviews')
       const jsonReviewUnLiked = await (response.json());
       console.log('jsonReviewUnliked', jsonReviewUnLiked);
       await fetchReviews(eventId);
@@ -295,7 +252,6 @@ const ViewReviews = ({showReviews, setShowReviews, eventReviews, eventId,getEven
 
   return (
     <div>
-      {/* <Button onClick={handleOpen}>Open modal</Button> */}
       <Modal
         open={showReviews}
         onClose={() => setShowReviews(false)}

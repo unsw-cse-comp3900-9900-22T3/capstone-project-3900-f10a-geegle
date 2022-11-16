@@ -1,29 +1,21 @@
+/* eslint-disable */ 
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import CardHeader from '@mui/material/CardHeader';
-import { FormControl, Modal, Grid } from '@mui/material';
+import { Modal, Grid } from '@mui/material';
 import { Navigate, useNavigate, Link } from 'react-router-dom';
 import ViewCustomers from '../components/ViewCustomers';
-const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
-    boxShadow: 24,
-    p: 4,
-  };
 
-
-  const CancelSuccessModal = ({
+/**
+ * 
+ * successful event cancellation message
+ */
+const CancelSuccessModal = ({
     unpublishSuccess,
     setUnpublishSuccess,
     eventInfo,
@@ -78,7 +70,9 @@ const style = {
     )
   }
 
-
+/**
+ * confirmation of does host want to cancel their own event
+ * */
 const ConfirmUnpublishModal = ({
   confirmUnpubPrompt,
   setConfirmUnpubPrompt,
@@ -195,6 +189,10 @@ const ConfirmUnpublishModal = ({
     </Modal>
   )
 }
+
+/**
+ * Success message when host has succesfully deleted their event from eventful systems
+ */
 const DeleteSuccessModal = ({
   delSuccess,
   setDelSuccess,
@@ -249,6 +247,11 @@ const DeleteSuccessModal = ({
     
   )
 }
+
+/**
+ * When events are unpublished users can delete their events from eventful system
+ * this is a confirmation message to ask them do they want to delete their event
+ */
 const ConfirmDeleteModal = ({
   deletePrompt,
   setDeletePrompt,
@@ -353,6 +356,10 @@ const ConfirmDeleteModal = ({
     </Modal>
   )
 }
+
+/**
+ * Page that displays user's events that they are hosting
+ */
 const HostEventsPage = () => {
   const [myListings, setMyListings] = React.useState([]);
   const [customerModal, setCustomerModal] = React.useState(false);
@@ -375,7 +382,6 @@ const HostEventsPage = () => {
       },
     });
     if (response.ok) {
-      console.log('published!')
       fetchHostEvents();
     };
 
@@ -400,7 +406,6 @@ const HostEventsPage = () => {
         },
       });
       const json = await response.json();
-      console.log('host payload', json);
       setMyListings(json.events)
     }
   }

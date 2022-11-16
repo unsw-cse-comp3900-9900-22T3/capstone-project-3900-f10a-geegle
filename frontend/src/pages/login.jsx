@@ -1,3 +1,4 @@
+/* eslint-disable */ 
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -17,6 +18,9 @@ const style = {
     p: 4,
   };
 
+/**
+ * Displays login page for the user
+ */
 const LoginPage = ({setLoggedIn}) => {
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
