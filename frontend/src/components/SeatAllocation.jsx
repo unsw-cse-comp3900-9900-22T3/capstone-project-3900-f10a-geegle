@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import {Card} from '@mui/material';
+import {Card, Grid} from '@mui/material';
 import AccorStadium from '../components/AccorStadium';
 import DoltonHouse from '../components/DoltonHouse';
 import SeatSelectionCard from '../components/SeatSelectioncard';
@@ -97,6 +97,9 @@ const SeatAllocation= ({
 
   return (
     <>
+      <Box id="seat allocation title">
+        <Typography variant="h5" style={{mt:'10px', fontWeight: 'bold'}}>Choose your seats</Typography>
+      </Box>
       <Box id="seat map" sx ={{mt:'1.5vw'}}>
         {displaySeatMap()}
       </Box>
@@ -124,19 +127,21 @@ const SeatAllocation= ({
         </Card>
       </Box>
       <Box id="seat allocation form" sx ={{mt:'1.5vw'}}>
-        {chosenSeats.map((seat, index) => {
-            return (<SeatSelectionCard
-              singleTicketType={seat.ticketType}
-              index={index}
-              seatingSectionAllocation={seatingSectionAllocation}
-              eventInfo={eventInfo}
-              chosenSeats={chosenSeats}
-              setChosenSeats={setChosenSeats}
-              key={index}
-              setCurrentSelected={setCurrentSelected}
-               />)  
-          }
-        )}
+        <Grid container spacing={2}>
+          {chosenSeats.map((seat, index) => {
+              return (<SeatSelectionCard
+                singleTicketType={seat.ticketType}
+                index={index}
+                seatingSectionAllocation={seatingSectionAllocation}
+                eventInfo={eventInfo}
+                chosenSeats={chosenSeats}
+                setChosenSeats={setChosenSeats}
+                key={index}
+                setCurrentSelected={setCurrentSelected}
+                />)  
+            }
+          )}
+        </Grid>
       </Box>
       
       

@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
 import CardHeader from '@mui/material/CardHeader';
-import { FormControl } from '@mui/material';
+import { FormControl, Grid } from '@mui/material';
 import { Navigate, useNavigate, Link, useParams } from 'react-router-dom';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
@@ -101,7 +101,7 @@ const SeatSelectionCard= ({
   
   
   return (
-    <>
+    <Grid item xs={3}>
       <Box key={index} sx={{mt:2}}>
         <FormControl>
           <Typography aria-label="ticket type" variant="h4" width="100%">Ticket {index+1}: {singleTicketType}</Typography>
@@ -147,7 +147,7 @@ const SeatSelectionCard= ({
           </FormControl>
         </FormControl>
       </Box>
-    </>
+    </Grid>
     
 
   );
