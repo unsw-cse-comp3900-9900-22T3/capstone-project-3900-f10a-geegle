@@ -195,13 +195,172 @@ const ConfirmUnpublishModal = ({
     </Modal>
   )
 }
+const DeleteSuccessModal = ({
+  delSuccess,
+  setDelSuccess,
+  eventInfo,
+  closeDeleteConfirmModal
+
+}) => {
+  const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '60vw',
+    height: '50vh',
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    gap: '16px',
+    alignItems: 'center',
+    p: 4,
+  };
+
+  const handleSuccessClose = () => {
+    setDelSuccess(false);
+    closeDeleteConfirmModal();
+  }
+
+  return (
+    <Modal
+      hideBackdrop
+      open={delSuccess}
+      onClose={()=>setDelSuccess(false)}
+      aria-labelledby="confirm email success modal"
+    >
+      <Box sx={style}>
+        <Typography variant="h5" style={{color: 'green'}}>
+          You have successfully delted the event "{eventInfo.eventName}".
+        </Typography>
+        <Button 
+            variant="text"
+            size="large"
+            style={{fontSize:'1.07rem'}}
+            onClick = {()=>handleSuccessClose()}
+            >
+              Close
+        </Button>
+      </Box>
+    </Modal>
+    
+  )
+}
+const ConfirmDeleteModal = ({
+  deletePrompt,
+  setDeletePrompt,
+  eventInfo,
+  fetchHostEvents,
+}) => {
+  const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '50vw',
+    height: '45vh',
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+  };
+  const dateOptions = {
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric',
+    hour: 'numeric', 
+    minute: 'numeric', 
+    hour12: true
+  }
+  const [delSuccess, setDelSuccess] = React.useState(false);
+  const closeDeleteConfirmModal = () => {
+    setDeletePrompt(false);
+  }
+
+  const handleDelete = async() => {
+    const response = await fetch(`http://localhost:3000/events/${eventInfo.eventID}/delete`, {
+      method: 'DELETE',
+      headers: {
+      'Content-Type': 'application/json',
+      'auth-token': localStorage.getItem('token'),
+      },
+    });
+
+    
+    if (response.ok) {
+      setDelSuccess(true);
+      fetchHostEvents();
+    };
+  }
+  return (
+    <Modal
+      hideBackdrop
+      open={deletePrompt}
+      onClose={()=> setDeletePrompt(false)}
+      aria-labelledby="confirm delete modal"
+    >
+      <Box sx={style}>
+        <Box id="content container" style={{width: "50vw", height: '40vh', display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", gap:"3rem"}}>
+          <Card style={{padding: '20px', height:'40%', width: '80%', overflow: 'auto'}}>
+            <Typography  variant="h4" color="text.secondary" sx={{fontWeight: "bold", lineHeight: "1.2"}}>
+              Event Name: {eventInfo.eventName}
+            </Typography>
+            <Typography  variant="h6" color="text.secondary" sx={{lineHeight: "1.2"}}>
+              Event Start Date and Time: {(new Date(eventInfo.startDateTime)).toLocaleString("en-AU",dateOptions)}
+            </Typography>
+            <Typography  variant="h6" color="text.secondary" sx={{lineHeight: "1.2"}}>
+              Event End Date and Time: {(new Date(eventInfo.endDateTime)).toLocaleString("en-AU",dateOptions)}
+            </Typography>
+            <Typography  variant="h6" color="text.secondary" sx={{lineHeight: "1.2"}}>
+              Venue: {eventInfo.eventVenue}, Location: {eventInfo.eventLocation}
+            </Typography>
+          </Card>
+          <Typography variant="h5">
+            Are you sure you want deleting {eventInfo.eventName}? By deleting the event you are permanantly deleting all information about this event on eventful systems
+          </Typography>
+          <Box id= "buttons">
+            <Button 
+                style={{marginRight: "15px",width: "8rem", fontSize: "1.3rem", backgroundColor: "green"}}
+                variant="contained"
+                size="large"
+                onClick = {()=>handleDelete()}
+                >
+                  Yes
+            </Button>
+            <Button 
+                style={{width: "8rem", fontSize: "1.3rem"}}
+                variant="contained"
+                onClick = {()=> setDeletePrompt(false)}
+                size="large"
+                >
+                  No
+            </Button>
+          </Box>
+          {delSuccess === true ? (
+          <DeleteSuccessModal
+            delSuccess= {delSuccess}
+            setDelSuccess ={setDelSuccess}
+            eventInfo = {eventInfo}
+            closeDeleteConfirmModal = {closeDeleteConfirmModal}
+            />
+        ): null}
+        </Box>
+      </Box>
+    </Modal>
+  )
+}
 const HostEventsPage = () => {
   const [myListings, setMyListings] = React.useState([]);
   const [customerModal, setCustomerModal] = React.useState(false);
   const [clickedEventInfo, setClickedEventInfo] = React.useState({});
   const [confirmUnpubPrompt, setConfirmUnpubPrompt] = React.useState(false);
   const [clickedEventUnpublished, setClickedEventUnpublished] = React.useState({});
-
+  const [clickedDeletedEvent, setClickedDeletedEvent] = React.useState({});
+  const [deletePrompt, setDeletePrompt] = React.useState({});
   const handleViewCustomers = (eventInfo) => {
     setCustomerModal(true);
     setClickedEventInfo({...eventInfo});
@@ -222,6 +381,10 @@ const HostEventsPage = () => {
 
   }
 
+  const openDeletePrompt = async(obj,idx) => {
+    setClickedDeletedEvent(obj);
+    setDeletePrompt(true);
+  }
   const openConfirmModal = async(obj, idx) => {
     setClickedEventUnpublished(obj);
     setConfirmUnpubPrompt(true);
@@ -238,35 +401,10 @@ const HostEventsPage = () => {
       });
       const json = await response.json();
       console.log('host payload', json);
-      // const events = []
-      // for (const eve of json.events) {
-      //   events.push({
-      //     eachEvent: {
-      //       venueCapacity: eve.venueCapacity,
-      //       capacity: eve.capacity,
-      //       endDateTime: eve.endDateTime,
-      //       eventDescription: eve.eventDescription,
-      //       eventID: eve.eventID,
-      //       eventLocation: eve.eventLocation,
-      //       eventName: eve.eventName,
-      //       eventType: eve.eventType,
-      //       eventVenue: eve.eventVenue,
-      //       hostID: eve.hostID,
-      //       image1: eve.image1,
-      //       image2: eve.image2,
-      //       image3: eve.image3,
-      //       published: eve.published,
-      //       startDateTime: eve.startDateTime,
-      //       totalTicketAmount:eve.totalTicketAmount,
-      //       seatedEvent:eve.seatedEvent
-      //     }
-      //   })
-      // }
       setMyListings(json.events)
     }
   }
 
-     // upon entering the page
   React.useEffect(() => {
     // fetch bookings if token is available
     fetchHostEvents();
@@ -365,6 +503,8 @@ const HostEventsPage = () => {
                         size="small">
                           Dashboard
                       </Button>
+                      {!obj.published && <Button size="small" onClick={e=>handlePublish(obj, idx)}>Publish</Button>}
+                      {!obj.published && <Button size="small" onClick={()=>openDeletePrompt(obj,idx)}>Delete</Button>}
                     </CardActions>
                   </Box>
                 </Box>
@@ -381,10 +521,17 @@ const HostEventsPage = () => {
         setCustomerModal = {setCustomerModal}/>) : null}
 
       {confirmUnpubPrompt === true ? (<ConfirmUnpublishModal
-      confirmUnpubPrompt = {confirmUnpubPrompt}
-      setConfirmUnpubPrompt = {setConfirmUnpubPrompt}
-      eventInfo = {clickedEventUnpublished}
-      fetchHostEvents= {fetchHostEvents}/>) : null}
+        confirmUnpubPrompt = {confirmUnpubPrompt}
+        setConfirmUnpubPrompt = {setConfirmUnpubPrompt}
+        eventInfo = {clickedEventUnpublished}
+        fetchHostEvents= {fetchHostEvents}/>) : null}
+
+      {deletePrompt === true ? (<ConfirmDeleteModal
+        deletePrompt ={deletePrompt}
+        setDeletePrompt ={setDeletePrompt}
+        eventInfo = {clickedDeletedEvent}
+        fetchHostEvents= {fetchHostEvents}/>) : null}
+        
     </Grid>
   );
 };
