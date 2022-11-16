@@ -166,6 +166,48 @@ CREATE TABLE eventSimilarity (
         references events(eventID) ON DELETE CASCADE
 );
 
+CREATE TABLE eventMetrics (
+    eventID integer NOT NULL,
+    pageViews integer NOT NULL,
+    dataDay timestamptz NOT NULL,
+    ticketCheckouts integer NOT NULL,
+    
+    primary key (eventID, dataDay),
+    foreign key (eventID)
+        references events(eventID) ON DELETE CASCADE
+);
+
+CREATE TABLE eventGoalMetrics (
+    eventID integer NOT NULL,
+    publishedGoal boolean DEFAULT FALSE,
+    publishedGoalTime timestamptz,
+    tenSalesGoal boolean DEFAULT FALSE,
+    tenSalesGoalTime timestamptz,
+    halfSalesGoal boolean DEFAULT FALSE,
+    halfSalesGoalTime timestamptz,
+    threeQuarterSalesGoal boolean DEFAULT FALSE,
+    threeQuarterSalesGoalTime timestamptz,
+    soldOutSalesGoal boolean DEFAULT FALSE,
+    soldOutSalesGoalTime timestamptz,
+    fiveMaxReviewsGoal boolean DEFAULT FALSE,
+    fiveMaxReviewsGoalTime timestamptz,
+    tenMaxReviewsGoal boolean DEFAULT FALSE,
+    tenMaxReviewsGoalTime timestamptz,
+    primary key (eventID),
+    foreign key (eventID)
+        references events(eventID) ON DELETE CASCADE
+);
+
+CREATE TABLE eventTaskList (
+    taskID SERIAL,
+    eventID integer NOT NULL,
+    taskDescription text NOT NULL,
+    taskCompleted boolean DEFAULT FALSE,
+    primary key (taskID),
+    foreign key (eventID)
+        references events(eventID) ON DELETE CASCADE
+);
+
 --CREATE TABLE eventTicketToSeatingAllocation (
 --    ticketID SERIAL,
 --    seatSection text,

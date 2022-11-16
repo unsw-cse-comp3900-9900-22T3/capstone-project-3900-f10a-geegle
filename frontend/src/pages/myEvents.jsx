@@ -187,7 +187,7 @@ const MyEvents = () => {
                   {obj.eventName}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {obj.eventType +' | '+ obj.eventVenue+' | '+obj.capacity}
+                {`Event Type: ${obj.eventType} | Venue: ${obj.eventVenue} | Event Capacity: ${obj.capacity}`}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   {`Description:  ${obj.eventDescription}`}

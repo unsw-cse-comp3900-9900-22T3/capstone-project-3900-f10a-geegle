@@ -1,7 +1,7 @@
 import { createEventsService, publishEventsService, unpublishEventsService, editEventsService, deleteEventsService, 
          getEventService, getUpcomingEventsService, getAllEventsService, getHostEventsService, getHostDetailsService, 
          getEventsUserAttendingService, getEventGuestListService, isEventSoldOutService, getSoldOutEventsService,
-         getEventsSearchedService, getEventsFilteredService, getAllEventCategoriesService, getRecommendedEventsForUserService } 
+         getEventsSearchedService, getEventsFilteredService, getAllEventCategoriesService, getRecommendedEventsForUserService, getEventDataService, getEventTodoService, addEventTodoService, updateEventTodoService, deleteEventTodoService } 
          from "../services/event.service.js";
 
 import { getEventReviewsService, createEventReviewService, editEventReviewService, 
@@ -362,7 +362,70 @@ export const getAllEventCategoriesController = async(req, res) => {
 export const getRecommendedEventsForUserController = async(req, res) => {
     try {
         const {events, statusCode, msg} = await getRecommendedEventsForUserService(req, res);
-        res.status(statusCode).json({events, msg})
+        if (!events) {
+            res.status(statusCode).json(msg)
+        } else {
+            res.status(statusCode).json({events, msg})
+        }
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
+
+export const getEventDataController = async(req, res) => {
+    try {
+        const {stats, statusCode, msg} = await getEventDataService(req, res);
+        if (!stats) {
+            res.status(statusCode).json(msg)
+        } else {
+            res.status(statusCode).json({stats, msg})
+        }
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
+
+export const getEventTodoController = async(req, res) => {
+    try {
+        const {todo, statusCode, msg} = await getEventTodoService(req, res);
+        res.status(statusCode).json({todo, msg})
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
+
+export const addEventTodoController = async(req, res) => {
+    try {
+        const {todo, statusCode, msg} = await addEventTodoService(req, res);
+        if (!todo) {
+            res.status(statusCode).json(msg)
+        } else {
+            res.status(statusCode).json({todo, msg})
+        }
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
+
+export const updateEventTodoController = async(req, res) => {
+    try {
+        const {todo, statusCode, msg} = await updateEventTodoService(req, res);
+        if (!todo) {
+            res.status(statusCode).json(msg)
+        } else {
+            res.status(statusCode).json({todo, msg})
+        }
+
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+}
+
+export const deleteEventTodoController = async(req, res) => {
+    try {
+        const {statusCode, msg} = await deleteEventTodoService(req, res);
+        res.status(statusCode).json(msg)
+
     } catch (e) {
         res.status(500).send(e.message)
     }
