@@ -189,10 +189,20 @@ function CreateEventsForm() {
     }
   };
 
-  const handleSeat = (event) => {
-    setSeat(event);
-  };
+  /**
+   * Function that error checks the form to make sure everything is filled in 
+   * in the create events form. If no errors are present in the form, the event is 
+   * successfully created and directs user to the home page 
+   * - All fields are required in the create events form except for image 2 and image 3
+   * - Form must have at least 1 ticket type group
+   * - quanities are rounded down to the nearest whole number if quantity is a decimal
+   * - error checks for decimals in venue capacity and event capacity 
+   * - error checks for number inputs to be not below 0
+   * - more error description below
+   */
   const handleSubmit = async () => {
+    console.log(venueCapacity);
+    console.log(capacity);
     // setting errors back to default
     setEndTimeError(false); // End time before start time error
     setEventCapacityError(false); // capacity < 0 or if capacity is a decimal 
@@ -234,12 +244,9 @@ function CreateEventsForm() {
       return
     }
 
-    console.log(thumbnail);
-    console.log(localStorage.getItem('token'));
-    console.log(allTicketTypes);
     let jsonString = JSON.stringify({});
     if (other) {
-      // add venue capacity
+      console.log("here");
       jsonString = JSON.stringify({
         events: {
           eventName: eventName,
@@ -282,13 +289,13 @@ function CreateEventsForm() {
       },
       body: jsonString,
     };
+    console.log(jsonString);
     const r = await fetch(
       `http://localhost:3000/events/create`,
       requestOptions
     );
     const json = await r.json();
     if (r.ok) {
-      console.log(json);
       navigate('/');
     } else if (r.status === 400) {
       if (json === "Invalid Starting and Finishing Times" ) {
@@ -355,7 +362,6 @@ function CreateEventsForm() {
                 value={eventType}
                 onChange={(e) => setEventType(e.target.value)}
               >
-                {/* do we need event types stored in the back end (maybe we need to when we filter?) */}
                 <MenuItem value={'Concert'}>Concert</MenuItem>
                 <MenuItem value={'Festival'}>Festival</MenuItem>
                 <MenuItem value={'Conference'}>Conference</MenuItem>
@@ -540,7 +546,7 @@ function CreateEventsForm() {
           <Grid item xs={12}>
             <Typography variant="h6" component="div">
               {' '}
-              upload a 2nd image
+              upload a 2nd image (optional)
             </Typography>
             <input
               id="thumbnail"
@@ -552,7 +558,7 @@ function CreateEventsForm() {
           <Grid item xs={12}>
             <Typography variant="h6" component="div">
               {' '}
-              upload a 3rd image
+              upload a 3rd image (optional)
             </Typography>
             <input
               id="thumbnail"
@@ -619,7 +625,7 @@ function CreateEventsForm() {
             {noTicketErr=== true 
             ? (<Alert severity="error">Event must have tickets</Alert>): null}
             {invalidTicketErr=== true 
-            ? (<Alert severity="error">Ticket fields cannot be empty and make sure quanitites are greater than 0 (decimals are rounded down to the nearest whole number)</Alert>): null}
+            ? (<Alert severity="error">Ticket fields cannot be empty and make sure quanitites are greater than 0 (decimals are rounded down to the nearest whole number) and prices is greater or equal to $0</Alert>): null}
           </Grid>
         </Grid>
       </form>
