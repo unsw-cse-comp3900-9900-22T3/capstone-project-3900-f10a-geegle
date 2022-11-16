@@ -59,7 +59,8 @@ const EventCalendar = () => {
         defaultDate={new Date()}
         defaultView="month"
         views={{
-          month: true
+          month: true,
+          agenda: true
         }}
         events={events}
         style={styles}
