@@ -14,7 +14,7 @@ import { getAllLPTORankings } from '../utils/lpto.ranking.js'
 import { getEventSimilarityById } from '../db/similarity.db.js'
 import { getEventTicketTypesController } from '../controllers/booking.controller.js'
 import { updateAllEventSimilarity } from '../utils/event.similarity.js'
-import { addPageViewToMetricDb, getEventMetricsDb } from '../db/dashboard.db.js'
+import { addEventGoalMetricsDb, addPageViewToMetricDb, getEventGoalMetricsDb, getEventMetricsDb, updateEventGoalMetricsDb } from '../db/dashboard.db.js'
 
 
 /*  Request
@@ -86,6 +86,8 @@ export const createEventsService = async(req, res) => {
             }
         }
 
+        await addEventGoalMetricsDb(newEvent.eventid)
+
         return {events: {
                             eventID: newEvent.eventid,
                             eventName: newEvent.eventname,
@@ -130,6 +132,8 @@ export const publishEventsService = async(req, res) => {
         const allEvents = await getAllEventsDb();
         updateAllEventSimilarity(allEvents);
 
+        await updatePublishEventGoalMetric(eventID)
+
         return {events: {
                     eventID: publishedEvent.eventid,
                     published: publishedEvent.published
@@ -140,6 +144,19 @@ export const publishEventsService = async(req, res) => {
     } catch(e) {
         throw e
     }
+}
+
+const updatePublishEventGoalMetric = async(eventID) => {
+    const goals = await getEventGoalMetricsDb(eventID)
+    
+    if (goals[0].publishedgoal) return
+    
+    await updateEventGoalMetricsDb(eventID, true, new Date(), goals[0].tensalesgoal, goals[0].tensalesgoaltime, 
+                                    goals[0].halfsalesgoal, goals[0].halfsalesgoaltime, 
+                                    goals[0].threequartersalesgoal, goals[0].threequartersalesgoaltime,
+                                    goals[0].soldoutsalesgoal, goals[0].soldoutsalesgoaltime, 
+                                    goals[0].fivemaxreviewsgoal, goals[0].fivemaxreviewsgoaltime,
+                                    goals[0].tenmaxreviewsgoal, goals[0].tenmaxreviewsgoaltime)
 }
 
 export const unpublishEventsService = async(req, res) => {
@@ -810,11 +827,11 @@ export const getRecommendedEventsForUserService = async(req, res) => {
 
 export const getEventDataService = async(req, res) => {
     try {
-        const events = getEventByIdDb(req.params.eventID);
+        const events = await getEventByIdDb(req.params.eventID);
         if (events.length == 0) {
             return {statusCode : 404, msg: 'Event does not exist'}
         }
-
+        
         const event = events[0]
         if (event.hostid != req.userID) {
             return {statusCode: 403, msg: 'You are not the owner of the event'}
@@ -839,13 +856,14 @@ export const getEventDataService = async(req, res) => {
             while (ticketDayStart <= currDate) {
                 let purchases = 0;
                 let revenue = 0;
-                let nextDay = new Date(ticketDayStart.setDate(ticketDayStart.getDate() + 1))
+                let nextDay = new Date(ticketDayStart)
+                nextDay.setDate(nextDay.getDate()+1)
                 for (let i = 0; i < eventTicketsPurchased.length; i++) {
-                    if (eventTicketsPurchased[i].ticketpurchasetime >= ticketDayStart &&
-                        eventTicketsPurchased[i].ticketpurchasetime < nextDay) {
+                    if (new Date(eventTicketsPurchased[i].ticketpurchasetime) >= ticketDayStart &&
+                        new Date(eventTicketsPurchased[i].ticketpurchasetime) < nextDay) {
                         purchases += 1;
-                        revenue += eventTicketsPurchased[i].price;
-                        totalRevenue += eventTicketsPurchased[i].price;
+                        revenue += Number(eventTicketsPurchased[i].price);
+                        totalRevenue += Number(eventTicketsPurchased[i].price);
                     }
                     
                 }
@@ -858,9 +876,9 @@ export const getEventDataService = async(req, res) => {
                     ticketRevenue : revenue,
                     date: ticketDayStart
                 });
-                let pageMetrics = getEventMetricsDb(event.eventid, ticketDayStart);
+                let pageMetrics = await getEventMetricsDb(event.eventid, ticketDayStart);
                 let numViews = 0;
-                if (pageViews.length != 0) {
+                if (pageMetrics.length != 0) {
                     numViews = pageMetrics[0].pageviews;
                     totalPageViews += pageMetrics[0].pageviews;
                     totalTicketPurchaseEvents += pageMetrics[0].ticketcheckouts;
@@ -880,34 +898,17 @@ export const getEventDataService = async(req, res) => {
         }
 
         // Milestones:
-        // Event Published
-        const isEventPublished = event.published;
-        
-        // First 10 Sales
-        const first10 = (eventTicketsPurchased.length >= 10);
+        const goals = await getEventGoalMetricsDb(event.eventid);
+        let milestones = []
 
-        // Reached 50% sales
-        const fiftyPercent = ((eventTicketsPurchased.length / event.totalticketamount) >= 0.5);
-
-        // Reached 75% sales
-        const seventyfivePercent = ((eventTicketsPurchased.length / event.totalticketamount) >= 0.75);
-        
-        // Sold out
-        const soldOut = ((eventTicketsPurchased.length / event.totalticketamount) >= 1.00);
-        
-        const eventReviews = getEventReviewsByEventIdDb(event.eventid)
-        let fiveStarReviews = 0;
-        for (let i = 0; i < eventReviews.length; i++) {
-            if (eventReviews[i].rating == 5) {
-                fiveStarReviews++;
-            }
-        }
-
-        // Received 5 5 star reviews
-        const fiveMaxReviews = (fiveStarReviews >= 5);
-        // Received 10 5 star reviews
-        const tenMaxReviews = (fiveStarReviews >= 10);
-
+        milestones.push({goal : "published", achieved: goals[0].publishedgoal, dateAchieved: goals[0].publishedgoaltime})
+        milestones.push({goal : "10Sales", achieved: goals[0].tensalesgoal, dateAchieved: goals[0].tensalesgoaltime})
+        milestones.push({goal : "50%Sales", achieved: goals[0].halfsalesgoal, dateAchieved: goals[0].halfsalesgoaltime})
+        milestones.push({goal : "75%Sales", achieved: goals[0].threequartersalesgoal, dateAchieved: goals[0].threequartersalesgoaltime})
+        milestones.push({goal : "SoldOut", achieved: goals[0].soldoutsalesgoal, dateAchieved: goals[0].soldoutsalesgoaltime})
+        milestones.push({goal : "5MaxReviews", achieved: goals[0].fivemaxreviewsgoal, dateAchieved: goals[0].fivemaxreviewsgoaltime})
+        milestones.push({goal : "10MaxReviews", achieved: goals[0].tenmaxreviewsgoal, dateAchieved: goals[0].tenmaxreviewsgoaltime})
+        milestones.sort((a,b) => new Date(a.dateAchieved) - new Date(b.dateAchieved))
 
         return ({ stats: {
             ticketPurchaseChart: ticketPurchases,
@@ -916,13 +917,7 @@ export const getEventDataService = async(req, res) => {
             conversionRate: totalConversion,
             revenue: totalRevenue,
             ticketsSold: eventTicketsPurchased.length,
-            eventPublished: isEventPublished,
-            firstTenSales: first10,
-            fiftyPercentSales: fiftyPercent,
-            seventyFivePercentSales: seventyfivePercent,
-            soldOut: soldOut,
-            fiveFiveStars: fiveMaxReviews,
-            tenFiveStars: tenMaxReviews
+            milestones: milestones
         }, statusCode: 200, msg: "Dashboard Stats Generated"});
     } catch (e) {
         throw e

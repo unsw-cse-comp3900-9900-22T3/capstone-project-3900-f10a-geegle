@@ -5,6 +5,7 @@ import { getUserByIdDb } from '../db/user.db.js'
 import { getEventByIdDb } from '../db/event.db.js'
 import { addReplyDb, editReplyByIdDb, getReplyAmountByReviewIDDb, getReplyByReplyIdDb, getReplyByReviewIdDb,
     deleteReplyByIdDb } from '../db/reply.db.js'
+import { getEventGoalMetricsDb, updateEventGoalMetricsDb } from '../db/dashboard.db.js'
 
 export const createEventReviewService = async(req, res) => {
     try {    
@@ -28,6 +29,10 @@ export const createEventReviewService = async(req, res) => {
         // assume the user that just created the review is valid (token validated)
         const user = await getUserByIdDb(newReview.userid);
 
+        if (newReview.rating === 5) {
+            await computeReviewsMetric(req.params.eventID)
+        }
+        
         return {reviews: {
             reviewID: newReview.reviewid,
             eventID: newReview.eventid,
@@ -46,6 +51,33 @@ export const createEventReviewService = async(req, res) => {
     } catch(e) {
         throw e
     }
+}
+
+const computeReviewsMetric = async(eventID) => {
+    const goals = await getEventGoalMetricsDb(eventID)
+    if (goals[0].fivemaxreviewsgoal && goals[0].tenmaxreviewsgoal) return
+    
+    const eventReviews = await getEventReviewsByEventIdDb(eventID)
+    let fiveStarReviews = 0
+    for (let i = 0; i < eventReviews.length; i++) {
+        if (eventReviews[i].rating == 5) {
+            fiveStarReviews++
+        }
+    }
+
+    // Received 5 5 star reviews
+    const fiveMaxReviews = !goals[0].fivemaxreviewsgoal ? (fiveStarReviews >= 5) : true
+    const fiveMaxReviewsTime = (!goals[0].fivemaxreviewsgoal && fiveMaxReviews) ? new Date() : goals[0].fivemaxreviewsgoaltime
+
+    // Received 10 5 star reviews
+    const tenMaxReviews = !goals[0].tenmaxreviewsgoal ? (fiveStarReviews >= 10) : true
+    const tenMaxReviewsTime = (!goals[0].tenmaxreviewsgoal && tenMaxReviews) ? new Date() : goals[0].tenmaxreviewsgoaltime
+
+    updateEventGoalMetricsDb(eventID, goals[0].publishedgoal, goals[0].publishedgoaltime, goals[0].tensalesgoal, 
+                            goals[0].tensalesgoaltime, goals[0].halfsalesgoal, goals[0].halfsalesgoaltime, 
+                            goals[0].threequartersalesgoal, goals[0].threequartersalesgoaltime,
+                            goals[0].soldoutsalesgoal, goals[0].soldoutsalesgoaltime, fiveMaxReviews, fiveMaxReviewsTime,
+                            tenMaxReviews, tenMaxReviewsTime)
 }
 
 export const getEventReviewsService = async(req, res) => {

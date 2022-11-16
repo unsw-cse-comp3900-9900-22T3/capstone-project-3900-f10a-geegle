@@ -171,6 +171,14 @@ CREATE TABLE eventMetrics (
     pageViews integer NOT NULL,
     dataDay timestamptz NOT NULL,
     ticketCheckouts integer NOT NULL,
+    
+    primary key (eventID, dataDay),
+    foreign key (eventID)
+        references events(eventID) ON DELETE CASCADE
+);
+
+CREATE TABLE eventGoalMetrics (
+    eventID integer NOT NULL,
     publishedGoal boolean DEFAULT FALSE,
     publishedGoalTime timestamptz,
     tenSalesGoal boolean DEFAULT FALSE,
@@ -185,7 +193,7 @@ CREATE TABLE eventMetrics (
     fiveMaxReviewsGoalTime timestamptz,
     tenMaxReviewsGoal boolean DEFAULT FALSE,
     tenMaxReviewsGoalTime timestamptz,
-    primary key (eventID, dataDay),
+    primary key (eventID),
     foreign key (eventID)
         references events(eventID) ON DELETE CASCADE
 );
