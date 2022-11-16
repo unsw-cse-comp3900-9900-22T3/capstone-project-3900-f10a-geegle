@@ -414,7 +414,7 @@ const HostEventsPage = () => {
     <Grid container spacing={1} style={{padding: "3.2rem"}}>  
       <Grid item xs={12}>
         <Typography variant="h5"  color="text.secondary" style={{textAlign:"center"}}>
-          Your Events that you are Hosting
+          Events that you are Hosting
         </Typography>
       </Grid>
       <Grid item xs= {12}>
