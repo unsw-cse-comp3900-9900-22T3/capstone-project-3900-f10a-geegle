@@ -28,12 +28,15 @@ function ChildModal({reviewId, eventId}) {
   const [open, setOpen] = React.useState(false);
   const [replies, setReplies] = React.useState([]);
   const [newReply, setNewReply] = React.useState("");
+  const [sentReply, setSentReply] = React.useState(false);
+  const [loginErr, setLoginErr] = React.useState(false);
   
   const handleOpen = () => {
     setOpen(true);
   };
   const handleClose = () => {
     setOpen(false);
+    setSentReply(false)
   };
 
   const handleSendReply = async() => {
@@ -49,10 +52,38 @@ function ChildModal({reviewId, eventId}) {
       },
       body: jsonString
     })
-    
+    // const json = await response.json();
+    // console.log(json);
     if (response.ok) {
+      setLoginErr(false);
+      const json = await response.json()
+      let replyObj = JSON.stringify({
+        replies: {
+          replyID: json.replies.replyID,
+          reviewID: json.replies.reviewID,
+          reply: json.replies.reply,
+          repliedOn: json.replies.repliedOn,
+          userID: json.replies.userID,
+          user: json.replies.user
+        }
+      })
+      console.log(replyObj);
       fetchReplies();
       setNewReply("");
+      const emailRes = await fetch(`http://localhost:3000/events/${eventId}/reviews/${reviewId}/emailReply`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'auth-token': localStorage.getItem('token')
+        },
+        body: replyObj
+      })
+      const jsonEmail = await emailRes.json();
+      console.log(jsonEmail);
+
+      setSentReply(true);
+    } else if(response.status === 401) {
+      setLoginErr(true);
     }
   }
   const fetchReplies = async() => {
@@ -71,6 +102,11 @@ function ChildModal({reviewId, eventId}) {
       }
       setReplies(allReplies)
     }
+  }
+
+  const handleReply = (e) => {
+    setNewReply(e.target.value);
+    setSentReply(false);
   }
 
   React.useEffect(()=> {
@@ -117,7 +153,7 @@ function ChildModal({reviewId, eventId}) {
                   aria-label="Send a Reply"
                   type="text"
                   variant="outlined"
-                  onChange={(e) => setNewReply(e.target.value)}
+                  onChange={(e) => handleReply(e)}
                   value={newReply}
                   fullWidth
 
@@ -127,6 +163,12 @@ function ChildModal({reviewId, eventId}) {
                   onClick={() => handleSendReply() }>
                   Send Reply
               </Button>
+              {sentReply && <Typography variant="h6" component="div" color='green'>
+                Replied and Email has been sent to review authur!
+              </Typography>}
+              {loginErr && <Typography variant="h6" component="div" color='red'>
+                Please login to leave a reply!
+              </Typography>}
             </FormControl>
           </Box>
           
@@ -142,7 +184,7 @@ function ChildModal({reviewId, eventId}) {
   );
 }
 
-export default function ViewReviews({showReviews, setShowReviews, eventReviews, eventId}) {
+const ViewReviews = ({showReviews, setShowReviews, eventReviews, eventId,getEventInfo}) => {
   // const [open, setOpen] = React.useState(false);
   // const handleOpen = () => {
   //   setOpen(true);
@@ -189,6 +231,7 @@ export default function ViewReviews({showReviews, setShowReviews, eventReviews, 
       const jsonReviewLiked = await (response.json());
       console.log('jsonReviewLiked', jsonReviewLiked);
       await fetchReviews(eventId);
+      await getEventInfo();
     } else if (response.status === 401){
       console.log('here');
       setloginErr(true);
@@ -244,6 +287,7 @@ export default function ViewReviews({showReviews, setShowReviews, eventReviews, 
       const jsonReviewUnLiked = await (response.json());
       console.log('jsonReviewUnliked', jsonReviewUnLiked);
       await fetchReviews(eventId);
+      await getEventInfo();
     } else if (response.status === 401){
       setloginErr(true);
     }
@@ -287,14 +331,11 @@ export default function ViewReviews({showReviews, setShowReviews, eventReviews, 
                 </CardActions>
               </Card>
             );
-          })}
-          {/* <h2 id="parent-modal-title">Text in a modal</h2>
-          <p id="parent-modal-description">
-            Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-          </p> */}
-          
+          })}        
         </Box>
       </Modal>
     </div>
   );
 }
+
+export default ViewReviews;

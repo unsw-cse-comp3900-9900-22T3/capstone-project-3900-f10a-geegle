@@ -112,6 +112,13 @@ const NavBar = ({setLoggedIn}) => {
                 </div>}
               </>
               <>
+                {localStorage.getItem('token') && <div style={{display:'inline-block'}} onClick>
+                  <Link to ='/events/calendar' style={{color:'white'}}>
+                    My Calendar
+                  </Link>
+                </div>}
+              </>
+              <>
                 {localStorage.getItem('token') && <button style={{display:'inline-block'}} onClick = {handleLogout}>
                   {/* <Link to ='/' style={{color:'white'}}>
                     Log Out

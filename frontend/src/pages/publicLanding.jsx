@@ -16,6 +16,7 @@ import SearchFilter from '../components/searchFilter';
 import { styled } from '@mui/system';
 import Grid from '@mui/material/Grid';
 import FilteredListings from '../components/FilteredListings';
+import PublishedCard from '../components/PublishedCard';
 // button styles
 const SearchButton = styled(Button)({
   color: 'darkslategray',
@@ -23,7 +24,6 @@ const SearchButton = styled(Button)({
   padding: 8,
   borderRadius: 4,
   width: '15%',
-  height: '15%',
   margin: '1%'
 });
 
@@ -50,6 +50,8 @@ const style = {
 const PublicLanding = () => {
   const [allListings, setAllListings] = React.useState([]);
   const [upcomingListings, setUpcomingListings] = React.useState([]);
+  const [soldOut, setSoldOut] = React.useState([]);
+  const [recommended, setRecommended] = React.useState([]);
   const [reviews, setReviews] = React.useState([]);
   const [averageRatingHook, setAverageRating] =React.useState(0);
   const [ratingRatioHook, setRatingRatio] = React.useState(0);
@@ -60,11 +62,8 @@ const PublicLanding = () => {
   const [filteredListings, setFilteredListings] = React.useState([]);
   const navigate = useNavigate();
 
-  console.log('filtered Listings', filteredListings);
-  const handleChange = (event, newAlignment) => {
-    setToggleState(newAlignment);
-    //console.log(newAlignment);
-  };
+  //console.log('filtered Listings', filteredListings);
+ 
   const getReviews = async(eventId) => {
     let json = []
 
@@ -117,43 +116,82 @@ const PublicLanding = () => {
     return allInfo;
   }
 
-
+  const fetchSoldOut = async () => {
+    
+    const response = await fetch(`http://localhost:3000/events/soldOut`, {
+      method: 'GET',
+    })
+    const eventJson = (await response.json()).events;
+      // console.log(json);
+      // const events = []
+      // for (const eve of json.events) {
+      //   const allInfoArray = await getReviews(eve.eventID)
+      //   events.push({
+      //     eachEvent: {
+      //       capacity: eve.capacity,
+      //       endDateTime: eve.endDateTime,
+      //       eventDescription: eve.eventDescription,
+      //       eventID: eve.eventID,
+      //       eventLocation: eve.eventLocation,
+      //       eventName: eve.eventName,
+      //       eventType: eve.eventType,
+      //       eventVenue: eve.eventVenue,
+      //       soldOut: eve.soldOut,
+      //       hostID: eve.hostID,
+      //       image1: eve.image1,
+      //       image2: eve.image2,
+      //       image3: eve.image3,
+      //       published: eve.published,
+      //       startDateTime: eve.startDateTime,
+      //       totalTicketAmount:eve.totalTicketAmount,
+      //       reviews:allInfoArray[0],
+      //       averageRating: allInfoArray[1],
+      //       ratingRatio: allInfoArray[2]
+      //     }
+      //   })
+      // }
+      console.log(eventJson);
+      setSoldOut([...eventJson])
+      //console.log(allListings)
+      // setMyListings(json);
+  }
   const fetchAllEvents = async () => {
     
     const response = await fetch(`http://localhost:3000/events/all`, {
       method: 'GET',
     })
-    const json = await response.json();
-      console.log(json);
-      const events = []
-      for (const eve of json.events) {
-        const allInfoArray = await getReviews(eve.eventID)
-        events.push({
-          eachEvent: {
-            capacity: eve.capacity,
-            endDateTime: eve.endDateTime,
-            eventDescription: eve.eventDescription,
-            eventID: eve.eventID,
-            eventLocation: eve.eventLocation,
-            eventName: eve.eventName,
-            eventType: eve.eventType,
-            eventVenue: eve.eventVenue,
-            hostID: eve.hostID,
-            image1: eve.image1,
-            image2: eve.image2,
-            image3: eve.image3,
-            published: eve.published,
-            startDateTime: eve.startDateTime,
-            totalTicketAmount:eve.totalTicketAmount,
-            reviews:allInfoArray[0],
-            averageRating: allInfoArray[1],
-            ratingRatio: allInfoArray[2]
-          }
-        })
-      }
+    const json = (await response.json()).events;
+      // console.log(json);
+      // const events = []
+      // for (const eve of json.events) {
+      //   const allInfoArray = await getReviews(eve.eventID)
+      //   events.push({
+      //     eachEvent: {
+      //       capacity: eve.capacity,
+      //       endDateTime: eve.endDateTime,
+      //       eventDescription: eve.eventDescription,
+      //       eventID: eve.eventID,
+      //       eventLocation: eve.eventLocation,
+      //       eventName: eve.eventName,
+      //       eventType: eve.eventType,
+      //       eventVenue: eve.eventVenue,
+      //       soldOut: eve.soldOut,
+      //       hostID: eve.hostID,
+      //       image1: eve.image1,
+      //       image2: eve.image2,
+      //       image3: eve.image3,
+      //       published: eve.published,
+      //       startDateTime: eve.startDateTime,
+      //       totalTicketAmount:eve.totalTicketAmount,
+      //       reviews:allInfoArray[0],
+      //       averageRating: allInfoArray[1],
+      //       ratingRatio: allInfoArray[2]
+      //     }
+      //   })
+      // }
       console.log(allListings);
-      setAllListings(events)
-      return events;
+      setAllListings([...json])
+      //return events;
       //console.log(allListings)
       // setMyListings(json);
   }
@@ -163,37 +201,38 @@ const PublicLanding = () => {
     const response = await fetch(`http://localhost:3000/events/upcoming`, {
       method: 'GET'
     })
-    const json = await response.json();
-      const events = []
-      for (const eve of json.events) {
-        const allInfoArray = await getReviews(eve.eventID)
-        events.push({
-          eachEvent: {
-            capacity: eve.capacity,
-            endDateTime: eve.endDateTime,
-            eventDescription: eve.eventDescription,
-            eventID: eve.eventID,
-            eventLocation: eve.eventLocation,
-            eventName: eve.eventName,
-            eventType: eve.eventType,
-            eventVenue: eve.eventVenue,
-            hostID: eve.hostID,
-            image1: eve.image1,
-            image2: eve.image2,
-            image3: eve.image3,
-            published: eve.published,
-            startDateTime: eve.startDateTime,
-            totalTicketAmount:eve.totalTicketAmount,
-            reviews:allInfoArray[0],
-            averageRating: allInfoArray[1],
-            ratingRatio: allInfoArray[2]
-          }
-        })
-      }
-      setUpcomingListings(events)
-      //console.log(upcomingListings)
+    const json = (await response.json()).events;
+    setUpcomingListings(json);
   }
 
+  const fetchRecommended = async() => {
+    const response = await fetch(`http://localhost:3000/events/recommended`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'auth-token': localStorage.getItem('token')
+      },
+
+    })
+    
+    const eventJson = (await response.json()).events;
+    console.log(eventJson);
+    setRecommended([...eventJson]);
+  }
+
+  const handleChange = (event, newAlignment) => {
+    setToggleState(newAlignment);
+    if (newAlignment === "Upcoming Events") {
+      fetchUpcomingEvents();
+    } else if (newAlignment === "All Events") {
+      fetchAllEvents();
+    } else if (newAlignment === "Sold Out") {
+      fetchSoldOut();
+    } else if (newAlignment === "For You") {
+      fetchRecommended();
+    }
+    
+  };
   const handleUnfilter = () => {
     setFilter(false);
     navigate('/');
@@ -201,185 +240,71 @@ const PublicLanding = () => {
   }
   // upon entering the page
   React.useEffect(() => {
-    // fetch bookings if token is available
     fetchAllEvents();
-    fetchUpcomingEvents();
   }, []);
   
   return (
-    <>
-    {!filter && <Grid item xs={12}>
-      <SearchButton onClick={()=>setOpenSearch(true)}>Search/Filter</SearchButton>
-    </Grid>}
-    {filter && <Grid item xs={12}>
-      <UnFilterButton onClick={()=>handleUnfilter()}>UnFilter</UnFilterButton>
-    </Grid>}
-    {openSearch && <SearchFilter openSearch={openSearch} setOpenSearch={setOpenSearch} setFilter={setFilter} setFilteredListings={setFilteredListings}></SearchFilter>}
-    <Grid item xs={12}>
-      <div>
-        <ToggleButtonGroup
-          color="primary"
-          value={toggleState}
-          exclusive
-          onChange={handleChange}
-          aria-label="Platform"
-        >
-          <ToggleButton value="All Events">All Events</ToggleButton>
-          <ToggleButton value="Upcoming Events">Upcoming Events</ToggleButton>
-        </ToggleButtonGroup>
-      </div>
+    <Grid container spacing={1} style={{padding: "3.2rem"}}>
+      {!filter && <Grid item xs={12}>
+        <SearchButton onClick={()=>setOpenSearch(true)}>Search/Filter</SearchButton>
+      </Grid>}
+      {filter && <Grid item xs={12}>
+        <UnFilterButton onClick={()=>handleUnfilter()}>UnFilter</UnFilterButton>
+      </Grid>}
+      {openSearch && <SearchFilter openSearch={openSearch} setOpenSearch={setOpenSearch} setFilter={setFilter} setFilteredListings={setFilteredListings}></SearchFilter>}
+      <Grid item xs={12}>
+        <Box>
+          {!filter ? (
+            <ToggleButtonGroup
+            color="primary"
+            value={toggleState}
+            exclusive
+            onChange={handleChange}
+            aria-label="Platform"
+          >
+            <ToggleButton value="All Events">All Events</ToggleButton>
+            <ToggleButton value="Upcoming Events">Upcoming Events</ToggleButton>
+            <ToggleButton value="Sold Out">Sold Out</ToggleButton>
+            {localStorage.getItem('token') !== null ? (
+              <ToggleButton value="For You">For You</ToggleButton>
+            ):null}
+            
+          </ToggleButtonGroup>
+          ): null}
+        </Box>
+      </Grid>
+      <Grid item xs= {12}>
+        <Grid container spacing={6}>
+          {filter && <FilteredListings filteredListings={filteredListings}/>}
+          {(!filter && toggleState === 'All Events') && (
+            allListings.map((obj, idx) => {
+              return (
+                <PublishedCard eventObj ={obj} idx={idx} />
+              )
+            })
+          )}
+          {(!filter && toggleState === 'Upcoming Events') && 
+            upcomingListings.map((obj, idx) => {
+            return (
+              <PublishedCard eventObj ={obj} idx={idx} />
+            )}
+          )}
+          {(!filter && toggleState === 'Sold Out') && 
+            soldOut.map((obj, idx) => {
+            return (
+              <PublishedCard eventObj ={obj} idx={idx} />
+            )}
+          )}
+          {(!filter && toggleState === 'For You') && 
+            recommended.map((obj, idx) => {
+            return (
+              <PublishedCard eventObj ={obj} idx={idx} />
+            )}
+          )}
+        </Grid>
+      </Grid>
     </Grid>
-    {filter && <FilteredListings filteredListings={filteredListings}></FilteredListings>}
-    {(!filter && toggleState === 'All Events') && (
-      
-      allListings.map((obj, idx) => {
-        return (
-        <>
-        <Card key={idx} sx={{ maxWidth: '100%' ,display: 'grid', gridTemplateColumns: '3fr 6fr'}}>
-          <CardMedia
-              component="img"
-              height="100%"
-              image={obj.eachEvent.image1}
-              alt="green iguana"
-          />
-          <CardContent>
-            <Typography gutterBottom variant="h5" component="div">
-            {obj.eachEvent.eventName}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-            {obj.eachEvent.eventType +' | '+ obj.eachEvent.eventVenue+' | '+obj.eachEvent.capacity}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-            {"Description: "+ obj.eachEvent.eventDescription}
-            </Typography>
-            {Array(Math.ceil(obj.eachEvent.ratingRatio * 5))
-              .fill(0)
-              .map((_, i) => (
-                <svg
-                  key={i}
-                  height="35"
-                  width="35"
-                  aria-label="coloured star rating"
-                >
-                  <polygon
-                    points="9.9, 1.1, 3.3, 21.78, 19.8, 8.58, 0, 8.58, 16.5, 21.78"
-                    fill="#ffd800"
-                  />
-                </svg>
-              ))}
-            {Array(5 - Math.ceil(obj.eachEvent.ratingRatio * 5))
-              .fill(0)
-              .map((_, i) => (
-                <svg
-                  key={i}
-                  height="35"
-                  width="35"
-                  aria-label="uncoloured star rating"
-                >
-                  <polygon
-                    points="9.9, 1.1, 3.3, 21.78, 19.8, 8.58, 0, 8.58, 16.5, 21.78"
-                    fill="#7e7e7e"
-                    stroke="#7e7e7e"
-                    strokeWidth="1"
-                  />
-                </svg>
-              ))}
-            <Typography variant="body2" color="text.secondary">
-              Average Rating: {obj.eachEvent.averageRating}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Reviews: {obj.eachEvent.reviews.length}
-            </Typography>
-
-          </CardContent>
-          <CardActions>
-            <Button 
-              component={Link}
-              to= {{pathname: `/event/view/${obj.eachEvent.eventID}`}}
-              state= {obj.eachEvent}
-              size="small">
-                view
-            </Button>
-          </CardActions>
-        </Card> 
-        </>
-        )
-      })
-    )}
-      
-    {(!filter && toggleState === 'Upcoming Events') && 
-      upcomingListings.map((obj, idx) => {
-      return (
-      <Card key = {idx} sx={{ maxWidth: '100%' ,display: 'grid', gridTemplateColumns: '3fr 6fr'}}>
-        <CardMedia
-            component="img"
-            height="100%"
-            image={obj.eachEvent.image1}
-            alt="green iguana"
-        />
-        <CardContent>
-          <Typography gutterBottom variant="h5" component="div">
-          {obj.eachEvent.eventName}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-          {obj.eachEvent.eventType +' | '+ obj.eachEvent.eventVenue+' | '+obj.eachEvent.capacity}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-          {"Description: "+ obj.eachEvent.eventDescription}
-          </Typography>
-          {Array(Math.ceil(obj.eachEvent.ratingRatio * 5))
-            .fill(0)
-            .map((_, i) => (
-              <svg
-                key={i}
-                height="35"
-                width="35"
-                aria-label="coloured star rating"
-              >
-                <polygon
-                  points="9.9, 1.1, 3.3, 21.78, 19.8, 8.58, 0, 8.58, 16.5, 21.78"
-                  fill="#ffd800"
-                />
-              </svg>
-            ))}
-          {Array(5 - Math.ceil(obj.eachEvent.ratingRatio * 5))
-            .fill(0)
-            .map((_, i) => (
-              <svg
-                key={i}
-                height="35"
-                width="35"
-                aria-label="uncoloured star rating"
-              >
-                <polygon
-                  points="9.9, 1.1, 3.3, 21.78, 19.8, 8.58, 0, 8.58, 16.5, 21.78"
-                  fill="#7e7e7e"
-                  stroke="#7e7e7e"
-                  strokeWidth="1"
-                />
-              </svg>
-            ))}
-          <Typography variant="body2" color="text.secondary">
-            Average Rating: {obj.eachEvent.averageRating}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Reviews: {obj.eachEvent.reviews.length}
-          </Typography>
-        </CardContent>
-        <CardActions>
-            <Button 
-              component={Link}
-              to= {{pathname: `/event/view/${obj.eachEvent.eventID}`}}
-              //state= {{eventObj: allListings}}
-              state= {obj.eachEvent}
-              size="small">
-                view
-            </Button>
-        </CardActions>
-      </Card>
-      )}
-    )}
-    </>
+    
   );
 };
 export default PublicLanding ;

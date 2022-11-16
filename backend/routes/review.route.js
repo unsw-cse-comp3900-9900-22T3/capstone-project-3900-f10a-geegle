@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { verifyToken } from '../middleware/verifyToken.js';
+import { verifyToken, userLoggedIn } from '../middleware/verifyToken.js';
 import { getEventReviewsController, createEventReviewController, editEventReviewController,
     deleteEventReviewController, addLikeToEventReviewController, removeLikeToEventReviewController, 
     getEventReviewReplyController, createEventReviewReplyController, editEventReviewReplyController,
@@ -7,7 +7,7 @@ import { getEventReviewsController, createEventReviewController, editEventReview
 
 const reviewRouter = Router();
 
-reviewRouter.get('/:eventID/reviews', getEventReviewsController); //get all reviews for an event
+reviewRouter.get('/:eventID/reviews', userLoggedIn, getEventReviewsController); //get all reviews for an event
 reviewRouter.get('/:eventID/reviews/user', verifyToken, getEventReviewsUserController) // if logged in
 reviewRouter.post('/:eventID/reviews', verifyToken, createEventReviewController); //send a review for an event
 reviewRouter.get('/:eventID/reviews/leftReview', verifyToken, checkUserLeftReviewController) // check user has left a review

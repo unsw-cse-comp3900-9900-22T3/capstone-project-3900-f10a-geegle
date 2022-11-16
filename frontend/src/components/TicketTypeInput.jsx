@@ -27,16 +27,10 @@ function TicketTypeInput( {
         'Content-Type': 'application/json',
         'auth-token': localStorage.getItem('token'),
       },
-      // body: JSON.stringify({
-      //   venue: venue.venue
-      // })
     });
     const json = (await response.json()).seatSections;
     if (response.ok) {
-      //const venueSection = [];
-      //venueSection.push(json.seatSections);
       setEventSeatSection([...json]);
-      // console.log(venueSection);
     }
   }
   useEffect(() => {
@@ -62,7 +56,7 @@ return (
       id="Quantity"
       label="Quantity"
       aria-label="Quantity"
-      type="text"
+      type="number"
       variant="outlined"
       onChange={(e) => handleAmount(index, e)}
       fullWidth
@@ -73,7 +67,7 @@ return (
       id="price"
       label="price"
       aria-label="price"
-      type="text"
+      type="number"
       variant="outlined"
       onChange={(e) => handleTicketPrice(index, e)}
       fullWidth
@@ -88,7 +82,6 @@ return (
                 <Checkbox
                   value = {elem}
                   onClick = {(e)=>handleTicketSeatSection(index, e)}
-                  // onChange = 
                 />
               }
               label = {elem} 
@@ -97,15 +90,6 @@ return (
           );
         })}
     </Grid>
-    {/* <Grid item xs = {2}>
-      <Button
-        variant ='outlined'
-        id = 'addButton'
-        onClick = {handleAddTicket}
-      > Add 
-      </Button>
-    </Grid> */}
-    
   </Grid>
 )}
 

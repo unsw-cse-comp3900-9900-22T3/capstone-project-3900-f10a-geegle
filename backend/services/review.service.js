@@ -92,9 +92,8 @@ export const getEventReviewsService = async(req, res) => {
         for (let i = 0; i < eventReviews.length; i++) {
             let username = await getUserByIdDb(eventReviews[i].userid);
             let likes = await getReviewLikeAmountDb(eventReviews[i].reviewid);
-            let currentUserReviewLike = await getReviewLikeDb(eventReviews[i].reviewid, req.userID);
             let currentUserLiked = false;
-            if (typeof req.userID !== 'undefined') {
+            if (req.userID) {
                 let currentUserReviewLike = await getReviewLikeDb(eventReviews[i].reviewid, req.userID);
                 if (currentUserReviewLike.length >= 1) {
                     currentUserLiked = true;

@@ -93,7 +93,6 @@ const ViewEvent= () => {
   const { eventId} = useParams();
   const state = useLocation();
   const eventObj = state.state;
-  console.log(eventObj);
   const [eventInfo, setEventInfo] = useState({
     capacity: '',
     endDateTime: '',
@@ -111,9 +110,12 @@ const ViewEvent= () => {
     image1: '',
     image2: '',
     image3: '',
+    soldOut: false,
     published: '',
     startDateTime: '',
     totalTicketAmount:'',
+    reviews:[],
+    averageRating:0
   });
   const [hostName, setHostName] = useState('');
   const [imageArray, setImageArray] = useState([]);
@@ -216,7 +218,6 @@ const ViewEvent= () => {
   //   }
   // }
   const handleTicketModal = () => {
-    //setTicketModal(false);
     if (localStorage.getItem('token') !== null) {
       setTicketModal(true);
       setLogInPrompt(false);
@@ -246,7 +247,6 @@ const ViewEvent= () => {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        // 'auth-token': localStorage.getItem('token'),
       },
     })
     const json = await response.json();
@@ -258,44 +258,61 @@ const ViewEvent= () => {
     setAllTicketTypes(tickets);
   }
   const getEventInfo = async() => {
-    const response = await fetch(`http://localhost:3000/events/${eventId}/info`, {
-      method: 'GET'
-    })
-    const eventJson = (await response.json()).event;
-    const eventDetails = {
-      venueCapacity: eventJson.venueCapacity,
-      capacity: eventJson.capacity,
-      endDateTime: eventJson.endDateTime,
-      eventDescription: eventJson.eventDescription,
-      eventID: eventJson.eventID,
-      eventLocation: eventJson.eventLocation,
-      eventName: eventJson.eventName,
-      eventType: eventJson.eventType,
-      eventVenue: eventJson.eventVenue,
-      eventVenueId: eventJson.eventVenueId,
-      hostEmail: eventJson.hostEmail,
-      seatedEvent: eventJson.seatedEvent,
-      hostID: eventJson.hostID,
-      hostName: eventJson.hostName,
-      image1: eventJson.image1,
-      image2: eventJson.image2,
-      image3: eventJson.image3,
-      published: eventJson.published,
-      startDateTime: eventJson.startDateTime,
-      totalTicketAmount:eventJson.totalTicketAmount,
+
+    let response = '';
+    if(localStorage.getItem('token')) {
+      response = await fetch(`http://localhost:3000/events/${eventId}/info`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'auth-token': localStorage.getItem('token'),
+        },
+      })
+    } else {
+      response = await fetch(`http://localhost:3000/events/${eventId}/info`, {
+        method: 'GET'
+      })
     }
-    console.log(eventDetails);
-    const fetchedImages = [eventDetails.image1,eventDetails.image2, eventDetails.image3];
-    const nonEmptyImages = fetchedImages.filter(image => {
-      return image !== "";
-    });
-    console.log("non empty image",nonEmptyImages);
-    console.log(eventDetails);
-    setImageArray(nonEmptyImages);
-    setEventInfo({...eventDetails});
-     //getHostInfo(eventDetails);
-      
+
+    
+    const eventJson = (await response.json()).event;
+    console.log(eventJson);
+      const eventDetails = {
+        venueCapacity: eventJson.venueCapacity,
+        capacity: eventJson.capacity,
+        endDateTime: eventJson.endDateTime,
+        eventDescription: eventJson.eventDescription,
+        eventID: eventJson.eventID,
+        eventLocation: eventJson.eventLocation,
+        eventName: eventJson.eventName,
+        eventType: eventJson.eventType,
+        eventVenue: eventJson.eventVenue,
+        eventVenueId: eventJson.eventVenueId,
+        hostEmail: eventJson.hostEmail,
+        seatedEvent: eventJson.seatedEvent,
+        soldOut: eventJson.soldOut,
+        hostID: eventJson.hostID,
+        hostName: eventJson.hostName,
+        image1: eventJson.image1,
+        image2: eventJson.image2,
+        image3: eventJson.image3,
+        published: eventJson.published,
+        startDateTime: eventJson.startDateTime,
+        totalTicketAmount:eventJson.totalTicketAmount,
+        averageRating:eventJson.averageRating,
+        reviews:eventJson.reviews
+      }
+      console.log(eventDetails);
+      const fetchedImages = [eventDetails.image1,eventDetails.image2, eventDetails.image3];
+      const nonEmptyImages = fetchedImages.filter(image => {
+        return image !== "";
+      });
+      console.log("non empty image",nonEmptyImages);
+      console.log('hello', eventDetails);
+      setImageArray(nonEmptyImages);
+      setEventInfo({...eventDetails});
   }
+
   useEffect(()=> {
     getEventInfo();
     getTicketInfo();
@@ -332,15 +349,26 @@ const ViewEvent= () => {
               </Typography>
             </Box>
             <Box id="button container" style={{display: "flex", justifyContent: "center", alignItems: "center", marginLeft: "35%"}}>
-              <Button
-                variant ='outlined'
-                id = 'Purchase Ticket Button'
-                size='large'
-                onClick = {() => handleTicketModal()}
-              > Buy Tickets
+              {eventInfo.soldOut === true ? (
+                <Button 
+                variant ="contained"
+                style={{backgroundColor:'#e93a3a', color: 'white', fontWeight: 'bold',width: "10rem", fontSize: "1.2rem"}}
+                disabled
+                size="large">
+                  Sold Out
               </Button>
+              ) : (
+                <Button
+                  variant ='outlined'
+                  id = 'Purchase Ticket Button'
+                  style = {{fontWeight: 'bold',width: "11rem", fontSize: "1.2rem"}}
+                  size='large'
+                  onClick = {() => handleTicketModal()}
+                > Buy Tickets
+                </Button>)}
               {ticketModal === true ? (
                 <PurchaseTicket 
+                  getEventInfo = {getEventInfo}
                   eventInfo = {eventInfo} 
                   setEventInfo={setEventInfo} 
                   ticketModal={ticketModal} 
@@ -390,9 +418,9 @@ const ViewEvent= () => {
           </Box>
           <Box>
             <Stack spacing={2} direction="row">
-              <Button variant="outlined" onClick={handleShowReviews}>{`Reviews (${eventObj.reviews.length})`}</Button>
+              <Button variant="outlined" onClick={handleShowReviews}>{`Reviews (${eventInfo.reviews.length})`}</Button>
             </Stack>
-            {Array(Math.ceil(eventObj.averageRating))
+            {Array(Math.ceil(eventInfo.averageRating))
               .fill(0)
               .map((_, i) => (
                 <svg
@@ -407,7 +435,7 @@ const ViewEvent= () => {
                   />
                 </svg>
               ))}
-            {Array(5 - Math.ceil(eventObj.averageRating))
+            {Array(5 - Math.ceil(eventInfo.averageRating))
               .fill(0)
               .map((_, i) => (
                 <svg
@@ -425,7 +453,7 @@ const ViewEvent= () => {
                 </svg>
               ))}
           </Box>
-          {showReviews && <ViewReviews showReviews={showReviews} setShowReviews={setShowReviews} eventReviews={eventObj.reviews} eventId={eventId}/>}
+          {showReviews && <ViewReviews showReviews={showReviews} setShowReviews={setShowReviews} eventReviews={eventInfo.reviews} eventId={eventId} getEventInfo={getEventInfo}/>}
         </Box>
       </Box>
     </>
