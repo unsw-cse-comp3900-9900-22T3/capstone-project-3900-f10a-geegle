@@ -1,17 +1,16 @@
+/* eslint-disable */ 
 import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Alert from '@mui/material/Alert';
-import CardHeader from '@mui/material/CardHeader';
 import { FormControl, Grid } from '@mui/material';
-import { Navigate, useNavigate, Link, useParams } from 'react-router-dom';
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { InputLabel,Select, MenuItem } from '@mui/material';
-import AccorStadium from '../components/AccorStadium';
-import DoltonHouse from '../components/DoltonHouse';
-import TicketTypeCard from '../components/TicketTypeCard';
-import { set } from 'date-fns/esm';
+
+
+/**
+ * Component that renders available seating options and 
+ * non taken seats for each ticket that 
+ * the user has selected
+ */
 const SeatSelectionCard= ({
   singleTicketType, 
   index,
@@ -21,34 +20,33 @@ const SeatSelectionCard= ({
   setChosenSeats,
   setCurrentSelected
    }) => {
-
-  const [ticketTypeSeatSections, setTicketTypeSeatSections] = useState([]); // variable that stores all the sections allocated to the ticket type
-  const [seatsFromChosenSection, setSeatsFromChosenSection] = useState([]); // stores seats by sections for the current ticket type, the index correlates to ticketTypeSeatSections
+  
+  // variable that stores all the sections allocated to the ticket type
+  const [ticketTypeSeatSections, setTicketTypeSeatSections] = useState([]); 
+  // stores seats by sections for the current ticket type, the index correlates to ticketTypeSeatSections
+  const [seatsFromChosenSection, setSeatsFromChosenSection] = useState([]); 
   const [chosenSection, setChosenSection] = useState('');
   const [chosenSeat, setChosenSeat] = useState('');
-  console.log('index', index);
-  console.log('chosenSeats',chosenSeats );
-  console.log(seatingSectionAllocation);
+  
 
-
+  // function that handles the changes when the user picks a seat in a section 
   const handleSeatChange = async(event)=> {
     const newChosenSeats = [...chosenSeats];
     const selectedSeat = JSON.parse(event.target.value);
-    console.log("chosen seat Obj", selectedSeat);
     setChosenSeat(selectedSeat);
     newChosenSeats[index].section = chosenSection;
     newChosenSeats[index].seatId = selectedSeat;
     setChosenSeats(newChosenSeats);
-    console.log("new chosen seats", newChosenSeats);
     setCurrentSelected(selectedSeat);
 
   }
+
+  // function that handles the changes when an available seating section is picked by the user
   const handleSectionChange = async(event) => {
     const section = event.target.value;
     setChosenSection(section);
     const seatsFromSection = await fetchAvailSeatsBySec(section);
     setSeatsFromChosenSection(seatsFromSection);
-    console.log('seatsFromSection', seatsFromSection);
   }
   /**
    * 
@@ -66,7 +64,7 @@ const SeatSelectionCard= ({
         },
     });
     const seatData = (await response.json());
-    console.log('seatData',seatData);
+  
     if (response.ok) {
       allSeats = seatData.seats;
       allSeats.forEach((seat)=> {
@@ -77,11 +75,13 @@ const SeatSelectionCard= ({
     };
     return allSeatsInSec;
   }
+
+  /**
+   *  Arranges seat section allocation data into an array 
+   */
   const getSectionsFromTicketType = (ticketType) => {
     // get keys from seatingSection
     const sectionsForTicket = [];
-    console.log("ticket type", ticketType);
-    console.log("seating section allocation",seatingSectionAllocation);
     const sections = Object.keys(seatingSectionAllocation);
     for (const s of sections) {
       if ((seatingSectionAllocation[`${s}`]).includes(ticketType)) {
@@ -93,10 +93,7 @@ const SeatSelectionCard= ({
 
   useEffect(()=> {
     const sectionsForTicket = getSectionsFromTicketType(singleTicketType);
-    console.log('sections for tick',sectionsForTicket);
     setTicketTypeSeatSections(sectionsForTicket);
-    console.log(singleTicketType);
-    console.log(sectionsForTicket);
   },[seatingSectionAllocation])
   
   
@@ -128,7 +125,6 @@ const SeatSelectionCard= ({
               onChange={(event) => handleSeatChange(event)}
             >
               {seatsFromChosenSection.map((seat,seatIdx) => {
-                console.log("seat",seat);
                 if(seat.seatRow !== null) {
                   return (
                     <MenuItem key={seatIdx} value={seat.seatid}>Row:{seat.seatRow} Seat Number: {seat.seatNo}</MenuItem>
@@ -138,9 +134,6 @@ const SeatSelectionCard= ({
                     <MenuItem key={seatIdx} value={seat.seatid}>Seat Number: {seat.seatNo}</MenuItem>
                   )
                 }
-                // return (
-                //   <MenuItem key={seatIdx} value={seat.seatid}>Row:{seat.seatRow} Seat Number: {seat.seatNo}</MenuItem>
-                // )
               })}
             </Select>
             

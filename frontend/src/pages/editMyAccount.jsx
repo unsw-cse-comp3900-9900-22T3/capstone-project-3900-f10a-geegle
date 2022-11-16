@@ -1,3 +1,4 @@
+/* eslint-disable */ 
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -17,6 +18,9 @@ const style = {
   p: 4,
 };
 
+/**
+ * Component that renders Edit my account form, when user clicks on their profile
+ */
 const EditMyAccount = () => {
   const [open, setOpen] = React.useState(true);
   const [firstName, setFirstName] = React.useState('');
@@ -27,7 +31,6 @@ const EditMyAccount = () => {
   const [month, setMonth] = React.useState('');
   const [year, setYear] = React.useState('');
   const navigate = useNavigate();
-  // const handleOpen = () => setOpen(true);
   const handleClose = () => {
     navigate('/user/profile');
     setOpen(false);
@@ -42,7 +45,6 @@ const EditMyAccount = () => {
         },
       });
       const json = await response.json();
-      console.log(json);
       if (json.user.firstName === null) {
         setFirstName('Not Specified');
       } else {
@@ -57,7 +59,6 @@ const EditMyAccount = () => {
       setCCV(json.user.creditCard.ccv);
       setMonth(json.user.creditCard.expiryMonth);
       setYear(json.user.creditCard.expiryYear);
-      // setMyListings(json);
     }
   }
 

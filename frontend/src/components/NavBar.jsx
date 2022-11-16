@@ -1,46 +1,22 @@
+/* eslint-disable */ 
 import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import Menu from '@mui/material/Menu';
-import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip';
-import MenuItem from '@mui/material/MenuItem';
-import AdbIcon from '@mui/icons-material/Adb';
 import { BrowserRouter as Router, Route, Link, Routes } from 'react-router-dom';
-import LoginPage from '../pages/login';
-import RegisterPage from '../pages/register';
 import { useNavigate } from 'react-router-dom';
 
 
-
+/**
+ *  Functional component that renders the navigation bar
+ *  and sets out the routing of the pages in eventful for loggin customers and prospective
+ */
 const NavBar = ({setLoggedIn}) => {
   const navigate = useNavigate();
-  //const [anchorElNav, setAnchorElNav] = React.useState(null);
-  //const [anchorElUser, setAnchorElUser] = React.useState(null);
-
-  //const handleOpenNavMenu = (event) => {
-    //setAnchorElNav(event.currentTarget);
-  // const handleOpenUserMenu = (event) => {
-  //   setAnchorElUser(event.currentTarget);
-  // };
-
-  const styles = {
-    appBar: {
-      padding: '0',
-      backgroundColor: '#9662f0'
-    }
-  }
 
   const handleLogout = (e) => {
-    console.log('here')
     localStorage.removeItem('token')
-    // localStorage.removeItem('email')
     setLoggedIn(false)
     navigate('/')
   }

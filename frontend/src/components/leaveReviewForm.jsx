@@ -1,3 +1,4 @@
+/* eslint-disable */ 
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -22,21 +23,29 @@ const style = {
   p: 4,
 };
 
+/**
+ * Functional requirement that renders the form to leave their review
+ * on a purchased event
+ */
 export default function LeaveReviewForm({openReviewForm, setOpenReviewForm, obj}) {
   const [submitted, setSubmitted] = React.useState(false);
   const [review, setReview] = React.useState('');
   const [rating, setRating] = React.useState('');
   const [ratingError, setRatingError] = React.useState(false);
-  console.log(obj);
-  // const handleOpen = () => setOpen(true);
+  
+  /**
+   *  Function that closes leave review form
+   */
   const handleClose = () => {
     setOpenReviewForm(false);
     setSubmitted(false);
   } 
 
+  /**
+   *  Function that submits the review and if 
+   *  successful it will return a successful message to the user
+   */
   const handleSubmit = async() => {
-    console.log('submitted');
-    console.log('eventId',obj.eventID);
     const response = await fetch(`http://localhost:3000/events/${obj.eventID}/reviews`, {
       method: 'POST',
       headers: {
@@ -55,6 +64,11 @@ export default function LeaveReviewForm({openReviewForm, setOpenReviewForm, obj}
       setSubmitted(false)
     }
   }
+
+  /**
+   *  Function that sets rating giving by the user and check if a rating was given 
+   *  by the user
+   */
   const handleRating = async(e) => {
     if (parseFloat(e.target.value) > 5){
       setRatingError(true);
@@ -66,7 +80,6 @@ export default function LeaveReviewForm({openReviewForm, setOpenReviewForm, obj}
 
   return (
     <div>
-      {/* <Button onClick={handleOpen}>Open modal</Button> */}
       <Modal
         open={openReviewForm}
         onClose={handleClose}

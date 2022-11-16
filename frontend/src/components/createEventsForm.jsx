@@ -1,16 +1,16 @@
+/* eslint-disable */ 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Grid, TextField, FormControl, InputLabel, Select, MenuItem, Card, Typography, Button, Checkbox, Stack, Paper, Alert } from '@mui/material';
+import { Grid, TextField, FormControl, InputLabel, Select, MenuItem, Typography, Button, Stack, Paper, Alert } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers';
-//import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import TicketTypeInput from './TicketTypeInput';
 import DefaultVenueInfo from './defaultVenueInfo';
 
 /**
- * https://stackoverflow.com/questions/36280818/how-to-convert-file-to-base64-in-javascript
- *
+ * Reference: https://stackoverflow.com/questions/36280818/how-to-convert-file-to-base64-in-javascript
+ * The function below converts an image into base 64 string
  */
 export function fileToDataUrl(file) {
   const validFileTypes = ['image/jpeg', 'image/png', 'image/jpg'];
@@ -25,6 +25,11 @@ export function fileToDataUrl(file) {
     reader.onerror = reject;
   });
 }
+
+/**
+ * The component CreateEventsForm renders the create
+ * page for eventful
+ */
 function CreateEventsForm() {
   const [eventName, setEventName] = useState('');
   const [eventType, setEventType] = useState('');
@@ -48,21 +53,19 @@ function CreateEventsForm() {
     seatSections: []
   });
   const [allTicketTypes, setAllTicketTypes] = useState([ticketInfo]);
+
   // error check variables 
   const [endTimeError, setEndTimeError] = useState(false); // End time before start time error
   const [eventCapacityError, setEventCapacityError] = useState(false); // capacity < 0
   const [startTimeError, setStartTimeError] = useState(false); // start time is before the current time 
   const [insufCapacityError, setInsufCapacityError] = useState(false); // event capacity venue capacity < total tickets
-
   const [venueCapacityError, setVenueCapacityError] = useState(false); // venue capacity < Event Capacity
   const [noTicketErr, setNoTicketErr] = useState(false); // the event must at least have 1 ticket type group
   const [eventNameError, setEventNameError]= useState(false); // eventName cannot be empty
   const [eventDesErr, setEventDesErr] = useState(false); // event description cannot be empty
-  // invalid ticket, ticket type must not be empty string, ticket quantity < 0 or ticket quantity cannot be decimal,
-  // ticket price < 0
+  // invalidTicketErr occurs ticket type must is an empty string, 
+  // ticket quantity < 0 and ticket price < 0
   const [invalidTicketErr, setInvalidTicketErr] = useState(false);  
-
-
   const [thumbnailErr, setThumbnailErr] = useState(false); // event needs to have a thumbnail
   const [venueError, setVenueError] = useState(false); // venue must be specified 
   const [locationError, setLocationError] = useState(false); // location must be specifield
@@ -70,14 +73,14 @@ function CreateEventsForm() {
   const [empVenueCapErr, setEmpVenueCapErr] = useState(false); // venue capacity cannot be empty
   const [eventTypeErr, setEventTypeErr] = useState(false); // event type must be defined
 
-
   const [ticketInput, setTicketInput] = useState(1);
   const navigate = useNavigate();
-  console.log(ticketInfo);
-  console.log(allTicketTypes);
+ 
 
+  /**
+   *  useEffect used to reset seat availability option in the form 
+   */
   React.useEffect(() => {
-    console.log(venue)
     if (venue === 'Accor Stadium' || venue === 'Doltone House - Jones Bay Wharf'){
       setSeat(true)
     } else {
@@ -85,19 +88,33 @@ function CreateEventsForm() {
     }
   },[venue])
 
+  /**
+   *  Function that sets image2 when it is selected
+   */
   const handleImage2 = async (event) => {
     const image2Data = await fileToDataUrl(event.target.files[0]);
     setImage2(image2Data);
   };
+
+   /**
+   *  Function that sets image3 when it is selected
+   */
   const handleImage3 = async (event) => {
     const image3Data = await fileToDataUrl(event.target.files[0]);
     setImage3(image3Data);
   };
+
+  /**
+   *  Function that sets thumbnail when it is selected
+   */
   const handleThumbnail = async (event) => {
     const thumbnailData = await fileToDataUrl(event.target.files[0]);
     setThumbnail(thumbnailData);
   };
 
+  /**
+   * Function that sets/resets quantity of a ticket type when quanitity is changed
+   */
   const handleAmount = (index, event) => {
     const newTicketInfo = { ...ticketInfo };
     const allNewTicketTypes = [...allTicketTypes];
@@ -106,6 +123,10 @@ function CreateEventsForm() {
     setTicketInfo(newTicketInfo);
     setAllTicketTypes(allNewTicketTypes);
   };
+
+  /**
+   * Function that sets/resets type name of a ticket type when it is changed
+   */
   const handleTicketType = (index, event) => {
     const newTicketInfo = { ...ticketInfo };
     const allNewTicketTypes = [...allTicketTypes];
@@ -115,6 +136,9 @@ function CreateEventsForm() {
     setAllTicketTypes(allNewTicketTypes);
   };
 
+  /**
+   * Function that sets/resets price of a ticket type when it is changed
+   */
   const handleTicketPrice = (index, event) => {
     const newTicketInfo = { ...ticketInfo };
     const allNewTicketTypes = [...allTicketTypes];
@@ -124,24 +148,26 @@ function CreateEventsForm() {
     setAllTicketTypes(allNewTicketTypes);
   };
 
+  /**
+   *  Function that handles changes when user selected a seat section for a ticket type
+   */
   const handleTicketSeatSection = (index, event) => {
     const newTicketInfo = { ...ticketInfo };
     const allNewTicketTypes = [...allTicketTypes];
-    //console.log('here');
     if (event.target.checked) {
       allNewTicketTypes[index].seatSections.push(event.target.value);
-      console.log(allNewTicketTypes[index].seatSections);
-      console.log('index',index);
     } else {
       const updatedSeats = allNewTicketTypes[index].seatSections.filter((section) => section !== event.target.value);
       allNewTicketTypes[index].seatSections = updatedSeats;
     }
-    setAllTicketTypes(allNewTicketTypes);
-    console.log('allNewTicketTypes',allNewTicketTypes);
-    
+    setAllTicketTypes(allNewTicketTypes);  
   }
+
+  /**
+   *  Function that adds a new ticket type, quanitity and price 
+   *  field everytime when "Add Ticket" button is clicked
+   */
   const handleAddTicket = (index) => {
-    // resetting the fields in ticketInfo
     const newTicketInfo = {  
       ticketType: '',
       ticketAmount:'',
@@ -150,12 +176,13 @@ function CreateEventsForm() {
     }
     setTicketInfo(newTicketInfo);
     setAllTicketTypes((prev) => [...prev, newTicketInfo]);
-    console.log(allTicketTypes);
   };
 
+  /**
+   *  Function that handles venue changes from the drop down
+   */
   const handleVenue = (event) => {
     setVenue(event);
-    console.log(event);
     if (event === 'Other') {
       setOther(true);
     } else {
@@ -163,10 +190,20 @@ function CreateEventsForm() {
     }
   };
 
-  const handleSeat = (event) => {
-    setSeat(event);
-  };
+  /**
+   * Function that error checks the form to make sure everything is filled in 
+   * in the create events form. If no errors are present in the form, the event is 
+   * successfully created and directs user to the home page 
+   * - All fields are required in the create events form except for image 2 and image 3
+   * - Form must have at least 1 ticket type group
+   * - quanities are rounded down to the nearest whole number if quantity is a decimal
+   * - error checks for decimals in venue capacity and event capacity 
+   * - error checks for number inputs to be not below 0
+   * - more error description below
+   */
   const handleSubmit = async () => {
+    console.log(venueCapacity);
+    console.log(capacity);
     // setting errors back to default
     setEndTimeError(false); // End time before start time error
     setEventCapacityError(false); // capacity < 0 or if capacity is a decimal 
@@ -208,12 +245,9 @@ function CreateEventsForm() {
       return
     }
 
-    console.log(thumbnail);
-    console.log(localStorage.getItem('token'));
-    console.log(allTicketTypes);
     let jsonString = JSON.stringify({});
     if (other) {
-      // add venue capacity
+      console.log("here");
       jsonString = JSON.stringify({
         events: {
           eventName: eventName,
@@ -256,13 +290,13 @@ function CreateEventsForm() {
       },
       body: jsonString,
     };
+    console.log(jsonString);
     const r = await fetch(
       `http://localhost:3000/events/create`,
       requestOptions
     );
     const json = await r.json();
     if (r.ok) {
-      console.log(json);
       navigate('/');
     } else if (r.status === 400) {
       if (json === "Invalid Starting and Finishing Times" ) {
@@ -329,7 +363,6 @@ function CreateEventsForm() {
                 value={eventType}
                 onChange={(e) => setEventType(e.target.value)}
               >
-                {/* do we need event types stored in the back end (maybe we need to when we filter?) */}
                 <MenuItem value={'Concert'}>Concert</MenuItem>
                 <MenuItem value={'Festival'}>Festival</MenuItem>
                 <MenuItem value={'Conference'}>Conference</MenuItem>
@@ -514,7 +547,7 @@ function CreateEventsForm() {
           <Grid item xs={12}>
             <Typography variant="h6" component="div">
               {' '}
-              upload a 2nd image
+              upload a 2nd image (optional)
             </Typography>
             <input
               id="thumbnail"
@@ -526,7 +559,7 @@ function CreateEventsForm() {
           <Grid item xs={12}>
             <Typography variant="h6" component="div">
               {' '}
-              upload a 3rd image
+              upload a 3rd image (optional)
             </Typography>
             <input
               id="thumbnail"
@@ -593,7 +626,7 @@ function CreateEventsForm() {
             {noTicketErr=== true 
             ? (<Alert severity="error">Event must have tickets</Alert>): null}
             {invalidTicketErr=== true 
-            ? (<Alert severity="error">Ticket fields cannot be empty and make sure quanitites are greater than 0 (decimals are rounded down to the nearest whole number)</Alert>): null}
+            ? (<Alert severity="error">Ticket fields cannot be empty and make sure quanitites are greater than 0 (decimals are rounded down to the nearest whole number) and prices is greater or equal to $0</Alert>): null}
           </Grid>
         </Grid>
       </form>

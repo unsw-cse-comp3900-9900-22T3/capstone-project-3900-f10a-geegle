@@ -1,15 +1,15 @@
+/* eslint-disable */ 
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Grid, TextField, FormControl, InputLabel, Select, MenuItem, Card, Typography, Button, Checkbox, Stack, Paper } from '@mui/material';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers';
-//import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { width } from '@mui/system';
+import { Grid, TextField,Checkbox} from '@mui/material';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import PropTypes from 'prop-types';
 
 
+/**
+ * Component that renders the ticket type input form for the createEventForm component
+ * It displays a field for ticket type, quantity and price for each time it is 
+ * called. 
+ */
 function TicketTypeInput( {
   handleAmount,
   handleTicketType,
@@ -20,7 +20,6 @@ function TicketTypeInput( {
 }) {
   const [eventSeatSection, setEventSeatSection] = useState([]);
   const fetchSeatSection = async () => {
-    console.log(venue);
     const response = await fetch(`http://localhost:3000/events/venues/${venue}/seatSections`, {
       method: 'GET',
       headers: {

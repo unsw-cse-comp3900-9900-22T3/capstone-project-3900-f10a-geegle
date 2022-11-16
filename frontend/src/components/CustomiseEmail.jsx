@@ -1,12 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState} from 'react';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import { FormControl, TextField,Alert } from '@mui/material';
+import { FormControl, TextField} from '@mui/material';
 
 
-
+/**
+ * 
+ * Functional component that displays success message when host
+ *  sent an email to all customers
+ */
 const SuccessModal = ({
   setEmailModal,
   emailSuccess,
@@ -33,6 +37,10 @@ const SuccessModal = ({
     p: 4,
   };
 
+  /**
+   * Function that handles the closing of confirmation modal and the success
+   * message confirmation modal
+   */
   const handleSuccessClose = () => {
     setEmailSuccess(false);
     closeEmailModal();
@@ -88,6 +96,10 @@ const CustomiseEmail = ({
   const [subject, setSubject] = useState("");
   const [emailContent, setEmailContent] = useState("");
   const [emailSuccess, setEmailSuccess] = useState(false);
+
+  /**
+   * function to close the customise email modal
+   */
   const closeEmailModal = () => {
     setEmailModal(false);
   }

@@ -1,3 +1,4 @@
+/* eslint-disable */ 
 import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
@@ -6,6 +7,11 @@ import Typography from '@mui/material/Typography';
 import { Grid, Alert, Card } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 
+
+/**
+ *  Component that displays a successful refund message when customer has
+ *  successfully refunded their ticket.
+ */
 const EmailSuccessModal = ({
   setConfirmRefundPrompt,
   refundSuccess,
@@ -61,6 +67,10 @@ const EmailSuccessModal = ({
 )
 }
 
+/**
+ * Component to confirm do they actually want to refund their ticket
+ * customers can only refund their tickets at least 7 days before their event
+ */
 const ConfirmRefundModal = ({
   confirmRefundPrompt,
   setConfirmRefundPrompt,
@@ -105,7 +115,6 @@ const ConfirmRefundModal = ({
         },
       })
     }
-    //setRefundSuccess(true);
   }
   return (
     <Modal
@@ -154,10 +163,8 @@ const ConfirmRefundModal = ({
 }
 
 /**
- * Function that renders modal to view ticket purchases of a customer
+ * Function that renders modal to view ticket purchases of the user
  * for a specifield event
- * @param {*} param0 
- * @returns 
  */
 const UserViewPurchasedTix = (
  ) => {
@@ -218,7 +225,6 @@ const UserViewPurchasedTix = (
       startDateTime: eventJson.startDateTime,
       totalTicketAmount:eventJson.totalTicketAmount,
     }
-    console.log(eventDetails);
     const startDate = new Date(eventDetails.startDateTime);
     const startDateInMs = startDate.getTime();
     setSevenDaysBeforeStart(new Date(startDateInMs - 7 * 24 * 60 * 60 * 1000));
@@ -237,7 +243,6 @@ const UserViewPurchasedTix = (
     
     if (response.ok) {
       const purchased = (await response.json()).tickets;
-      console.log(purchased);
       setPurchasedTixs(purchased);
     }
     

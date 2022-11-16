@@ -1,6 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, {useEffect } from 'react';
 
-
+/**
+ *  Venue Map for Accor stadium
+ *  This function is used to display available and unavailable seats, 
+ *  when user is buying tickets for this venue
+ */
 const AccorStadium = ({
   unAvailSeats,
   availSeats,

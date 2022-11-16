@@ -1,8 +1,5 @@
+/* eslint-disable */ 
 import * as React from 'react';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import TextField from '@mui/material/TextField';
-import { FormControl } from '@mui/material';
 import RegisterForm from '../components/registerForm';
 
 const style = {

@@ -1,17 +1,16 @@
+/* eslint-disable */ 
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import { FormControl,Grid } from '@mui/material';
+import { Grid } from '@mui/material';
 import { Navigate, useNavigate, Link } from 'react-router-dom';
 import LeaveReviewForm from '../components/leaveReviewForm';
 import EditReviewForm from '../components/editReviewForm';
-import UserViewPurchasedTix from '../components/UserViewPurchasedTix';
 const MyEvents = () => {
   const [attendingEvents, setAttendingEvents] = React.useState([]);
   const [openReviewForm, setOpenReviewForm] = React.useState(false);
@@ -71,7 +70,6 @@ const MyEvents = () => {
     let ratingRatio = 0
     let averageRating = 0
     let allInfo = [allReviews, averageRating, ratingRatio];
-    console.log(json);
     if (json.reviews.length !== 0) {
       for (const rev of json.reviews) {
         allReviews.push(rev);
@@ -102,7 +100,6 @@ const MyEvents = () => {
     } else {
       edited = false;
     }
-    console.log('edited',json)
     return info;
   }
 
@@ -115,7 +112,6 @@ const MyEvents = () => {
       },
     });
     const json = await response.json();
-    console.log('attending events json',json);
     const allMyEvents = []
     for (const event of json.events) {
       const allInfoArray = await getReviews(event.eventID);

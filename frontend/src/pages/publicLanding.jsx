@@ -1,14 +1,7 @@
+/* eslint-disable */ 
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import CardHeader from '@mui/material/CardHeader';
-import { FormControl } from '@mui/material';
 import { Navigate, useNavigate, Link } from 'react-router-dom';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
@@ -36,16 +29,6 @@ const UnFilterButton = styled(Button)({
   margin: '1%'
 });
 
-const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
-    boxShadow: 24,
-    p: 4,
-  };
 
 const PublicLanding = () => {
   const [allListings, setAllListings] = React.useState([]);
@@ -62,7 +45,6 @@ const PublicLanding = () => {
   const [filteredListings, setFilteredListings] = React.useState([]);
   const navigate = useNavigate();
 
-  //console.log('filtered Listings', filteredListings);
  
   const getReviews = async(eventId) => {
     let json = []
@@ -74,7 +56,7 @@ const PublicLanding = () => {
           'Content-Type': 'application/json',
           'auth-token': localStorage.getItem('token'),
         },
-        // body: JSON.stringify({userID:userID }),
+        
       })
       json = await response.json();
     } else {
@@ -83,7 +65,6 @@ const PublicLanding = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        // body: JSON.stringify({userID:userID }),
       })
       json = await response.json();
     }
@@ -93,7 +74,6 @@ const PublicLanding = () => {
     let ratingRatio = 0
     let averageRating = 0
     let allInfo = [allReviews, averageRating, ratingRatio];
-    console.log(json);
     if (json.reviews.length !== 0) {
       for (const rev of json.reviews) {
         allReviews.push(rev);
@@ -101,16 +81,12 @@ const PublicLanding = () => {
       }
       averageRating = (totalRating)/(json.reviews.length)
       ratingRatio = (totalRating)/(json.reviews.length * 5)
-      // setRatingRatio(ratingRatio)
-      // setAverageRating(averageRating)
-      // setReviews(allReviews)
-
     } else {
       // setRatingRatio(0)
       // setAverageRating(0)
       // setReviews([])
     }
-    //return allInfo
+
     setAllEventReviews([...allEventReviews, ''])
     allInfo = [allReviews, averageRating, ratingRatio];
     return allInfo;
@@ -122,38 +98,10 @@ const PublicLanding = () => {
       method: 'GET',
     })
     const eventJson = (await response.json()).events;
-      // console.log(json);
-      // const events = []
-      // for (const eve of json.events) {
-      //   const allInfoArray = await getReviews(eve.eventID)
-      //   events.push({
-      //     eachEvent: {
-      //       capacity: eve.capacity,
-      //       endDateTime: eve.endDateTime,
-      //       eventDescription: eve.eventDescription,
-      //       eventID: eve.eventID,
-      //       eventLocation: eve.eventLocation,
-      //       eventName: eve.eventName,
-      //       eventType: eve.eventType,
-      //       eventVenue: eve.eventVenue,
-      //       soldOut: eve.soldOut,
-      //       hostID: eve.hostID,
-      //       image1: eve.image1,
-      //       image2: eve.image2,
-      //       image3: eve.image3,
-      //       published: eve.published,
-      //       startDateTime: eve.startDateTime,
-      //       totalTicketAmount:eve.totalTicketAmount,
-      //       reviews:allInfoArray[0],
-      //       averageRating: allInfoArray[1],
-      //       ratingRatio: allInfoArray[2]
-      //     }
-      //   })
-      // }
+      
       console.log(eventJson);
       setSoldOut([...eventJson])
-      //console.log(allListings)
-      // setMyListings(json);
+      
   }
   const fetchAllEvents = async () => {
     
@@ -161,39 +109,7 @@ const PublicLanding = () => {
       method: 'GET',
     })
     const json = (await response.json()).events;
-      // console.log(json);
-      // const events = []
-      // for (const eve of json.events) {
-      //   const allInfoArray = await getReviews(eve.eventID)
-      //   events.push({
-      //     eachEvent: {
-      //       capacity: eve.capacity,
-      //       endDateTime: eve.endDateTime,
-      //       eventDescription: eve.eventDescription,
-      //       eventID: eve.eventID,
-      //       eventLocation: eve.eventLocation,
-      //       eventName: eve.eventName,
-      //       eventType: eve.eventType,
-      //       eventVenue: eve.eventVenue,
-      //       soldOut: eve.soldOut,
-      //       hostID: eve.hostID,
-      //       image1: eve.image1,
-      //       image2: eve.image2,
-      //       image3: eve.image3,
-      //       published: eve.published,
-      //       startDateTime: eve.startDateTime,
-      //       totalTicketAmount:eve.totalTicketAmount,
-      //       reviews:allInfoArray[0],
-      //       averageRating: allInfoArray[1],
-      //       ratingRatio: allInfoArray[2]
-      //     }
-      //   })
-      // }
-      console.log(allListings);
-      setAllListings([...json])
-      //return events;
-      //console.log(allListings)
-      // setMyListings(json);
+    setAllListings([...json])
   }
   
   const fetchUpcomingEvents = async () => {
@@ -216,7 +132,6 @@ const PublicLanding = () => {
     })
     
     const eventJson = (await response.json()).events;
-    console.log(eventJson);
     setRecommended([...eventJson]);
   }
 

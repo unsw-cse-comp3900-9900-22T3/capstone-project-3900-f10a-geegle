@@ -1,10 +1,11 @@
+/* eslint-disable */ 
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
-import { Navigate, useNavigate, Link } from 'react-router-dom';
+import {useNavigate } from 'react-router-dom';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -23,6 +24,11 @@ const style = {
   p: 4,
 };
 
+/**
+ * Functional component that renders edit review form for customers to 
+ * edit their review once a review is left by them on a purchased event
+ * 
+ */
 export default function EditReviewForm({editForm, setEditForm, obj}) {
   const [submitted, setSubmitted] = React.useState(false);
   const [review, setReview] = React.useState(obj.prevReview.review);
@@ -37,18 +43,19 @@ export default function EditReviewForm({editForm, setEditForm, obj}) {
       setRatingError(false);
     }
   }
-  // const [defRev, setDefRev] = React.useState(myReview.review);
-  // const [defRating, setDefRating] = React.useState(myReview.rating);
-  const navigate = useNavigate();
-  console.log(obj);
-  // const handleOpen = () => setOpen(true);
+  
+  /**
+   * close the edit modal 
+   */
   const handleClose = () => {
     setEditForm(false);
     setSubmitted(false);
-    //navigate('/events/myEvent');
   };
+
+  /**
+   * function that handles if editted review could be submitted to the event 
+   */
   const handleSubmit = async() => {
-    console.log('submitted')
     const response = await fetch(`http://localhost:3000/events/${obj.eventID}/reviews/${obj.prevReview.reviewID}`, {
       method: 'PUT',
       headers: {
@@ -64,8 +71,6 @@ export default function EditReviewForm({editForm, setEditForm, obj}) {
     if (response.ok) {
       setSubmitted(true);
       setFormError(false);
-      // setDefRev(review);
-      // setDefRating(rating);
     } else {
       setSubmitted(false);
       setFormError(true);
@@ -74,7 +79,6 @@ export default function EditReviewForm({editForm, setEditForm, obj}) {
 
   return (
     <div>
-      {/* <Button onClick={handleOpen}>Open modal</Button> */}
       <Modal
         open={editForm}
         onClose={handleClose}
@@ -122,15 +126,6 @@ export default function EditReviewForm({editForm, setEditForm, obj}) {
                 </Select>
               </FormControl>
             </Grid>
-            {/* <TextField
-              id="standard-multiline-static"
-              label="Rate it out of 5..."
-              multiline
-              fullWidth
-              type='number'
-              onChange={(e)=>handleRating(e)}
-              defaultValue={obj.prevReview.rating}
-            /> */}
             <Button onClick={handleSubmit}>
               Submit
             </Button>

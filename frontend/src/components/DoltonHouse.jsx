@@ -1,5 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, {useEffect } from 'react';
 
+/**
+ * 
+ * Map of Dolton House event venue 
+ * This functional component renders seats available and unvailable when 
+ * dolton house is selected as a venue
+ */
 const DoltonHouse = ({
   unAvailSeats,
   availSeats,

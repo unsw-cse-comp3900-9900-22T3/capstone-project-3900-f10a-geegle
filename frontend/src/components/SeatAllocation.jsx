@@ -1,3 +1,4 @@
+/* eslint-disable */ 
 import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -5,6 +6,11 @@ import {Card, Grid} from '@mui/material';
 import AccorStadium from '../components/AccorStadium';
 import DoltonHouse from '../components/DoltonHouse';
 import SeatSelectionCard from '../components/SeatSelectioncard';
+
+/**
+ *  This component allows user to select their seats when purchasing a ticket that is a 
+ *  seated event. This component renders page 2 of the purchasing ticket form.
+ */
 const SeatAllocation= ({
   eventInfo, 
   availTicketTypes, 
@@ -18,6 +24,10 @@ const SeatAllocation= ({
   const [unAvailSeats, setUnAvailSeats] = useState([]);
   const [currentSelected, setCurrentSelected] = useState('');
 
+
+ /**
+  * fetch seating sections for the event
+  */
   const fetchSeatingSectionAllocation = async() => {
     const response = await fetch(`http://localhost:3000/events/${eventInfo.eventID}/seatSectionsTicketAllocation`, {
       method: 'GET',
@@ -34,6 +44,7 @@ const SeatAllocation= ({
     }
   }
   
+  // fetch all available seats for the event
   const fetchAvailSeats = async() => {
     const response = await fetch(`http://localhost:3000/events/${eventInfo.eventID}/availableSeats`, {
       method: 'GET',
@@ -48,6 +59,7 @@ const SeatAllocation= ({
     }
   }
 
+  // fetch unavailable seats for the event
   const fetchUnAvailSeats = async() => {
     const response = await fetch(`http://localhost:3000/events/${eventInfo.eventID}/purchasedSeats`, {
       method: 'GET',
@@ -62,7 +74,7 @@ const SeatAllocation= ({
     }
   }
   
-  
+  // display the correct event map for the venue
   const displaySeatMap = () => {
     if (parseInt(eventInfo.eventVenueId) === 1) {
       return (<AccorStadium  
@@ -82,6 +94,9 @@ const SeatAllocation= ({
     fetchAvailSeats();
     fetchUnAvailSeats();
     let chosenSeatsArray = [];
+
+    // initialising chosenSeats array that will store the seats chosen by the customer
+    // for each ticket that they have chosen 
     quantity.forEach((q, ticketTypeIdx) => {
       for(let ticketNum=0; ticketNum< q; ticketNum++) {
         const newSeatInfo = {

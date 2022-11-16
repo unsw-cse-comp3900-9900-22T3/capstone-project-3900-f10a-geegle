@@ -1,3 +1,4 @@
+/* eslint-disable */ 
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -16,6 +17,10 @@ const style = {
     p: 4,
   };
 
+/**
+ *  Function component that returns the register form on the frontend and
+ *  allows the user to register to eventful
+ */
 const RegisterForm = () => {
     const [emailVar, setEmail] = React.useState('');
     const [firstNameVar, setFirstName] = React.useState('');
@@ -27,21 +32,7 @@ const RegisterForm = () => {
     const [confirmPwError, setConfirmPwError] = React.useState(false);
     const [userExistError, setUserExistError] = React.useState(false);
     const [registerSuccess, setRegisterSuccess] = React.useState(false);
-    // const [payment, setPayment] = React.useState('');
-    // const [card, setCard] = React.useState(false);
-    // const [paypal, setPaypal] = React.useState(false);
-
-  //     // holds the keywords that needs to be searched
-  //   const handleCard = (e) => {
-  //       setCard(e.target.checked);
-  //       setPaypal(false);
-  // };
-
-  //   // holds the keywords that needs to be searched
-  //   const handlePaypal = (e) => {
-  //       setPaypal(e.target.checked);
-  //       setCard(false);
-  //   };
+    
 
     const handleSubmit = async (e) => {
       // reset all errors to default state 
@@ -73,28 +64,20 @@ const RegisterForm = () => {
         console.log('res',res);
         console.log('out',out);
         if (res.ok) {
-          // localStorage.setItem('token', out.token);
-          //setPasswordError(false);
-          //setEmailError(false);
-          //setRegisterError(false);
           setRegisterSuccess(true);
         } else if (res.status === 401) {
           if (out === "Invalid Password") {
             setPasswordError(true);
-            //setRegisterSuccess(false);
           } else if (out === "Invalid Email") {
             setEmailError(true);
-            //setRegisterSuccess(false);
           } else if(out === "User Already Exists") {
             setUserExistError(true);
-            //setRegisterSuccess(false);
           }
         }
       } else {
         setConfirmPwError(true);
       }
       
-  
     }
 
     

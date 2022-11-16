@@ -1,5 +1,5 @@
+/* eslint-disable */ 
 import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
@@ -10,7 +10,10 @@ import { Grid } from '@mui/material';
 import { Link } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 
-
+/**
+ *  Functional component that event cards on the home/public landing page
+ *  
+ */
 const PublishedCard = ({
   eventObj, 
   idx
