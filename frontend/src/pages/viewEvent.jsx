@@ -383,6 +383,9 @@ const ViewEvent= () => {
             <Typography  variant="h6" color="text.secondary" sx={{fontWeight: "bold", lineHeight: "1.2"}}>
               Event Type: {eventInfo.eventType}
             </Typography>
+            <Typography  variant="h6" color="text.secondary" sx={{fontWeight: "bold", lineHeight: "1.2"}}>
+              Event Capacity: {eventInfo.capacity}
+            </Typography>
             <Typography   variant="h6" color="text.secondary" sx={{fontWeight: "bold", lineHeight: "1.2"}}>
               Venue: {eventInfo.eventVenue}
             </Typography>
@@ -405,7 +408,7 @@ const ViewEvent= () => {
             </Typography>
           </Box>
           <Box>
-            <Typography variant="h5"color="text.secondary" sx={{fontWeight: "bold", lineHeight: "1.2"}}>
+            <Typography variant="h5"color="text.secondary" sx={{fontWeight: "bold", lineHeight: "1.2", mt: 5}}>
             Ticket types and price
             </Typography>
             {allTicketTypes.map((obj,idx)=> {
