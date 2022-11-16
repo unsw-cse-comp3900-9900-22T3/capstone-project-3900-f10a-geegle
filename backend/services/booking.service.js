@@ -4,6 +4,7 @@ import * as eventdb from '../db/event.db.js'
 import * as ticketPurchasedb from '../db/ticketpurchase.db.js'
 import * as userdb from '../db/user.db.js'
 import nodemailer from 'nodemailer'
+import * as metricdb from '../db/dashboard.db.js'
 
 export const getEventTicketTypesService = async(req, res) => {
     try {
@@ -346,6 +347,8 @@ export const bookEventService = async(req, res) => {
             
         }
 
+        computeSalesMetric(eventID)
+
         return { booking: ticketPurchases, statusCode: 200, msg: `Tickets purchased to Event ${eventID}`}
 
     } catch (error) {
@@ -364,6 +367,39 @@ const checkValidCreditCard = (cardNo, ccv, expiryMonth, expiryYear) => {
             regexMonth.test(expiryMonth)   && 
             parseInt(expiryMonth) <= 12     && 
             regexYear.test(expiryYear)) 
+}
+
+const computeSalesMetric = async(eventID) => {
+    let currDate = new Date()
+    currDate.setHours(0,0,0,0)
+    const metric = await metricdb.getEventMetricsDb(eventID, currDate)
+    const ticketCheckouts = metric.length ? metric[0].ticketcheckouts : 1
+    await metricdb.addTicketCheckoutsToMetricDb(eventID, ticketCheckouts)
+
+    const tickets = await ticketPurchasedb.getTicketPurchaseByEventIdDb(eventID)
+    const event = await eventdb.getEventByIdDb(eventID)
+    const goals = await metricdb.getEventGoalMetricsDb(eventID)
+
+    // First 10 Sales
+    const first10 = !goals[0].tensalesgoal ? (tickets.length >= 10) : true
+    const first10Time = (!goals[0].tensalesgoal && first10) ? new Date() : goals[0].tensalesgoaltime
+
+    // Reached 50% sales
+    const fiftyPercent = !goals[0].halfsalesgoal ? ((tickets.length / event[0].totalticketamount) >= 0.5) : true
+    const fiftyPercentTime = (!goals[0].halfsalesgoal && fiftyPercent) ? new Date() : goals[0].halfsalesgoaltime
+    
+    // Reached 75% sales
+    const seventyfivePercent = !goals[0].threequartersalesgoal ? ((tickets.length / event[0].totalticketamount) >= 0.75) : true
+    const seventyfivePercentTime = (!goals[0].threequartersalesgoal && seventyfivePercent) ? new Date() : goals[0].threequartersalesgoaltime
+    
+    // Sold out
+    const soldOut = !goals[0].soldoutsalesgoal ? ((tickets.length / event[0].totalticketamount) >= 1.00) : true
+    const soldOutTime = (!goals[0].soldoutsalesgoal && soldOut) ? new Date() : goals[0].soldoutsalesgoaltime
+
+    await metricdb.updateEventGoalMetricsDb(eventID, goals[0].publishedgoal, goals[0].publishedgoaltime, first10, first10Time,
+                                            fiftyPercent, fiftyPercentTime, seventyfivePercent, seventyfivePercentTime,
+                                            soldOut, soldOutTime, goals[0].fivemaxreviewsgoal, goals[0].fivemaxreviewsgoaltime,
+                                            goals[0].tenmaxreviewsgoal, goals[0].tenmaxreviewsgoaltime)
 }
 
 export const getEventTicketsUserPurchasedService = async(req, res) => {

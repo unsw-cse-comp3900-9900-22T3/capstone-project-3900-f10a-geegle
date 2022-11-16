@@ -9,11 +9,12 @@ import { getReplyAmountByReviewIDDb } from '../db/reply.db.js'
 import { addTicketDb, unassignEventSeatsDb } from '../db/ticket.db.js'
 import { getUserByIdDb } from '../db/user.db.js'
 import { isVenueSeatingAvailableDb } from '../db/venueSeating.db.js'
-import { getEventsFromUserTicketsDb, getTicketPurchaseByUserIdDb, removeTicketPurchaseByEventIdDb } from '../db/ticketpurchase.db.js'
+import { getEventsFromUserTicketsDb, getTicketPurchaseByEventIdDb, getTicketPurchaseByUserIdDb, removeTicketPurchaseByEventIdDb } from '../db/ticketpurchase.db.js'
 import { getAllLPTORankings } from '../utils/lpto.ranking.js'
 import { getEventSimilarityById } from '../db/similarity.db.js'
 import { getEventTicketTypesController } from '../controllers/booking.controller.js'
 import { updateAllEventSimilarity } from '../utils/event.similarity.js'
+import { addEventGoalMetricsDb, addPageViewToMetricDb, getEventGoalMetricsDb, getEventMetricsDb, updateEventGoalMetricsDb } from '../db/dashboard.db.js'
 
 
 /*  Request
@@ -102,6 +103,8 @@ export const createEventsService = async(req, res) => {
             }
         }
 
+        await addEventGoalMetricsDb(newEvent.eventid)
+
         return {events: {
                             eventID: newEvent.eventid,
                             eventName: newEvent.eventname,
@@ -146,6 +149,8 @@ export const publishEventsService = async(req, res) => {
         const allEvents = await getAllEventsDb();
         updateAllEventSimilarity(allEvents);
 
+        await updatePublishEventGoalMetric(eventID)
+
         return {events: {
                     eventID: publishedEvent.eventid,
                     published: publishedEvent.published
@@ -156,6 +161,19 @@ export const publishEventsService = async(req, res) => {
     } catch(e) {
         throw e
     }
+}
+
+const updatePublishEventGoalMetric = async(eventID) => {
+    const goals = await getEventGoalMetricsDb(eventID)
+    
+    if (goals[0].publishedgoal) return
+    
+    await updateEventGoalMetricsDb(eventID, true, new Date(), goals[0].tensalesgoal, goals[0].tensalesgoaltime, 
+                                    goals[0].halfsalesgoal, goals[0].halfsalesgoaltime, 
+                                    goals[0].threequartersalesgoal, goals[0].threequartersalesgoaltime,
+                                    goals[0].soldoutsalesgoal, goals[0].soldoutsalesgoaltime, 
+                                    goals[0].fivemaxreviewsgoal, goals[0].fivemaxreviewsgoaltime,
+                                    goals[0].tenmaxreviewsgoal, goals[0].tenmaxreviewsgoaltime)
 }
 
 export const unpublishEventsService = async(req, res) => {
@@ -232,6 +250,13 @@ export const getEventService = async(req, res) => {
         const seating = await isSeatedEventDb(req.params.eventID)
         const reviewRating = await eventRatingScore(req.params.eventID, userID)
         const soldOut = await isEventSoldOutDb(req.params.eventID)
+
+        let currDate = new Date()
+        currDate.setHours(0,0,0,0)
+        const metric = await getEventMetricsDb(req.params.eventID, currDate)
+        await addPageViewToMetricDb(req.params.eventID, metric.length ? metric[0].pageviews : 1, currDate, 
+                                    metric.length ? metric[0].ticketcheckouts : 0)
+        
         return {event: {
                     eventID: event[0].eventid,
                     eventName: event[0].eventname,
@@ -834,8 +859,108 @@ export const getRecommendedEventsForUserService = async(req, res) => {
         }
         // Sorts list by ranking
         recommendedList.sort((a,b) => b.rating - a.rating);
+        // List can be cleansed of ranking if necessary here
         return {events: recommendedList, statusCode: 200, msg: "Events recommended"}
     } catch (e) {
         throw (e)
+    }
+}
+
+export const getEventDataService = async(req, res) => {
+    try {
+        const events = await getEventByIdDb(req.params.eventID);
+        if (events.length == 0) {
+            return {statusCode : 404, msg: 'Event does not exist'}
+        }
+        
+        const event = events[0]
+        if (event.hostid != req.userID) {
+            return {statusCode: 403, msg: 'You are not the owner of the event'}
+        }
+
+        // Sorts purchased tickets by date of purchase
+        const eventTicketsPurchased = await getTicketPurchaseByEventIdDb(event.eventid);
+        // sort from query easier
+        //eventTicketsPurchased.sort((a,b) => new Date(a.ticketpurchasetime) - new Date(b.ticketpurchasetime));
+
+        let ticketPurchases = [];
+        let ticketRevenue = [];
+        let pageViews = [];
+        let totalPageViews = 0;
+        let totalTicketPurchaseEvents = 0;
+        let totalRevenue = 0;
+        let ticketDayStart;
+        if (eventTicketsPurchased.length != 0) {
+            ticketDayStart = new Date (eventTicketsPurchased[0].ticketpurchasetime);
+            ticketDayStart.setHours(0,0,0,0);
+            let currDate = new Date()
+            while (ticketDayStart <= currDate) {
+                let purchases = 0;
+                let revenue = 0;
+                let nextDay = new Date(ticketDayStart)
+                nextDay.setDate(nextDay.getDate()+1)
+                for (let i = 0; i < eventTicketsPurchased.length; i++) {
+                    if (new Date(eventTicketsPurchased[i].ticketpurchasetime) >= ticketDayStart &&
+                        new Date(eventTicketsPurchased[i].ticketpurchasetime) < nextDay) {
+                        purchases += 1;
+                        revenue += Number(eventTicketsPurchased[i].price);
+                        totalRevenue += Number(eventTicketsPurchased[i].price);
+                    }
+                    
+                }
+                ticketPurchases.push({
+                   ticketPurchases : purchases,
+                   date : ticketDayStart
+                });
+                
+                ticketRevenue.push({
+                    ticketRevenue : revenue,
+                    date: ticketDayStart
+                });
+                let pageMetrics = await getEventMetricsDb(event.eventid, ticketDayStart);
+                let numViews = 0;
+                if (pageMetrics.length != 0) {
+                    numViews = pageMetrics[0].pageviews;
+                    totalPageViews += pageMetrics[0].pageviews;
+                    totalTicketPurchaseEvents += pageMetrics[0].ticketcheckouts;
+                }
+                pageViews.push({
+                    pageViews : numViews,
+                    date: ticketDayStart
+                });
+
+                ticketDayStart = nextDay;
+            }
+        }
+
+        let totalConversion = 0.00;
+        if (totalPageViews != 0) {
+            totalConversion = totalTicketPurchaseEvents / totalPageViews;
+        }
+
+        // Milestones:
+        const goals = await getEventGoalMetricsDb(event.eventid);
+        let milestones = []
+
+        milestones.push({goal : "published", achieved: goals[0].publishedgoal, dateAchieved: goals[0].publishedgoaltime})
+        milestones.push({goal : "10Sales", achieved: goals[0].tensalesgoal, dateAchieved: goals[0].tensalesgoaltime})
+        milestones.push({goal : "50%Sales", achieved: goals[0].halfsalesgoal, dateAchieved: goals[0].halfsalesgoaltime})
+        milestones.push({goal : "75%Sales", achieved: goals[0].threequartersalesgoal, dateAchieved: goals[0].threequartersalesgoaltime})
+        milestones.push({goal : "SoldOut", achieved: goals[0].soldoutsalesgoal, dateAchieved: goals[0].soldoutsalesgoaltime})
+        milestones.push({goal : "5MaxReviews", achieved: goals[0].fivemaxreviewsgoal, dateAchieved: goals[0].fivemaxreviewsgoaltime})
+        milestones.push({goal : "10MaxReviews", achieved: goals[0].tenmaxreviewsgoal, dateAchieved: goals[0].tenmaxreviewsgoaltime})
+        milestones.sort((a,b) => new Date(a.dateAchieved) - new Date(b.dateAchieved))
+
+        return ({ stats: {
+            ticketPurchaseChart: ticketPurchases,
+            ticketRevenueChart: ticketRevenue,
+            pageViewChart: pageViews,
+            conversionRate: totalConversion,
+            revenue: totalRevenue,
+            ticketsSold: eventTicketsPurchased.length,
+            milestones: milestones
+        }, statusCode: 200, msg: "Dashboard Stats Generated"});
+    } catch (e) {
+        throw e
     }
 }
