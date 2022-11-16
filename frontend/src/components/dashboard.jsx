@@ -25,7 +25,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
-
+import Tooltip from '@mui/material/Tooltip';
 var CanvasJS = CanvasJSReact.CanvasJS;
 var CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
@@ -77,6 +77,21 @@ const buttonStyle= {
   border: "2px solid purple",
 };
 
+const conversionText = `
+Conversion rate is the number of people purchased a 
+ticket divided by the total number of visitors for 
+the event page!!
+`;
+
+const revenueText = `
+Revenue is the total amount earned from selling tickets!!
+`;
+const ticketsSoldText = `
+The total number of tickets sold for this event
+`;
+const addTaskText = `
+click this button to start adding tasks to your to-do list!!
+`;
 export default function Dashboard() {
   const { eventId} = useParams();
   const [open, setOpen] = React.useState(true);
@@ -104,8 +119,6 @@ export default function Dashboard() {
     console.log(event);
     console.log(newAlignment);
   };
-
-  
   
   const fetchPageViewPlot = async (data) => {
     const updatedDate = data.map(({ pageViews, date }) => ({
@@ -365,27 +378,33 @@ export default function Dashboard() {
               Metrics: 
             </Typography>
             <Grid container spacing={2}>
-              <Grid item xs={4}>
-                <Typography gutterBottom variant="body1" component="div" color="text.primary" align='center'>
-                  Conversion Rate
-                </Typography>
-                <Item>{parseFloat(conversionRate).toFixed(2)}</Item>
-              </Grid>
-              <Grid item xs={4}>
-                <Typography gutterBottom variant="body1" component="div" color="text.primary" align='center'>
-                  Total Revenue
-                </Typography>
-                <Item>${revenue}</Item>
-              </Grid>
-              <Grid item xs={4}>
-                <Typography gutterBottom variant="body1" component="div" color="text.primary" align='center'>
-                  Tickets Sold
-                </Typography>
-                <Item>{ticketSold}</Item>
-              </Grid>
+              <Tooltip title={conversionText}>
+                <Grid item xs={4}>
+                  <Typography gutterBottom variant="body1" component="div" color="text.primary" align='center'>
+                    Conversion Rate
+                  </Typography>
+                  <Item>{parseFloat(conversionRate).toFixed(2)}</Item>
+                </Grid>
+              </Tooltip>
+              <Tooltip title={revenueText}>
+                <Grid item xs={4}>
+                  <Typography gutterBottom variant="body1" component="div" color="text.primary" align='center'>
+                    Total Revenue
+                  </Typography>
+                  <Item>${revenue}</Item>
+                </Grid>
+              </Tooltip>
+              <Tooltip title={ticketsSoldText}>
+                <Grid item xs={4}>
+                  <Typography gutterBottom variant="body1" component="div" color="text.primary" align='center'>
+                    Tickets Sold
+                  </Typography>
+                  <Item>{ticketSold}</Item>
+                </Grid>
+              </Tooltip>
               <Grid item xs={6}>
                 <Typography gutterBottom variant="body1" component="div" color="text.primary" align='center'>
-                  To-Do {<button style={buttonStyle} onClick={()=>addInput()}>+</button>}
+                  To-Do {<Tooltip title={addTaskText}><button style={buttonStyle} onClick={()=>addInput()}>+</button></Tooltip>}
                 </Typography>
               </Grid>
               <Grid item xs={6}>
