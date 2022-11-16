@@ -15,7 +15,6 @@ const PublishedCard = ({
   eventObj, 
   idx
 }) => {
-  //console.log(eventObj)
   const [dispDescription, setDispDescription] = useState("");
   useEffect(()=>{
     const words = eventObj.eventDescription.split(' ');
