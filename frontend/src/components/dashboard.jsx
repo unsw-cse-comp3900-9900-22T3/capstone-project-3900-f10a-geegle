@@ -52,6 +52,7 @@ const Item = styled(Paper)(({ theme }) => ({
   color: 'purple',
   height: '10vh',
   fontSize: '5vh',
+  overflow: 'scroll'
 }));
 
 const stepperTheme = createTheme({
@@ -68,14 +69,13 @@ const stepperTheme = createTheme({
   },
 });
 
-const buttonStyle = {
+const buttonStyle= {
   display: "inline-block",
   backgroundColor: "white",
   color: "purple",
   borderRadius: "25px",
   border: "2px solid purple",
 };
-
 
 export default function Dashboard() {
   const { eventId} = useParams();
@@ -95,34 +95,19 @@ export default function Dashboard() {
   const [showTextInput, setShowTextInput] = React.useState(false);
   const [taskName, setTaskName] = React.useState('');
   const [tasks, setTasks] = React.useState([]);
-  const [tastErr, setTaskErr] = React.useState(false);
+  const [taskErr, setTaskErr] = React.useState(false);
+  const [reRender, setReRender] = React.useState([""]);
+  const navigate = useNavigate();
 
   const handleChange = (event, newAlignment) => {
     setToggleState(newAlignment);
     console.log(event);
     console.log(newAlignment);
-    // if (newAlignment ===  'pageView') {
-    //   console.log('here');
-    //   fetchPageViewPlot();
-    // }
-    // if (newAlignment ===  'ticketPurchase') {
-    //   console.log('here');
-    //   fetchTicketPurchasePlot();
-    // }
-    // if (newAlignment ===  'revenue') {
-    //   console.log('here');
-    //   fetchRevenuePlot();
-    // }
   };
 
   
   
   const fetchPageViewPlot = async (data) => {
-    // pass a function to map
-    // const newData = data.map(dp =>{ 
-    //   delete data.x;
-    // });
-
     const updatedDate = data.map(({ pageViews, date }) => ({
       ["y"]:pageViews,
       ["x"]:new Date(date)
@@ -218,12 +203,32 @@ export default function Dashboard() {
     }
     
 
-  const navigate = useNavigate();
+  
   // const handleOpen = () => setOpen(true);
-  const handleClose = () => {
+  const handleClose = async() => {
+    console.log('here');
+    await updateTasks(tasks);
     setOpen(false);
     navigate(`/events/host`);
   } 
+
+  const updateTasks = async(task) => {
+    for (const t of task) {
+      const response = await fetch(`http://localhost:3000/events/${t.eventID}/todo/${t.taskID}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'auth-token': localStorage.getItem('token'),
+        },
+        body: JSON.stringify({
+          taskCompleted: t.taskCompleted 
+        }),
+      })
+      const json = await response.json();
+      console.log(json);
+    }
+
+  }
 
   const addInput = () => {
     if(showTextInput) {
@@ -234,13 +239,13 @@ export default function Dashboard() {
   }
   const fetchDashboardData = async() => {
     const response = await fetch(`http://localhost:3000/events/dashboard/${eventId}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'auth-token': localStorage.getItem('token'),
-        },
-        // body: JSON.stringify({userID:userID }),
-      })
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'auth-token': localStorage.getItem('token'),
+      },
+      // body: JSON.stringify({userID:userID }),
+    })
       if (response.ok) {
         const json = await response.json();
         console.log('json', json);
@@ -278,12 +283,17 @@ export default function Dashboard() {
 
     if (response.ok) {
       const json = await response.json();
+      console.log(json.todo, 'fetch Now')
       setTasks(json.todo);
       setTaskErr(false);
+      console.log(reRender);
+      // const currChange = [...reRender];
+      
     } 
   }
 
   const addTasks = async(task) => {
+    console.log(task);
     const response = await fetch(`http://localhost:3000/events/${eventId}/todo`, {
       method: 'POST',
       headers: {
@@ -291,24 +301,51 @@ export default function Dashboard() {
         'auth-token': localStorage.getItem('token'),
       },
       body: JSON.stringify({
-        taskDesciption: task,
+        taskDescription: task,
         taskCompleted: false
       }),
     })
 
+    // const json = await response.json();
+    // console.log(json);
     if (response.ok) {
       const json = await response.json();
-      setTasks(json.todo);
+      //const allTask = [...tasks];
+      setTasks([...tasks, json.todo]);
       setTaskErr(false);
+      setReRender([...reRender,'']);
     } else if (response.status === 400) {
       setTaskErr(true);
     }
   }
 
+  const deleteTasks = async(t) => {
+    console.log(t);
+    const response = await fetch(`http://localhost:3000/events/${t.eventID}/todo/${t.taskID}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'auth-token': localStorage.getItem('token'),
+      },
+    })
+
+    if (response.ok) {
+      const json = await response.json();
+      setTaskErr(false);
+      setReRender([...reRender,'']);
+    }
+  }
+
+  const editTasks = async(idx,e) => {
+    const allTask = tasks;
+    allTask[idx].taskCompleted = e;
+    setTasks(allTask);
+  }
+
   React.useEffect(()=> {
     fetchDashboardData();
     fetchTasks();
-  }, [tasks])
+  }, [reRender])
 
   return (
     <ThemeProvider theme={stepperTheme}>
@@ -346,17 +383,34 @@ export default function Dashboard() {
                 </Typography>
                 <Item>{ticketSold}</Item>
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={6}>
                 <Typography gutterBottom variant="body1" component="div" color="text.primary" align='center'>
-                  To-Do <button style={buttonStyle} onClick={()=>addInput()}>+</button>
+                  To-Do {<button style={buttonStyle} onClick={()=>addInput()}>+</button>}
                 </Typography>
-                <Item sx={{height: '20vh'}}> 
-                  {tasks.map((t,idx)=> {
+              </Grid>
+              <Grid item xs={6}>
+                {showTextInput && <>
+                  <Paper sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: '20vw' , height: '5vh'}}>
+                    <InputBase
+                      sx={{ ml: 1, flex: 1 }}
+                      placeholder="Add a task ...."
+                      inputProps={{ 'aria-label': 'Add tasks to your to do list' }}
+                      onChange={(e) => setTaskName(e.target.value)}
+                    />
+                    <IconButton type="button" sx={{ p: '10px' }} aria-label="addTaskButton" onClick={()=>addTasks(taskName)}>
+                      <AddIcon />
+                    </IconButton>
+                  </Paper >
+                </>}
+              </Grid>
+              <Grid item xs={12}>
+                <Item sx={{minHeight: '20vh', display: "flex", flexDirection: "column"}}> 
+                  {(tasks.length !== 0) && tasks.map((t,idx)=> {
                     return (
                     <ListItem
                       key={t.taskDesciption}
                       secondaryAction={
-                        <IconButton edge="end" aria-label="comments">
+                        <IconButton edge="end" aria-label="comments" onClick={()=>deleteTasks(t)}>
                           <RemoveCircleOutlineIcon/>
                         </IconButton>
                       }
@@ -366,31 +420,22 @@ export default function Dashboard() {
                         <ListItemIcon>
                           <Checkbox
                             edge="start"
+                            onChange={(e)=>editTasks(idx,e.target.checked)}
                             checked={t.taskCompleted}
                             tabIndex={-1}
                             disableRipple
                             inputProps={{ 'aria-labelledby': idx}}
                           />
                         </ListItemIcon>
-                        <ListItemText id={idx} primary={`${t.taskDesciption}`} />
+                        <ListItemText id={idx} primary={`${t.taskDescription}`} />
                       </ListItemButton>
                     </ListItem>
                     );
                   })}
-                  {showTextInput && <>
-                    <Paper sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: '20vw' , height: '5vh', position: "relative", top: "70%", left: "27%"}}>
-                      <InputBase
-                        sx={{ ml: 1, flex: 1 }}
-                        placeholder="Add a task ...."
-                        inputProps={{ 'aria-label': 'Add tasks to your to do list' }}
-                        onChange={(e) => setTaskName(e.target.value)}
-                      />
-                      <IconButton type="button" sx={{ p: '10px' }} aria-label="addTaskButton" onClick={()=>addTasks(taskName)}>
-                        <AddIcon />
-                      </IconButton>
-                    </Paper >
-                  </>}
                 </Item>
+                {taskErr && <Typography gutterBottom variant="body1" component="div" color="red" align='center'>
+                  Maximum task reach, please remove 1 or more
+                </Typography>}
               </Grid>
               <Grid item xs={12}>
                 <Typography gutterBottom variant="h6" component="div" color="purple">
