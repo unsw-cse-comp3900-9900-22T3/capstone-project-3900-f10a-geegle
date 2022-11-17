@@ -538,8 +538,8 @@ export const getHostDetailsService = async(req, res) => {
             runningTotalReviewRatings = 0;
         }
         let name = host.firstname + " " + host.lastname
-
-        return {events: eventSummary, hostRating: runningTotalReviewRatings, hostName: name, statusCode: 200, msg: 'Details found'}
+        let hEmail = host.email
+        return {events: eventSummary, hostRating: runningTotalReviewRatings, hostName: name, hostEmail: hEmail, statusCode: 200, msg: 'Details found'}
 
     } catch (e) {
         throw e
