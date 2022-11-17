@@ -979,7 +979,7 @@ export const getEventTodoService = async(req, res) => {
             delete t['eventid']
             t['taskDescription'] = t['taskdescription']
             delete t['taskdescription']
-            t['taskCompleted'] = t['taskCompleted']
+            t['taskCompleted'] = t['taskcompleted']
             delete t['taskcompleted']
         }
 
