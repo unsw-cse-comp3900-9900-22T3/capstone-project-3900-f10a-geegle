@@ -33,6 +33,7 @@ export default function EditReviewForm({editForm, setEditForm, obj}) {
   const [submitted, setSubmitted] = React.useState(false);
   const [review, setReview] = React.useState(obj.prevReview.review);
   const [rating, setRating] = React.useState(obj.prevReview.rating);
+  const [prevReview, setPrevReview] = React.useState(obj.prevReview.review);
   const [ratingError, setRatingError] = React.useState(false);
   const [formError, setFormError] = React.useState(false);
   const handleRating = async(e) => {
@@ -56,16 +57,25 @@ export default function EditReviewForm({editForm, setEditForm, obj}) {
    * function that handles if editted review could be submitted to the event 
    */
   const handleSubmit = async() => {
+    let jsonString = "";
+    if (review === '') {
+      jsonString = JSON.stringify({
+        review: prevReview,
+        rating: rating
+      });
+    } else {
+      jsonString = JSON.stringify({
+        review: review,
+        rating: rating
+      });
+    }
     const response = await fetch(`http://localhost:3000/events/${obj.eventID}/reviews/${obj.prevReview.reviewID}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         'auth-token': localStorage.getItem('token'),
       },
-      body: JSON.stringify({
-        review: review,
-        rating: rating
-      })
+      body: jsonString
     })
     const json = await response.json();
     if (response.ok) {
@@ -108,7 +118,7 @@ export default function EditReviewForm({editForm, setEditForm, obj}) {
             </Typography>
             <Grid item xs={12}>
               <FormControl style={{ width: '35%' }}>
-                <InputLabel id="Event Rating label">Event Rating Equivalent or Higher</InputLabel>
+                <InputLabel id="Event Rating label">Rate it out of 5</InputLabel>
                 <Select
                   labelId="Event Rating label"
                   id="Event Rating"
