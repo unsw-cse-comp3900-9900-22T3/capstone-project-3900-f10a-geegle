@@ -731,7 +731,7 @@ const eventRatingScore = async(eventID, userID = 0) => {
         eventReviews[i]['userID'] = eventReviews[i]['userid']
         delete eventReviews[i]['userid']
         const user = await getUserByIdDb(eventReviews[i]['userID'])
-        eventReviews[i]['username'] = user.firstname + ' ' + user.lastname
+        eventReviews[i]['user'] = user.firstname + ' ' + user.lastname
         eventReviews[i]['eventID'] = eventReviews[i]['eventid']
         delete eventReviews[i]['eventid']
         eventReviews[i]['postedOn'] = eventReviews[i]['postedon']
