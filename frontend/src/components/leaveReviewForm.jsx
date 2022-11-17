@@ -32,6 +32,7 @@ export default function LeaveReviewForm({openReviewForm, setOpenReviewForm, obj}
   const [review, setReview] = React.useState('');
   const [rating, setRating] = React.useState('');
   const [ratingError, setRatingError] = React.useState(false);
+  const [reviewError, setReviewError] = React.useState(false);
   
   /**
    *  Function that closes leave review form
@@ -60,8 +61,10 @@ export default function LeaveReviewForm({openReviewForm, setOpenReviewForm, obj}
     const json = await response.json();
     if (response.ok) {
       setSubmitted(true)
-    } else {
+      setReviewError(false)
+    } else if(response.status === 400){
       setSubmitted(false)
+      setReviewError(true)
     }
   }
 
@@ -142,6 +145,9 @@ export default function LeaveReviewForm({openReviewForm, setOpenReviewForm, obj}
           </Typography>}
           {ratingError &&  <Typography variant="h6" component="div" color='red'>
               Rating must be smaller than 5
+          </Typography>}
+          {reviewError &&  <Typography variant="h6" component="div" color='red'>
+              Rating/ Review must not be emtpty
           </Typography>}
         </Box>
       </Modal>
