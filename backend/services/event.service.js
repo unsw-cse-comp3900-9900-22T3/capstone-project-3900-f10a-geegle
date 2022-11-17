@@ -62,7 +62,9 @@ export const createEventsService = async(req, res) => {
 
         let totalTickets = 0;
         for (let i = 0; i < tickets.length; i++) {
-            if (!tickets[i].ticketType || tickets[i].ticketAmount <= 0 || 
+            if (!tickets[i].ticketType && !tickets[i].ticketAmount && !tickets[i].price) continue
+
+            if (!tickets[i].ticketType ||!tickets[i].ticketAmount || !tickets[i].price || tickets[i].ticketAmount <= 0 || 
                 Math.floor(tickets[i].ticketAmount) !== tickets[i].ticketAmount || tickets[i].price < 0) {
                 return {events: null, statusCode : 400, msg: 'Invalid ticket'}
             }
