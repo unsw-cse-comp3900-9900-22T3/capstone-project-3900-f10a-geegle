@@ -202,8 +202,6 @@ function CreateEventsForm() {
    * - more error description below
    */
   const handleSubmit = async () => {
-    console.log(venueCapacity);
-    console.log(capacity);
     // setting errors back to default
     setEndTimeError(false); // End time before start time error
     setEventCapacityError(false); // capacity < 0 or if capacity is a decimal 
@@ -247,7 +245,6 @@ function CreateEventsForm() {
 
     let jsonString = JSON.stringify({});
     if (other) {
-      console.log("here");
       jsonString = JSON.stringify({
         events: {
           eventName: eventName,
@@ -290,7 +287,6 @@ function CreateEventsForm() {
       },
       body: jsonString,
     };
-    console.log(jsonString);
     const r = await fetch(
       `http://localhost:3000/events/create`,
       requestOptions
