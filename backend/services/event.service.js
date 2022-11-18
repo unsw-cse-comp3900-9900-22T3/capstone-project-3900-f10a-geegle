@@ -62,7 +62,7 @@ export const createEventsService = async(req, res) => {
 
         let totalTickets = 0;
         for (let i = 0; i < tickets.length; i++) {
-            if (!tickets[i].ticketType && !tickets[i].ticketAmount && !tickets[i].price) continue
+            if (i > 0 && !tickets[i].ticketType && !tickets[i].ticketAmount && !tickets[i].price) continue
 
             if (!tickets[i].ticketType ||!tickets[i].ticketAmount || !tickets[i].price || tickets[i].ticketAmount <= 0 || 
                 Math.floor(tickets[i].ticketAmount) !== tickets[i].ticketAmount || tickets[i].price < 0) {
@@ -778,7 +778,7 @@ export const getRecommendedEventsForUserService = async(req, res) => {
         }
         // Updates the event with LPTO rankings
         let events = await getAllLPTORankings(upcomingEventList, userID);
-        let userEventTickets = await getEventsFromUserTicketsDb(userID);
+        let userEventTickets = await getEventsUserAttendingDb(userID);
         let eventsCopy = events;
         let purchasedEvents = [];
 
