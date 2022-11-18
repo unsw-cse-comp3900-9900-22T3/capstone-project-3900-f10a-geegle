@@ -1,12 +1,11 @@
-/* eslint-disable */ 
+
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import { FormControl } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
-import EditMyAccount from './editMyAccount';
+import { useNavigate } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
 
 const style = {
@@ -31,7 +30,6 @@ const MyAccount = () => {
   const [lastName, setLastName] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [creditCardNum, setCreditCardNum] = React.useState('');
-  const [ccv, setCCV] = React.useState('');
   const [month, setMonth] = React.useState('');
   const [year, setYear] = React.useState('');
   const [editNum, setEditNum] = React.useState('');
@@ -39,7 +37,7 @@ const MyAccount = () => {
   const [editYear, setEditYear] = React.useState('');
   const [editMonth, setEditMonth] = React.useState('');
   const navigate = useNavigate();
-  // const handleOpen = () => setOpen(true);
+  
   const handleClose = () => {
     navigate('/');
     setOpen(false);
@@ -87,11 +85,11 @@ const MyAccount = () => {
       }),
     });
     const json = await response.json();
+    console.log(json);
     if (response.ok) {
       setEdit(false);
       fetchUserDetails();
     }
-    // setMyListings(json);
     
   }
   const fetchUserDetails = async () => {

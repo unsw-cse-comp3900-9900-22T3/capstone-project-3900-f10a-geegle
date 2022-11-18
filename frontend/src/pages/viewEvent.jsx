@@ -12,7 +12,7 @@ import ViewReviews from './viewReviews';
 import PurchaseTicket from '../components/PurchaseTicket';
 
 /**
- * Prmpt that tells user to login or register purchase tickets when they 
+ * Prompt that tells user to login or register purchase tickets when they 
  * click the buy ticket button
  */
 const LogInPurchaseModal=(
@@ -84,6 +84,10 @@ const LogInPurchaseModal=(
   )
 }
 
+/**
+ * Component that renders event details of an event to show 
+ * to the user when they enter a specific event page
+ */
 const ViewEvent= () => {
   const { eventId} = useParams();
   const state = useLocation();
@@ -112,7 +116,6 @@ const ViewEvent= () => {
     reviews:[],
     averageRating:0
   });
-  const [hostName, setHostName] = useState('');
   const [imageArray, setImageArray] = useState([]);
   const [ticketModal, setTicketModal] = useState(false); //opening and closing the purchasing ticket modal 
   const [allTicketTypes, setAllTicketTypes] = useState([]);
@@ -153,8 +156,6 @@ const ViewEvent= () => {
   const styles = {
     BoxContainer: {
       display: 'flex',
-      // alignItems: 'center',
-      // justifyContent: 'center',
       flexDirection: 'column',
       padding: '3vw',
       margin: '1vw 5vw 5vw 5vw'
@@ -163,8 +164,6 @@ const ViewEvent= () => {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      // padding: '3vw',
-      // margin: '9vw'
     },
     detailSec: {
       margin: '0',
@@ -175,43 +174,7 @@ const ViewEvent= () => {
       fontWeight: "bold"
     }
   }
-  // const getHostInfo = async(eventDetails) => {
-  //   const requestOptions = {
-  //     method: 'GET',
-  //     headers: {
-  //       'auth-token': localStorage.getItem('token'),
-  //     },
-  //   }
-  //   const response = await fetch(`http://localhost:3000/user/profile/${eventDetails.hostID}`, requestOptions
-  //   )
-  //   if (response.ok) {
-  //     const json = (await response.json()).user;
-  //     console.log(json);
-  //     const firstName = json.firstName;
-  //     const lastName = json.lastname;
-  //     setHostName(`${firstName} ${lastName}`);
-  //   } else {
-  //     alert(`error: ${response.status}`)
-  //   }
-  // }
   
-  // const getReviews = async() => {
-  //   const response = await fetch(`http://localhost:3000/events/${eventId}/reviews`, {
-  //     method: 'GET',
-  //     headers: {
-  //       'Content-Type': 'application/json'
-  //     },
-  //   })
-  //   const json = await response.json();
-  //   const allReviews = []
-  //   console.log(json);
-  //   if (json.reviews.length !== 0) {
-  //     for (const rev of json.reviews) {
-  //       allReviews.push(rev);
-  //     }
-  //     setReviews(allReviews)
-  //   }
-  // }
   const handleTicketModal = () => {
     if (localStorage.getItem('token') !== null) {
       setTicketModal(true);
@@ -246,7 +209,6 @@ const ViewEvent= () => {
     })
     const json = await response.json();
     const tickets = []
-    console.log(json);
     for (const ticket of json.tickets) {
       tickets.push(ticket);
     }
@@ -271,41 +233,39 @@ const ViewEvent= () => {
 
     
     const eventJson = (await response.json()).event;
-    console.log(eventJson);
-      const eventDetails = {
-        venueCapacity: eventJson.venueCapacity,
-        capacity: eventJson.capacity,
-        endDateTime: eventJson.endDateTime,
-        eventDescription: eventJson.eventDescription,
-        eventID: eventJson.eventID,
-        eventLocation: eventJson.eventLocation,
-        eventName: eventJson.eventName,
-        eventType: eventJson.eventType,
-        eventVenue: eventJson.eventVenue,
-        eventVenueId: eventJson.eventVenueId,
-        hostEmail: eventJson.hostEmail,
-        seatedEvent: eventJson.seatedEvent,
-        soldOut: eventJson.soldOut,
-        hostID: eventJson.hostID,
-        hostName: eventJson.hostName,
-        image1: eventJson.image1,
-        image2: eventJson.image2,
-        image3: eventJson.image3,
-        published: eventJson.published,
-        startDateTime: eventJson.startDateTime,
-        totalTicketAmount:eventJson.totalTicketAmount,
-        averageRating:eventJson.averageRating,
-        reviews:eventJson.reviews
-      }
-      console.log(eventDetails);
-      const fetchedImages = [eventDetails.image1,eventDetails.image2, eventDetails.image3];
-      const nonEmptyImages = fetchedImages.filter(image => {
-        return image !== "";
-      });
-      console.log("non empty image",nonEmptyImages);
-      console.log('hello', eventDetails);
-      setImageArray(nonEmptyImages);
-      setEventInfo({...eventDetails});
+    
+    const eventDetails = {
+      venueCapacity: eventJson.venueCapacity,
+      capacity: eventJson.capacity,
+      endDateTime: eventJson.endDateTime,
+      eventDescription: eventJson.eventDescription,
+      eventID: eventJson.eventID,
+      eventLocation: eventJson.eventLocation,
+      eventName: eventJson.eventName,
+      eventType: eventJson.eventType,
+      eventVenue: eventJson.eventVenue,
+      eventVenueId: eventJson.eventVenueId,
+      hostEmail: eventJson.hostEmail,
+      seatedEvent: eventJson.seatedEvent,
+      soldOut: eventJson.soldOut,
+      hostID: eventJson.hostID,
+      hostName: eventJson.hostName,
+      image1: eventJson.image1,
+      image2: eventJson.image2,
+      image3: eventJson.image3,
+      published: eventJson.published,
+      startDateTime: eventJson.startDateTime,
+      totalTicketAmount:eventJson.totalTicketAmount,
+      averageRating:eventJson.averageRating,
+      reviews:eventJson.reviews
+    }
+    const fetchedImages = [eventDetails.image1,eventDetails.image2, eventDetails.image3];
+    const nonEmptyImages = fetchedImages.filter(image => {
+      return image !== "";
+    });
+      
+    setImageArray(nonEmptyImages);
+    setEventInfo({...eventDetails});
   }
 
   useEffect(()=> {

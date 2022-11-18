@@ -7,7 +7,6 @@ import Typography from '@mui/material/Typography';
 import { CardActions, FormControl, TextField } from '@mui/material';
 import CardContent from '@mui/material/CardContent';
 import Card from '@mui/material/Card';
-import { Navigate, useNavigate, Link, useParams, useLocation } from 'react-router-dom';
 
 const style = {
   position: 'absolute',
@@ -25,6 +24,10 @@ const style = {
   overflow:'scroll'
 };
 
+/**
+ * Modal that shows replies to a review, and send reply form 
+ * for the user
+ */
 function ChildModal({reviewId, eventId}) {
   const [open, setOpen] = React.useState(false);
   const [replies, setReplies] = React.useState([]);
@@ -79,7 +82,6 @@ function ChildModal({reviewId, eventId}) {
       })
       const jsonEmail = await emailRes.json();
       console.log(jsonEmail);
-
       setSentReply(true);
     } else if(response.status === 401) {
       setLoginErr(true);
@@ -176,14 +178,15 @@ function ChildModal({reviewId, eventId}) {
   );
 }
 
+/**
+ * Modal that shows reviews and ratings of the event
+ */
 const ViewReviews = ({showReviews, setShowReviews, eventReviews, eventId,getEventInfo}) => {
   const [reviews, setReviews] = React.useState(eventReviews);
   const [loginErr, setloginErr] = React.useState(false);
  
 
   const likeReview = async(reviewId, eventId) => {
-    console.log('reviewId', reviewId);
-    console.log('eventId', eventId);
     const response = await fetch(`http://localhost:3000/events/${eventId}/reviews/${reviewId}/like`, {
       method: 'POST',
       headers: {
@@ -194,7 +197,6 @@ const ViewReviews = ({showReviews, setShowReviews, eventReviews, eventId,getEven
     if (response.ok) {
       setloginErr(false);
       const jsonReviewLiked = await (response.json());
-      console.log('jsonReviewLiked', jsonReviewLiked);
       await fetchReviews(eventId);
       await getEventInfo();
     } else if (response.status === 401){
@@ -214,7 +216,6 @@ const ViewReviews = ({showReviews, setShowReviews, eventReviews, eventId,getEven
         })
         if (response.ok) {
           json = await response.json();
-          console.log('reviews',json);
         }
       } else {
         const response = await fetch(`http://localhost:3000/events/${eventId}/reviews`, {
@@ -242,7 +243,6 @@ const ViewReviews = ({showReviews, setShowReviews, eventReviews, eventId,getEven
     if (response.ok) {
       setloginErr(false);
       const jsonReviewUnLiked = await (response.json());
-      console.log('jsonReviewUnliked', jsonReviewUnLiked);
       await fetchReviews(eventId);
       await getEventInfo();
     } else if (response.status === 401){

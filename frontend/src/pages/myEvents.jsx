@@ -8,21 +8,15 @@ import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { Grid } from '@mui/material';
-import { Navigate, useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import LeaveReviewForm from '../components/leaveReviewForm';
 import EditReviewForm from '../components/editReviewForm';
 const MyEvents = () => {
   const [attendingEvents, setAttendingEvents] = React.useState([]);
   const [openReviewForm, setOpenReviewForm] = React.useState(false);
-  const [reviews, setReviews] = React.useState([]);
-  const [averageRatingHook, setAverageRating] =React.useState(0);
-  const [ratingRatioHook, setRatingRatio] = React.useState(0);
-  const [edited, setEdited] = React.useState(false);
-  const [myReview, setMyReview] = React.useState('');
   const [editForm, setEditForm] = React.useState(false);
   const [editFormObj, setEditFormObj] = React.useState({});
   const [reviewFormObj, setReviewFormObj] = React.useState({});
-  const [puchasedModal, setPuchasedModal] = React.useState(false);
 
 
   const handleForm = (obj) => {
@@ -95,8 +89,7 @@ const MyEvents = () => {
     const json = await response.json();
     if(json.reviews.length !== 0) {
       edited = true;
-      setMyReview(json.reviews[0])
-      info = [edited,json.reviews[0]]
+      info = [edited,json.reviews[0]];
     } else {
       edited = false;
     }
