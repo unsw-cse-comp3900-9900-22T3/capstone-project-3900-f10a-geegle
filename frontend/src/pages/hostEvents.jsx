@@ -232,7 +232,7 @@ const DeleteSuccessModal = ({
     >
       <Box sx={style}>
         <Typography variant="h5" style={{color: 'green'}}>
-          You have successfully delted the event "{eventInfo.eventName}".
+          You have successfully deleted the event "{eventInfo.eventName}".
         </Typography>
         <Button 
             variant="text"
