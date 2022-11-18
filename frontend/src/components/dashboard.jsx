@@ -1,7 +1,6 @@
+/* eslint-disable */ 
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import Grid from '@mui/material/Grid';
@@ -17,8 +16,6 @@ import CanvasJSReact from '../canvasjs.react';
 import AddIcon from '@mui/icons-material/Add';
 import InputBase from '@mui/material/InputBase';
 import IconButton from '@mui/material/IconButton';
-import { SettingsBackupRestoreRounded } from '@mui/icons-material';
-import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -26,6 +23,14 @@ import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import Tooltip from '@mui/material/Tooltip';
+
+/**
+ * CanvasJs in eventful is used for line plots on dashboard
+ * so customers can view their page views, ticket purchases and
+ * revenue. 
+ * CanvaJs is an open source code base that supports graphing:
+ * https://canvasjs.com/html5-javascript-line-chart/
+ */
 var CanvasJS = CanvasJSReact.CanvasJS;
 var CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
@@ -48,7 +53,6 @@ const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
   padding: theme.spacing(1),
   textAlign: 'center',
-  // color: theme.palette.text.secondary,
   color: 'purple',
   height: '10vh',
   fontSize: '5vh',
@@ -97,8 +101,6 @@ export default function Dashboard() {
   const [open, setOpen] = React.useState(true);
   const state = useLocation();
   const eventObj = state.state;
-  const [toDoList, setToDoList] = React.useState([]);
-  const [alignment, setAlignment] = React.useState('pageView');
   const [toggleState, setToggleState] = React.useState('');
   const [pageViewPlot, setPageViewPlot] = React.useState({});
   const [ticketPurchasePlot, setTicketPurchasePlot] = React.useState({});
@@ -130,7 +132,7 @@ export default function Dashboard() {
     setPageViewPlot({
       animationEnabled: true,
       exportEnabled: true,
-      theme: "light2", // "light1", "dark1", "dark2"
+      theme: "light2", 
       title:{
         text: "Page views"
       },
@@ -139,34 +141,24 @@ export default function Dashboard() {
       },
       axisX: {
         title: "per day",
-        //interval: 1
       },
       data: [{
         type: "line",
-        // xValueType: "dateTime",
         toolTipContent: "Week {date}: {pageViews}%",
         dataPoints: updatedDate
       }]})
     }
 
     const fetchTicketPurchasePlot = async(data) => {
-          // pass a function to map
-      // const newData = data.map(dp =>{ 
-      //   delete data.x;
-      // });
-
-      console.log('here');
-      console.log(data);
       const updatedDate = data.map(({ ticketPurchases, date }) => ({
         ["y"]:ticketPurchases,
         ["x"]:new Date(date)
       }));
 
-      console.log("here");
       setTicketPurchasePlot({
         animationEnabled: true,
         exportEnabled: true,
-        theme: "light2", // "light1", "dark1", "dark2"
+        theme: "light2",
         title:{
           text: "Ticket Purchases"
         },
@@ -186,8 +178,6 @@ export default function Dashboard() {
 
     
     const fetchRevenuePlot = async(data) => {
-
-      console.log('here');
       const updatedDate = data.map(({ ticketRevenue, date }) => ({
         ["y"]:ticketRevenue,
         ["x"]:new Date(date)
@@ -197,7 +187,7 @@ export default function Dashboard() {
       setRevenuePlot({
         animationEnabled: true,
         exportEnabled: true,
-        theme: "light2", // "light1", "dark1", "dark2"
+        theme: "light2", 
         title:{
           text: "Revenue"
         },
@@ -215,11 +205,7 @@ export default function Dashboard() {
       })
     }
     
-
-  
-  // const handleOpen = () => setOpen(true);
   const handleClose = async() => {
-    console.log('here');
     await updateTasks(tasks);
     setOpen(false);
     navigate(`/events/host`);
@@ -257,11 +243,9 @@ export default function Dashboard() {
         'Content-Type': 'application/json',
         'auth-token': localStorage.getItem('token'),
       },
-      // body: JSON.stringify({userID:userID }),
     })
       if (response.ok) {
         const json = await response.json();
-        console.log('json', json);
         const mileStone = [];
         await fetchPageViewPlot(json.stats.pageViewChart);
         await fetchTicketPurchasePlot(json.stats.ticketPurchaseChart);
@@ -291,22 +275,17 @@ export default function Dashboard() {
         'Content-Type': 'application/json',
         'auth-token': localStorage.getItem('token'),
       },
-      // body: JSON.stringify({userID:userID }),
     })
 
     if (response.ok) {
       const json = await response.json();
-      console.log(json.todo, 'fetch Now')
       setTasks(json.todo);
-      setTaskErr(false);
-      console.log(reRender);
-      // const currChange = [...reRender];
+      setTaskErr(false);  
       
     } 
   }
 
   const addTasks = async(task) => {
-    console.log(task);
     const response = await fetch(`http://localhost:3000/events/${eventId}/todo`, {
       method: 'POST',
       headers: {
@@ -319,11 +298,8 @@ export default function Dashboard() {
       }),
     })
 
-    // const json = await response.json();
-    // console.log(json);
     if (response.ok) {
       const json = await response.json();
-      //const allTask = [...tasks];
       setTasks([...tasks, json.todo]);
       setTaskErr(false);
       setReRender([...reRender,'']);
@@ -333,7 +309,6 @@ export default function Dashboard() {
   }
 
   const deleteTasks = async(t) => {
-    console.log(t);
     const response = await fetch(`http://localhost:3000/events/${t.eventID}/todo/${t.taskID}`, {
       method: 'DELETE',
       headers: {
@@ -363,7 +338,6 @@ export default function Dashboard() {
   return (
     <ThemeProvider theme={stepperTheme}>
       <div>
-        {/* <Button onClick={handleOpen}>Open modal</Button> */}
         <Modal
           open={open}
           onClose={()=>handleClose()}

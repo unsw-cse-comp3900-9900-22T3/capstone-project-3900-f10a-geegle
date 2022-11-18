@@ -7,7 +7,6 @@ import Typography from '@mui/material/Typography';
 import { Grid } from '@mui/material';
 import CustomerTickets from '../components/CustomerTickets';
 import CustomiseEmail from '../components/CustomiseEmail';
-import { useNavigate } from 'react-router-dom';
 
 /**
  *  Component that renders customers that has bought ticketsto their selected event,

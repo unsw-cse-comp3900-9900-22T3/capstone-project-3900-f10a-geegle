@@ -1,4 +1,3 @@
-/* eslint-disable */ 
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -53,9 +52,7 @@ const LoginPage = ({setLoggedIn}) => {
         localStorage.setItem('token', json.token);
         localStorage.setItem('email', email);
         localStorage.setItem('userId', json.user.userID)
-        // setLogin(true);
-
-        //alert('Success, you are now logged in!');
+        
         navigate('/');
       } else if (response.status === 401) {
         if (json === "Invalid Email") {
