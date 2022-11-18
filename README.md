@@ -80,7 +80,7 @@ Close and reopen the terminal for nvm to be installed
 
 ### Install: node dependencies 
 
-*QTerminal 1 *
+*QTerminal 1*
 
 `cd capstone-project-3900-f10a-geegle/backend/ `
 
@@ -90,7 +90,7 @@ Close and reopen the terminal for nvm to be installed
 
 `npm install `
 
-*QTerminal 2 (open a new qterminal) *
+*QTerminal 2 (open a new qterminal)*
 
 `cd capstone-project-3900-f10a-geegle/frontend/ `
 
@@ -100,7 +100,7 @@ Close and reopen the terminal for nvm to be installed
 
 Having two terminals open from above with one in the backend folder and the other in the frontend folder 
 
-*QTerminal 1 (backend) *
+*QTerminal 1 (backend)*
 
 `npm start `
 
