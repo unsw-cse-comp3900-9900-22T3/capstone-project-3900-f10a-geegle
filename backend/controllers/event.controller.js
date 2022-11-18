@@ -1,4 +1,4 @@
-import { createEventsService, publishEventsService, unpublishEventsService, editEventsService, deleteEventsService, 
+import { createEventsService, publishEventsService, unpublishEventsService, deleteEventsService, 
          getEventService, getUpcomingEventsService, getAllEventsService, getHostEventsService, getHostDetailsService, 
          getEventsUserAttendingService, getEventGuestListService, isEventSoldOutService, getSoldOutEventsService,
          getEventsSearchedService, getEventsFilteredService, getAllEventCategoriesService, getRecommendedEventsForUserService, getEventDataService, getEventTodoService, addEventTodoService, updateEventTodoService, deleteEventTodoService } 

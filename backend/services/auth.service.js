@@ -1,4 +1,3 @@
-import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import {getUserByEmailDb, addUserDb} from '../db/user.db.js'
 import {generateNewToken} from '../utils/auth.helper.js'
