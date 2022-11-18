@@ -167,7 +167,7 @@ const PurchaseTicket= ({
         return;
       }
 
-      // check if at least one seat is selected (use Input error)
+      // check if at least one ticket is selected (use Input error)
       if (quantity.every((val)=> val === 0)) {
         setInputError(true);
         return;
@@ -481,7 +481,7 @@ const PurchaseTicket= ({
           ? (<Alert severity="error">Quanities must be positive numbers</Alert>) 
           : null} 
         {checkoutError === true 
-          ? (<Alert severity="error">Invalid credit card details, please check that Credit Card Number is 16 digits, CVV is 3 digits, month is in the form of mm and year is in the form of yy</Alert>) 
+          ? (<Alert severity="error">Invalid credit card details, please check credit card details are correct. Make sure Credit Card Number is 16 digits, CVV is 3 digits, month is in the form of mm and year is in the form of yy</Alert>) 
           : null}
         {checkoutSuccess === true 
           ? (
