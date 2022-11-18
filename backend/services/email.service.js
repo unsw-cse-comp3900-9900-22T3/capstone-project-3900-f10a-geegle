@@ -1,9 +1,7 @@
 import * as ticketdb from '../db/ticket.db.js'
 import * as venueSeatingdb from '../db/venueSeating.db.js'
 import * as eventdb from '../db/event.db.js'
-import * as ticketPurchasedb from '../db/ticketpurchase.db.js'
 import * as userdb from '../db/user.db.js'
-import { addReplyDb } from '../db/reply.db.js'
 import { getReviewByReviewIdDb } from '../db/review.db.js'
 import nodemailer from 'nodemailer'
 import * as dotenv from 'dotenv'
@@ -16,6 +14,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 /* Code source: https://github.com/trulymittal/gmail-api/blob/master/app.js */
 
+// Module to send email to end user
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -235,7 +234,8 @@ export const sendEventAnnouncementService = async(req, res) => {
     }
 }
 
-
+// Sends email for notifying user that their review has been replied to
+// from the event host
 export const notifyReviewReplyService = async(req, res) => {
     try {
         const reviewID = req.params.reviewID;

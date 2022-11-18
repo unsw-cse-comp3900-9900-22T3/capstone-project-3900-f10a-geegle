@@ -7,6 +7,7 @@ import { addReplyDb, editReplyByIdDb, getReplyAmountByReviewIDDb, getReplyByRepl
     deleteReplyByIdDb } from '../db/reply.db.js'
 import { getEventGoalMetricsDb, updateEventGoalMetricsDb } from '../db/dashboard.db.js'
 
+// Creates a review for an event
 export const createEventReviewService = async(req, res) => {
     try {    
         const {review, rating} = req.body
@@ -53,6 +54,7 @@ export const createEventReviewService = async(req, res) => {
     }
 }
 
+// Computes the event reviews to see if they have achieved the milestones
 const computeReviewsMetric = async(eventID) => {
     const goals = await getEventGoalMetricsDb(eventID)
     if (goals[0].fivemaxreviewsgoal && goals[0].tenmaxreviewsgoal) return
@@ -80,6 +82,7 @@ const computeReviewsMetric = async(eventID) => {
                             tenMaxReviews, tenMaxReviewsTime)
 }
 
+// Gets all event review for an event
 export const getEventReviewsService = async(req, res) => {
     try {
         const eventReviews = await getEventReviewsByEventIdDb(req.params.eventID);
@@ -119,6 +122,7 @@ export const getEventReviewsService = async(req, res) => {
     }
 }
 
+// Allows a user to edit an event review
 export const editEventReviewService = async(req, res) => {
     try {
         const reviewID = req.params.reviewID;
@@ -159,6 +163,7 @@ export const editEventReviewService = async(req, res) => {
     }
 }
 
+// Deletes an event review if you created it
 export const deleteEventReviewService = async(req, res) => {
     try {
         const reviewID = req.params.reviewID;
@@ -178,6 +183,7 @@ export const deleteEventReviewService = async(req, res) => {
     }
 }
 
+// Check if a user has left a review on an event
 export const checkUserHasLeftReviewService = async(req, res) => {
     try {
         const eventID = req.params.eventID;
@@ -218,7 +224,7 @@ export const checkUserHasLeftReviewService = async(req, res) => {
     }
 }
 
-
+// Adds a like to the event review
 export const addLikeToEventReviewService = async(req, res) => {
     try {
         const reviewID = req.params.reviewID;
@@ -249,6 +255,7 @@ export const addLikeToEventReviewService = async(req, res) => {
     }
 }
 
+// Removes a like from an event review
 export const removeLikeToEventReviewService = async(req, res) => {
     try {
         const reviewID = req.params.reviewID;
@@ -279,6 +286,7 @@ export const removeLikeToEventReviewService = async(req, res) => {
     }
 }
 
+// Creates a reply to an event review
 export const createReviewReplyService = async(req, res) => {
     try {
         const reviewID = req.params.reviewID;
@@ -315,6 +323,7 @@ export const createReviewReplyService = async(req, res) => {
     }
 }
 
+// Gets all replies to an event review
 export const getReviewReplyService = async(req, res) => {
     try {
         const reviewID = req.params.reviewID;
@@ -345,6 +354,7 @@ export const getReviewReplyService = async(req, res) => {
     }
 }
 
+// Allows a user to edit an event review if they created it
 export const editReviewReplyService = async(req, res) => {
     try {    
         const reviewID = req.params.reviewID;
@@ -383,6 +393,7 @@ export const editReviewReplyService = async(req, res) => {
     }
 }
 
+// Allows a user to delete an event review if they created it
 export const deleteReviewReplyService = async(req, res) => {
     try {    
         const reviewID = req.params.reviewID;

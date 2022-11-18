@@ -1,5 +1,6 @@
 import * as emailService from '../services/email.service.js'
 
+// Controller layer for sending an email after booking an event
 export const bookEventController = async(req, res) => {
     try {
         await emailService.bookEventService(req, res);
@@ -9,6 +10,7 @@ export const bookEventController = async(req, res) => {
     }
 }
 
+// Controller layer for sending an email after an event is cancelled
 export const cancelEventUserBookingController = async(req, res) => {
     try {
         await emailService.cancelUserBookingService(req, res);
@@ -18,6 +20,7 @@ export const cancelEventUserBookingController = async(req, res) => {
     }
 }
 
+// Controller layer for sending an email after an event is unpublished
 export const unpublishEventsController = async(req, res) => {
     try {
         await emailService.unpublishEventsService(req, res);
@@ -27,6 +30,7 @@ export const unpublishEventsController = async(req, res) => {
     }
 }
 
+// Controller layer for sending an email after a host replies to your review
 export const notifyReviewReplyController = async(req, res) => {
     try {
         await emailService.notifyReviewReplyService(req, res);
@@ -36,6 +40,7 @@ export const notifyReviewReplyController = async(req, res) => {
     }
 }
 
+// Controller layer for sending an email after the host makes an event announcement
 export const sendEventAnnouncementController = async(req, res) => {
     try {
         await emailService.sendEventAnnouncementService(req, res);

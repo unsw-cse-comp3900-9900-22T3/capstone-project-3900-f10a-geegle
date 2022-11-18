@@ -3,6 +3,7 @@ import * as ticketpurchaseDb from '../db/ticketpurchase.db.js'
 import { isSeatedEventDb } from '../db/event.db.js'
 import bcrypt from 'bcrypt'
 
+// Gets the profile information for a user
 const getUserProfileService = async (req, res) => {
     if (req.params.userID != req.userID) {
         return { user: null, statusCode : 403, msg: 'No permission to access this user\'s profile' }
@@ -54,6 +55,7 @@ const getUserProfileService = async (req, res) => {
     
 }
 
+// Updates a user's profile information
 const updateUserProfileService = async (req, res) => {
     if (req.params.userID != req.userID) {
         return { user: null, statusCode : 403, msg: 'No permission to access this user\'s profile' }
@@ -62,7 +64,6 @@ const updateUserProfileService = async (req, res) => {
     const { firstName, lastName, email, password, creditCard } = req.body
     /*
         The null values received from req.body is of type object rather than null so use !!
-        console.log(typeof firstName, null)
     */
     try {
         let updatedUser = await userDb.getUserByIdDb(req.params.userID)
@@ -160,6 +161,7 @@ const updateUserProfileService = async (req, res) => {
     
 }
 
+// Checks if a credit card is valid
 const checkValidCreditCard = (cardNo, ccv, expiryMonth, expiryYear) => {
     const regexCardNo = new RegExp('^[0-9]{16}$')
     const regexCCV = new RegExp('^[0-9]{3}$')

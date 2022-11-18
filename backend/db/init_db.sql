@@ -58,16 +58,6 @@ CREATE TABLE eventMessages (
         references events (eventID) ON DELETE CASCADE
 );
 
--- CREATE TABLE ticketType (
---     ticketTypeID SERIAL PRIMARY KEY,
---     amount integer,
---     venueID integer,
---     price integer NOT NULL,
-
---     foreign key (venueID)
---         references venues (venueID)
--- )
-
 CREATE TABLE tickets(
     ticketID SERIAL PRIMARY KEY,
     ticketType text NOT NULL,
@@ -208,16 +198,6 @@ CREATE TABLE eventTaskList (
         references events(eventID) ON DELETE CASCADE
 );
 
---CREATE TABLE eventTicketToSeatingAllocation (
---    ticketID SERIAL,
---    seatSection text,
---    primary key (ticketID, seatSection),
---    foreign key (ticketID) 
---        references events (ticketID)
---);
-
-
-INSERT INTO USERS (userID, firstName, lastName, email, userPassword) VALUES (DEFAULT, 'John', 'SMITH', 'jsmith@email.com', 'password123');
 
 INSERT INTO VENUES (venueID, venueName, venueLocation, maxCapacity) VALUES (DEFAULT, 'Accor Stadium', 'Edwin Flack Ave, Sydney Olympic Park NSW 2127', 83500);
 INSERT INTO VENUES (venueID, venueName, venueLocation, maxCapacity) VALUES (DEFAULT, 'ICC Sydney', '14 Darling Dr, Sydney NSW 2000', 5000);

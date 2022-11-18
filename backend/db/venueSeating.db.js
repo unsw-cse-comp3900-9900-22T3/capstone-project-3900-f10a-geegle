@@ -1,6 +1,6 @@
 import db from './db.js'
 
-// READ
+// READ query - gets venue seats by event
 const getVenueSeatsByEventIdDb = async(eventID) => {
     const result = await db.query (
         "SELECT s.seatid, s.seatsection, s.seatrow, s.seatno FROM events e JOIN venues v ON e.eventVenue = v.venueID " +
@@ -9,7 +9,7 @@ const getVenueSeatsByEventIdDb = async(eventID) => {
     return result.rows
 }
 
-// READ
+// READ query - gets available seats at an event's venue
 const getVenueAvailableSeatsByEventIdDb = async(eventID) => {
     const result = await db.query (
         "SELECT s.seatid, s.seatsection, s.seatrow, s.seatno FROM events e JOIN venues v ON e.eventVenue = v.venueID " +
@@ -22,7 +22,7 @@ const getVenueAvailableSeatsByEventIdDb = async(eventID) => {
     return result.rows
 }
 
-// READ
+// READ query - gets purchased seats at an event's venue
 const getVenuePurchasedSeatsByEventIdDb = async(eventID) => {
     const result = await db.query (
         "SELECT s.seatid, s.seatsection, s.seatrow, s.seatno FROM ticketPurchases tp JOIN tickets t ON tp.ticketID = t.ticketID " +
@@ -31,7 +31,7 @@ const getVenuePurchasedSeatsByEventIdDb = async(eventID) => {
     return result.rows
 }
 
-// READ
+// READ query - gets available seats at a venue by the event id and ticket type
 const getVenueAvailableSeatsByEventIdAndTicketTypeDb = async(eventID, ticketType) => {
     const result = await db.query (
         "SELECT s.seatid, s.seatsection, s.seatrow, s.seatno FROM events e JOIN venues v ON e.eventVenue = v.venueID " +
@@ -45,7 +45,7 @@ const getVenueAvailableSeatsByEventIdAndTicketTypeDb = async(eventID, ticketType
     return result.rows
 }
 
-// READ
+// READ query - gets the venue seat information by event
 const getVenueSeatInfoByEventIdDb = async(eventID, seatID) => {
     const result = await db.query (
         "SELECT s.seatid, s.seatsection, s.seatrow, s.seatno, t.ticketType, t.price " +
@@ -54,7 +54,7 @@ const getVenueSeatInfoByEventIdDb = async(eventID, seatID) => {
     return result.rows
 }
 
-// READ
+// READ query - gets the occupant for a specific seat
 const getSeatOccupantDb = async(eventID, seatID) => {
     const result = await db.query (
         "SELECT * FROM tickets WHERE eventID = $1 and seatID = $2", [eventID, seatID])
@@ -62,7 +62,7 @@ const getSeatOccupantDb = async(eventID, seatID) => {
     return result.rows
 }
 
-// READ
+// READ query - gets the venue seat sections by the venue name
 const getVenueSeatSectionsByVenueNameDb = async(venueName) => {
     const result = await db.query (
         "SELECT distinct s.seatSection FROM seats s JOIN venues v on s.venueID = v.venueID where v.venueName = $1", [venueName])
@@ -70,7 +70,7 @@ const getVenueSeatSectionsByVenueNameDb = async(venueName) => {
     return result.rows
 }
 
-// READ
+// READ query - checks if the seat is in the section allocated the the ticket type
 const isSeatInSeatSectionAllocatedToTicketTypeDb = async(eventID, seatID, ticketType) => {
     const result = await db.query (
         "SELECT * FROM seats s WHERE s.seatID = $1 AND EXISTS " +
@@ -81,21 +81,21 @@ const isSeatInSeatSectionAllocatedToTicketTypeDb = async(eventID, seatID, ticket
     return result.rows
 }
 
-// READ
+// READ query - checks if venue seating is available
 const isVenueSeatingAvailableDb = async(venueID) => {
     const result = await db.query(
         "SELECT count(*) from seats where venueID = $1", [venueID])
     return result.rows[0]
 }
 
-// READ
+// READ query - gets the seat by id
 const getSeatBySeatId = async(seatID) => {
     const result = await db.query (
         "SELECT seatsection, seatrow, seatno FROM seats WHERE seatID = $1", [seatID])
     return result.rows
 }
 
-// UPDATE
+// UPDATE query - uassigns seat from the ticket
 const unassignSeatFromTicketDb = async(ticketID) => {
     await db.query("UPDATE tickets SET seatID = NULL WHERE ticketID = $1", [ticketID])
 }

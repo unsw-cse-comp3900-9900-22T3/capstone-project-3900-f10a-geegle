@@ -1,8 +1,7 @@
-import { DefaultDeserializer } from 'v8'
 import db from './db.js'
 
 
-// READ
+// READ query - gets a reply to a review
 const getReplyByReviewIdDb = async(reviewID) => {
     const result = await db.query (
         "SELECT * FROM reviewReplies WHERE reviewID = $1", [reviewID]
@@ -10,7 +9,7 @@ const getReplyByReviewIdDb = async(reviewID) => {
     return result.rows
 }
 
-// READ
+// READ query - gets a reply by id
 const getReplyByReplyIdDb = async(replyID) => {
     const result = await db.query (
         "SELECT * FROM reviewReplies WHERE replyID = $1", [replyID]
@@ -18,6 +17,7 @@ const getReplyByReplyIdDb = async(replyID) => {
     return result.rows
 }
 
+// READ query - gets the amount of replies to a review
 const getReplyAmountByReviewIDDb = async(reviewID) => {
     const result = await db.query (
         'SELECT count(*) FROM reviewReplies WHERE reviewID = $1',
@@ -26,7 +26,7 @@ const getReplyAmountByReviewIDDb = async(reviewID) => {
     return result.rows[0].count
 }
 
-// CREATE
+// CREATE query - adds a reply to a review
 const addReplyDb = async(reviewID, userID, reply, repliedOn) => {
     const result = await db.query (
         "INSERT INTO reviewReplies (replyID, reviewID, userID, reply, repliedOn) VALUES " +
@@ -35,7 +35,7 @@ const addReplyDb = async(reviewID, userID, reply, repliedOn) => {
     return result.rows[0]
 }
 
-// UPDATE
+// UPDATE query - edits a reply
 const editReplyByIdDb = async(replyID, reply, repliedOn) => {
     const result = await db.query (
         "UPDATE reviewReplies SET reply = $1, repliedOn = $2 WHERE replyID = $3 RETURNING *",
@@ -44,7 +44,7 @@ const editReplyByIdDb = async(replyID, reply, repliedOn) => {
     return result.rows[0]
 }
 
-// DELETE
+// DELETE query - deletes a reply
 const deleteReplyByIdDb = async(replyID) => {
     const result = await db.query (
         "DELETE FROM reviewReplies WHERE replyID = $1",
