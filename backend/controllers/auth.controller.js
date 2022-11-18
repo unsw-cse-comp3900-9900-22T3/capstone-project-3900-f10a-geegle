@@ -1,5 +1,6 @@
 import { registerUserService, loginUserService } from '../services/auth.service.js'
 
+// Controller layer to register a user
 const registerUserController = async(req, res) => {
     try {
         const {user, token, statusCode, msg} = await registerUserService(req, res);
@@ -19,6 +20,7 @@ const registerUserController = async(req, res) => {
     }
 }
 
+// Controller layer to login a user
 const loginUserController = async(req, res) => {
     try {
         const {user, token, statusCode, msg} = await loginUserService(req, res);
@@ -38,6 +40,7 @@ const loginUserController = async(req, res) => {
     }
 }
 
+// Controller response to verified token
 const verifyUserTokenController = async(req, res) => {
     res.status(200).send("Verified")
 }

@@ -3,6 +3,7 @@ import * as dotenv from 'dotenv'
 
 dotenv.config()
 
+// Will not authorise the user unless the token is valid
 export const verifyToken = async (req, res, next) => {
     const token = req.headers["auth-token"]
 
@@ -22,6 +23,7 @@ export const verifyToken = async (req, res, next) => {
     }
 }
 
+// Checks if the user has a token and decrypts it if it is valid
 export const userLoggedIn = async (req, res, next) => {
     const token = req.headers["auth-token"]
     if (!token) {

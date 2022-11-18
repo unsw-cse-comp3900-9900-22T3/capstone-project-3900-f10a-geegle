@@ -3,9 +3,9 @@ import * as venueSeatingdb from '../db/venueSeating.db.js'
 import * as eventdb from '../db/event.db.js'
 import * as ticketPurchasedb from '../db/ticketpurchase.db.js'
 import * as userdb from '../db/user.db.js'
-import nodemailer from 'nodemailer'
 import * as metricdb from '../db/dashboard.db.js'
 
+// Gets all ticket types for an event given an event id
 export const getEventTicketTypesService = async(req, res) => {
     try {
         const eventID = req.params.eventID;
@@ -25,6 +25,7 @@ export const getEventTicketTypesService = async(req, res) => {
     }
 }
 
+// Gets all tickets for an event given an event id
 export const getEventTicketsService = async(req, res) => {
     try {
         const eventID = req.params.eventID;
@@ -49,6 +50,7 @@ export const getEventTicketsService = async(req, res) => {
     }
 }
 
+// Gets all available tickets for an event given an event id
 export const getEventAvailableTicketService = async(req, res) => {
     try {
         const eventID = req.params.eventID;
@@ -70,6 +72,7 @@ export const getEventAvailableTicketService = async(req, res) => {
     }
 }
 
+// Gets all available tickets for an event grouped by type given an event id
 export const getEventAvailableTicketGroupService = async(req, res) => {
     try {
         const eventID = req.params.eventID;
@@ -91,6 +94,7 @@ export const getEventAvailableTicketGroupService = async(req, res) => {
     }
 }
 
+// Gets all seats from an event given an event id
 export const getEventSeatsService = async(req, res) => {
     try {
         const eventID = req.params.eventID;
@@ -116,6 +120,7 @@ export const getEventSeatsService = async(req, res) => {
     }
 }
 
+// Gets all available seats in an event given an event id
 export const getEventAvailableSeatsService = async(req, res) => {
     try {
         const eventID = req.params.eventID;
@@ -141,6 +146,7 @@ export const getEventAvailableSeatsService = async(req, res) => {
     }
 }
 
+// Gets all purchased seats in an event given an event id
 export const getEventPurchasedSeatsService = async(req, res) => {
     try {
         const eventID = req.params.eventID;
@@ -166,6 +172,7 @@ export const getEventPurchasedSeatsService = async(req, res) => {
     }
 }
 
+// Gets all available seats at an event given an event id and ticket type
 export const getEventAvailableSeatsByTicketTypeService = async(req, res) => {
     try {
         const { eventID, ticketType } = req.params;
@@ -191,6 +198,7 @@ export const getEventAvailableSeatsByTicketTypeService = async(req, res) => {
     }
 }
 
+// Gets all seat sections given a venue name
 export const getEventVenueSeatSectionsService = async(req, res) => {
     try {
         const venueName = req.params.venueName;
@@ -205,6 +213,7 @@ export const getEventVenueSeatSectionsService = async(req, res) => {
     }
 }
 
+// Gets the seat sections that the tickets are allocated to
 export const getEventSeatSectionTicketAllocationService = async(req, res) => {
     try {
         const eventID = req.params.eventID;
@@ -228,6 +237,7 @@ export const getEventSeatSectionTicketAllocationService = async(req, res) => {
     }
 }
 
+// Gets information about a seat given an id and event id
 export const getEventSeatInfoService = async(req, res) => {
     try {
         const { eventID, seatID } = req.params;
@@ -261,6 +271,7 @@ export const getEventSeatInfoService = async(req, res) => {
     }
 }
 
+// Processes a booking for an event for a logged in user given an event id
 export const bookEventService = async(req, res) => {
     try {
         const eventID = req.params.eventID
@@ -307,13 +318,6 @@ export const bookEventService = async(req, res) => {
                 return { booking: null, statusCode: 400, msg: `Seat '${seats[i]}' cannot be chosen for ticket type: '${tickets[i]}'`}
             }
         }
-        
-        // DB: get all available tickets at event
-        // https://stackoverflow.com/questions/3396088/how-do-i-remove-an-object-from-an-array-with-javascript
-        // - Use array.findIndex to find ticket matching the ticket type
-        // - Delete from available tickets
-
-        // Alternative: each iteration get from DB list of available tickets
         /*
             For each booking:
                 
@@ -331,7 +335,6 @@ export const bookEventService = async(req, res) => {
 
             ticketResult = ticketResult[0]
             if (seats.length !== 0) {
-                // implement this
                 ticketResult = await ticketdb.assignSeatToTicketDb(ticketResult.ticketid, seats[i])
             }
 
@@ -356,6 +359,7 @@ export const bookEventService = async(req, res) => {
     }
 }
 
+// Checks if a credit card is valid
 const checkValidCreditCard = (cardNo, ccv, expiryMonth, expiryYear) => {
     const regexCardNo = new RegExp('^[0-9]{16}$')
     const regexCCV = new RegExp('^[0-9]{3}$')
@@ -369,6 +373,7 @@ const checkValidCreditCard = (cardNo, ccv, expiryMonth, expiryYear) => {
             regexYear.test(expiryYear)) 
 }
 
+// Calculates all the sales metrics and milestones for an event
 const computeSalesMetric = async(eventID) => {
     let currDate = new Date()
     currDate.setHours(0,0,0,0)
@@ -402,6 +407,7 @@ const computeSalesMetric = async(eventID) => {
                                             goals[0].tenmaxreviewsgoal, goals[0].tenmaxreviewsgoaltime)
 }
 
+// Gets all tickets purchased by a user to an event
 export const getEventTicketsUserPurchasedService = async(req, res) => {
     try {
         const userID = req.userID
@@ -435,6 +441,7 @@ export const getEventTicketsUserPurchasedService = async(req, res) => {
     }
 }
 
+// Cancels a user's ticket to an event
 export const cancelEventUserBookingService = async(req, res) => {
     try {
         

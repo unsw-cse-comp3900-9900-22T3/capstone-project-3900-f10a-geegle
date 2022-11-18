@@ -1,8 +1,7 @@
 import db from './db.js'
 
-// CREATE, UPDATE
+// CREATE, UPDATE query - adds/creates a pageview to eventmetrices table
 const addPageViewToMetricDb = async(eventID, pageViews, dataDay, ticketCheckouts) => {
-    
     const result = await db.query (
         "INSERT INTO eventMetrics (eventID, pageViews, dataDay, ticketCheckouts) " +
         "VALUES ($1, $2, $3, $4) "+ 
@@ -13,7 +12,7 @@ const addPageViewToMetricDb = async(eventID, pageViews, dataDay, ticketCheckouts
     return result.rows[0]
 }
 
-// UPDATE
+// UPDATE query - adds a ticket checkout to eventmetrics table
 const addTicketCheckoutsToMetricDb = async(eventID, ticketCheckouts) => {
     const result = await db.query (
         "UPDATE eventMetrics SET ticketCheckouts = ($1 + 1) WHERE eventid = $2 RETURNING *", 
@@ -22,7 +21,7 @@ const addTicketCheckoutsToMetricDb = async(eventID, ticketCheckouts) => {
     return result.rows[0]
 }
 
-// READ
+// READ query - gets all event metrics for an event
 const getEventMetricsDb = async(eventID, dataDay) => {
     const result = await db.query (
         "SELECT * FROM eventMetrics WHERE eventID = $1 AND dataDay = $2", 
@@ -31,7 +30,7 @@ const getEventMetricsDb = async(eventID, dataDay) => {
     return result.rows
 }
 
-// READ
+// READ query - gets all event goals for an event
 const getEventGoalMetricsDb = async(eventID) => {
     const result = await db.query (
         "SELECT * FROM eventGoalMetrics WHERE eventID = $1", 
@@ -40,7 +39,7 @@ const getEventGoalMetricsDb = async(eventID) => {
     return result.rows
 }
 
-// UPDATE
+// UPDATE query - updates all event goals for an event
 const updateEventGoalMetricsDb = async(eventID, publishedGoal=false, publishedGoalTime=null, tenSalesGoal=false, tenSalesGoalTime=null, 
                                         halfSalesGoal=false, halfSalesGoalTime=null,
                                         threeQuarterSalesGoal=false, threeQuarterSalesGoalTime=null,
@@ -61,7 +60,7 @@ const updateEventGoalMetricsDb = async(eventID, publishedGoal=false, publishedGo
     return result.rows[0]
 }
 
-// CREATE
+// CREATE query - creates goal metrics for an event
 const addEventGoalMetricsDb = async(eventID) => {
     const result = await db.query (
         "INSERT INTO eventGoalMetrics (eventID, publishedGoal, publishedGoalTime, tenSalesGoal, tenSalesGoalTime, halfSalesGoal, halfSalesGoalTime, " +
@@ -73,7 +72,7 @@ const addEventGoalMetricsDb = async(eventID) => {
     return result.rows[0]
 }
 
-// CREATE
+// CREATE query - adds an event task to the task list
 const addEventTaskDb = async(eventID, taskDescription, taskCompleted) => {
     const result = await db.query (
         "INSERT INTO eventTaskList (taskID, eventID, taskDescription, taskCompleted) " +
@@ -82,7 +81,7 @@ const addEventTaskDb = async(eventID, taskDescription, taskCompleted) => {
     return result.rows[0]
 }
 
-// READ
+// READ query - gets all event tasks from a task list
 const getEventTaskByEventIDDb = async(eventID) => {
     const result = await db.query (
         "SELECT * FROM eventTaskList WHERE eventID = $1", [eventID]
@@ -90,7 +89,7 @@ const getEventTaskByEventIDDb = async(eventID) => {
     return result.rows
 }
 
-// READ
+// READ query - gets a task from the task list
 const getEventTaskByTaskIDDb = async(taskID) => {
     const result = await db.query (
         "SELECT * FROM eventTaskList WHERE taskID = $1", [taskID]
@@ -98,7 +97,7 @@ const getEventTaskByTaskIDDb = async(taskID) => {
     return result.rows
 }
 
-// UPDATE
+// UPDATE query - updates a task from the task list
 const updateTaskByTaskIDDb = async(taskID, taskCompleted) => {
     const result = await db.query (
         "UPDATE eventTaskList SET taskCompleted = $1 WHERE taskID = $2 RETURNING *",
@@ -107,7 +106,7 @@ const updateTaskByTaskIDDb = async(taskID, taskCompleted) => {
     return result.rows[0]
 }
 
-// UPDATE
+// DELETE query - deletes a task from the task list
 const deleteTaskByTaskIDDb = async(taskID) => {
     await db.query (
         "DELETE FROM eventTaskList where taskID = $1",

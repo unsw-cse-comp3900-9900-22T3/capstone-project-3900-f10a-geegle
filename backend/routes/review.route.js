@@ -7,6 +7,8 @@ import { getEventReviewsController, createEventReviewController, editEventReview
 
 const reviewRouter = Router();
 
+// All routes related to event reviews, likes and replies
+// Route: /events
 reviewRouter.get('/:eventID/reviews', userLoggedIn, getEventReviewsController); //get all reviews for an event
 reviewRouter.get('/:eventID/reviews/user', verifyToken, getEventReviewsUserController) // if logged in
 reviewRouter.post('/:eventID/reviews', verifyToken, createEventReviewController); //send a review for an event

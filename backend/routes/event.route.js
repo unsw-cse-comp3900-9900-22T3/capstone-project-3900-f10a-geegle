@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { getEventController, getUpcomingEventsController, getAllEventsController, createEventsController,
-         publishEventsController, unpublishEventsController, editEventsController, deleteEventsController, 
+         publishEventsController, unpublishEventsController, deleteEventsController, 
          getHostEventsController, getEventsUserAttendingController, getEventGuestListController, getHostDetailsController,
          isEventSoldOutController, getSoldOutEventsController, getMatchingEventsController, getAllEventCategoriesController, getRecommendedEventsForUserController, getEventDataController, getEventTodoController, addEventTodoController, updateEventTodoController, deleteEventTodoController } 
          from '../controllers/event.controller.js'
@@ -11,11 +11,11 @@ import emailRouter from './email.route.js';
 
 const eventRouter = Router();
 
+// All routes for general event related actions
+// Route: /events
 eventRouter.post('/create', verifyToken, createEventsController);
 eventRouter.put('/:eventID/publish', verifyToken, publishEventsController)
 eventRouter.put('/:eventID/cancel', verifyToken, unpublishEventsController)
-// TODO
-eventRouter.put('/:eventID/edit', verifyToken, editEventsController)
 eventRouter.delete('/:eventID/delete', verifyToken, deleteEventsController)
 eventRouter.get('/:eventID/info', userLoggedIn, getEventController);
 eventRouter.get('/upcoming', userLoggedIn, getUpcomingEventsController);

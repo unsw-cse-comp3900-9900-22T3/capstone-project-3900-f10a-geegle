@@ -1,6 +1,6 @@
 import db from './db.js'
 
-// READ
+// READ query - gets an event review by event id
 const getEventReviewsByEventIdDb = async(eventID) => {
     const result = await db.query (
         "SELECT * FROM reviews WHERE eventID = $1", [eventID]
@@ -8,7 +8,7 @@ const getEventReviewsByEventIdDb = async(eventID) => {
     return result.rows
 }
 
-// READ
+// READ query - gets an event review by event and user
 const getEventReviewsByEventIdAndUserIdDb = async(eventID, userID) => {
     const result = await db.query (
         "SELECT * FROM reviews WHERE eventID = $1 AND userID = $2",
@@ -17,7 +17,7 @@ const getEventReviewsByEventIdAndUserIdDb = async(eventID, userID) => {
     return result.rows
 }
 
-// READ
+// READ query - gets a review by id
 const getReviewByReviewIdDb = async(reviewID) => {
     const result = await db.query (
         "SELECT * FROM reviews WHERE reviewID = $1", [reviewID]
@@ -25,7 +25,7 @@ const getReviewByReviewIdDb = async(reviewID) => {
     return result.rows
 }
 
-// CREATE
+// CREATE query - adds a review
 const addReviewDb = async(eventID, userID, rating, review, postedOn) => {
     const result = await db.query (
         "INSERT INTO reviews (reviewID, eventID, userID, rating, review, postedOn) VALUES " +
@@ -34,7 +34,7 @@ const addReviewDb = async(eventID, userID, rating, review, postedOn) => {
     return result.rows[0]
 }
 
-// UPDATE
+// UPDATE query - edits a review
 const editReviewByIdDb = async(reviewID, review, rating, timestamp) => {
     const result = await db.query (
         "UPDATE reviews SET review = $1, rating = $2, postedOn = $3, edited = $4 WHERE reviewID = $5 RETURNING *",
@@ -43,7 +43,7 @@ const editReviewByIdDb = async(reviewID, review, rating, timestamp) => {
     return result.rows[0]
 }
 
-// DELETE
+// DELETE query - deletes a review
 const deleteReviewByIdDb = async(reviewID) => {
     const result = await db.query (
         "DELETE FROM reviews WHERE reviewID = $1",
@@ -51,7 +51,7 @@ const deleteReviewByIdDb = async(reviewID) => {
     )
 }
 
-// CREATE
+// CREATE query - adds a like to a review
 const addReviewLikeDb = async(reviewID, userID) => {
     const result = await db.query (
         "INSERT INTO reviewLikes (reviewID, userID) VALUES ($1, $2) RETURNING *",
@@ -60,7 +60,7 @@ const addReviewLikeDb = async(reviewID, userID) => {
     return result.rows
 }
 
-// READ
+// READ query - gets amount of likes in a review
 const getReviewLikeAmountDb = async(reviewID) => {
     const result = await db.query (
         "SELECT count(*) FROM reviewLikes WHERE reviewID = $1",
@@ -69,7 +69,7 @@ const getReviewLikeAmountDb = async(reviewID) => {
     return result.rows[0].count
 }
 
-// READ
+// READ query - checks whether a user has liked a review
 const getReviewLikeDb = async(reviewID, userID) => {
     const result = await db.query (
         "SELECT * FROM reviewLikes WHERE reviewID = $1 AND userID = $2",
@@ -78,7 +78,7 @@ const getReviewLikeDb = async(reviewID, userID) => {
     return result.rows
 }
 
-// DELETE
+// DELETE query - deletes a like from a review
 const deleteReviewLikeByIdDb = async(reviewID, userID) => {
     const result = await db.query (
         "DELETE FROM reviewLikes WHERE reviewID = $1 AND userID = $2",

@@ -4,6 +4,8 @@ import * as emailController from '../controllers/email.controller.js'
 
 const emailRouter = Router();
 
+// All routes for email related actions
+// Route: /events
 emailRouter.post('/:eventID/emailPurchase', verifyToken, emailController.bookEventController)
 emailRouter.post('/emailCancelBooking/:ticketID', verifyToken, emailController.cancelEventUserBookingController)
 emailRouter.post('/:eventID/emailUnpublish', verifyToken, emailController.unpublishEventsController)

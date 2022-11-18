@@ -2,7 +2,7 @@ import { getEventsByHostIdDb } from "../db/event.db.js";
 import { getEventReviewsByEventIdDb } from "../db/review.db.js";
 import { getAvailableTicketsByEventIdDb } from "../db/ticket.db.js";
 
-
+// Adds a LTPO value to all events based on their LTPO score
 export async function getAllLPTORankings(events, user) {
     for (let i = 0; i < events.length; i++) {
         let lptoVal = await getSingleEventLPTO(events[i]);
@@ -11,9 +11,9 @@ export async function getAllLPTORankings(events, user) {
     return events;
 }
 
-async function getSingleEventLPTO(event, user) {
-    
-    
+// Determines the LTPO score of a single event
+// Used to determine ranking when no customer information/similarity ties
+async function getSingleEventLPTO(event, user) {    
     let eventStart = new Date(event.startdatetime);
     let currTime = new Date();
     let timeDiff = (eventStart - currTime)/36e5;

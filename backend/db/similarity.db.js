@@ -1,6 +1,6 @@
 import db from './db.js'
 
-// CREATE
+// CREATE, UPDATE query - creates or updates an event similarity value
 const addEventSimilarityById = async(ID1, ID2, rating) => {
     const result = await db.query (
         "INSERT INTO eventSimilarity (event1, event2, similarity_rating)" +
@@ -11,7 +11,7 @@ const addEventSimilarityById = async(ID1, ID2, rating) => {
     return result.rows[0]
 }
 
-// READ
+// READ query - gets an event similarity between 2 events
 const getEventSimilarityById = async(ID1, ID2) => {
     const result = await db.query (
         "SELECT * FROM eventSimilarity WHERE event1 = $1 and event2 = $2", 

@@ -9,15 +9,14 @@ import { getReplyAmountByReviewIDDb } from '../db/reply.db.js'
 import { addTicketDb, unassignEventSeatsDb } from '../db/ticket.db.js'
 import { getUserByIdDb } from '../db/user.db.js'
 import { isVenueSeatingAvailableDb } from '../db/venueSeating.db.js'
-import { getEventsFromUserTicketsDb, getTicketPurchaseByEventIdDb, getTicketPurchaseByUserIdDb, removeTicketPurchaseByEventIdDb } from '../db/ticketpurchase.db.js'
+import { getTicketPurchaseByEventIdDb, getTicketPurchaseByUserIdDb, removeTicketPurchaseByEventIdDb } from '../db/ticketpurchase.db.js'
 import { getAllLPTORankings } from '../utils/lpto.ranking.js'
 import { getEventSimilarityById } from '../db/similarity.db.js'
-import { getEventTicketTypesController } from '../controllers/booking.controller.js'
 import { updateAllEventSimilarity } from '../utils/event.similarity.js'
 import { addEventGoalMetricsDb, addEventTaskDb, addPageViewToMetricDb, deleteTaskByTaskIDDb, getEventGoalMetricsDb, getEventMetricsDb, getEventTaskByEventIDDb, getEventTaskByTaskIDDb, updateEventGoalMetricsDb, updateTaskByTaskIDDb } from '../db/dashboard.db.js'
 
 
-/*  Request
+/*  Request Body
     All fields must be filled in
     {
         events: {
@@ -28,6 +27,10 @@ import { addEventGoalMetricsDb, addEventTaskDb, addPageViewToMetricDb, deleteTas
         tickets: [{ticketType: "Gold class", price: 50, ticketAmount: 20}, {...}]
     }
 */
+
+// Creates an event for the host
+// Requires a name, start and end time, description, event type, venue,
+// capacity and a thumbnail
 export const createEventsService = async(req, res) => {
     try {
         const {events, tickets} = req.body
@@ -60,6 +63,7 @@ export const createEventsService = async(req, res) => {
             return {events: null, statusCode : 400, msg: 'Event must have tickets'}
         }
 
+        // Checks validity of tickets
         let totalTickets = 0;
         for (let i = 0; i < tickets.length; i++) {
             if (i > 0 && !tickets[i].ticketType && !tickets[i].ticketAmount && !tickets[i].price) continue
@@ -75,6 +79,7 @@ export const createEventsService = async(req, res) => {
             return {events: null, statusCode : 400, msg: 'Capacity not sufficient'}
         }
 
+        // Venue capacity checking
         let venue = await getEventVenueByNameDb(eventVenue)
         let seatingAvailable = false
         if (venue.length === 0) {
@@ -96,7 +101,7 @@ export const createEventsService = async(req, res) => {
         const newEvent = await addEventDb(eventName, req.userID, new Date(startDateTime), new Date(endDateTime), eventDescription,
                 eventType, venue.venueid, Number(capacity), totalTickets, image1, image2, image3)
     
-
+        // Populates db with tickets
         for (let i = 0; i < tickets.length; i++) {
             const {ticketType, price, ticketAmount, seatSections} = tickets[i]
             for (let j = 0 ; j < ticketAmount; j++) {
@@ -135,6 +140,7 @@ export const createEventsService = async(req, res) => {
     }  
 }
 
+// Publishes an event for the public to purchase tickets to
 export const publishEventsService = async(req, res) => {
     try {
         const eventID = req.params.eventID;
@@ -168,6 +174,7 @@ export const publishEventsService = async(req, res) => {
     }
 }
 
+// Updates the event goals of a published event
 const updatePublishEventGoalMetric = async(eventID) => {
     const goals = await getEventGoalMetricsDb(eventID)
     
@@ -181,6 +188,7 @@ const updatePublishEventGoalMetric = async(eventID) => {
                                     goals[0].tenmaxreviewsgoal, goals[0].tenmaxreviewsgoaltime)
 }
 
+// Unpublishes an event that is published
 export const unpublishEventsService = async(req, res) => {
     try {
         const eventID = req.params.eventID;
@@ -211,16 +219,7 @@ export const unpublishEventsService = async(req, res) => {
     }
 }
 
-export const editEventsService = async(req, res) => {
-    try {
-        const eventID = req.params.eventID;
-        return 
-
-    } catch(e) {
-        throw e
-    }
-}
-
+// Deletes an event
 export const deleteEventsService = async(req, res) => {
     try {
         const eventID = req.params.eventID;
@@ -243,6 +242,7 @@ export const deleteEventsService = async(req, res) => {
     }
 }
 
+// Gets an event given an id (bulk API endpoint)
 export const getEventService = async(req, res) => {
     try {
         const event = await getEventByIdDisplayDb(req.params.eventID);
@@ -294,6 +294,7 @@ export const getEventService = async(req, res) => {
     }
 }
 
+// Gets all events coming up in the next month
 export const getUpcomingEventsService = async(req, res) => {
     try {
         const eventList = await getAllEventsNotSoldOutDb();
@@ -334,6 +335,7 @@ export const getUpcomingEventsService = async(req, res) => {
     }
 }
 
+// Gets all events for the user
 export const getAllEventsService = async(req, res) => {
     try {
         const eventList = await getAllEventsDb();
@@ -375,7 +377,7 @@ export const getAllEventsService = async(req, res) => {
     }
 }
 
-
+// Gets all events hosted by a specific person
 export const getHostEventsService = async(req, res) => {
     try {
         const eventList = await getEventsByHostIdDb(req.userID);
@@ -416,6 +418,7 @@ export const getHostEventsService = async(req, res) => {
     }
 }
 
+// Gets all events that a user is attending
 export const getEventsUserAttendingService = async(req, res) => {
     try {
         let eventList = await getEventsUserAttendingDb(req.userID);
@@ -453,6 +456,7 @@ export const getEventsUserAttendingService = async(req, res) => {
     }
 }
 
+// Gets the guest list for an event
 export const getEventGuestListService = async(req, res) => {
     try {
         const eventID = req.params.eventID;
@@ -483,13 +487,13 @@ export const getEventGuestListService = async(req, res) => {
             }
             guestList.push(info)
         }
-        // console.log(guestList)
         return {guests: guestList, statusCode: 200, msg: 'Guest list'}
     } catch (e) {
         throw e
     }
 }
 
+// Gets the details of the host, including past events and reviews
 export const getHostDetailsService = async(req, res) => {
     try {
 
@@ -546,6 +550,7 @@ export const getHostDetailsService = async(req, res) => {
     }
 }
 
+// Gets whether the event is sold out
 export const isEventSoldOutService = async(req, res) => {
     try {
         const eventID = req.params.eventID;
@@ -562,6 +567,7 @@ export const isEventSoldOutService = async(req, res) => {
     }
 }
 
+// Gets all sold out events 
 export const getSoldOutEventsService = async(req, res) => {
     try {
         const eventList = await getSoldOutEventsDb()
@@ -599,6 +605,7 @@ export const getSoldOutEventsService = async(req, res) => {
     }
 }
 
+// Gets event matching a search criteria
 export const getEventsSearchedService = async(searchWords, userID) => {
     try {
         const eventList = await getMatchingEventsDb(searchWords)
@@ -639,6 +646,7 @@ export const getEventsSearchedService = async(searchWords, userID) => {
     }
 }
 
+// Gets events when filtered by category, date, location, rating or price
 export const getEventsFilteredService = async(from, to, category, location, rating, priceLimit, userID) => {
     try {
         let eventList = await getAllEventsDb();
@@ -719,6 +727,7 @@ export const getEventsFilteredService = async(from, to, category, location, rati
     }
 }
 
+// Gets the reviews and determines the review score of an event
 const eventRatingScore = async(eventID, userID = 0) => {
     let eventReviews = await getEventReviewsByEventIdDb(eventID);
     let score = 0.00;
@@ -752,6 +761,7 @@ const eventRatingScore = async(eventID, userID = 0) => {
     return {reviews: eventReviews, rating: score}
 }
 
+// Gets all event categories for events
 export const getAllEventCategoriesService = async() => {
     const categoriesDb = await getAllEventCategoriesDb(); 
 
@@ -763,6 +773,7 @@ export const getAllEventCategoriesService = async() => {
     return { categories: categories, statusCode: 200, msg: 'All event categories' }
 }
 
+// Recommends events for the user based on their past behaviour
 export const getRecommendedEventsForUserService = async(req, res) => {
     try {    
         const userID = req.userID;
@@ -871,6 +882,7 @@ export const getRecommendedEventsForUserService = async(req, res) => {
     }
 }
 
+// Gets all the data metrics for an event
 export const getEventDataService = async(req, res) => {
     try {
         const events = await getEventByIdDb(req.params.eventID);
@@ -885,9 +897,8 @@ export const getEventDataService = async(req, res) => {
 
         // Sorts purchased tickets by date of purchase
         const eventTicketsPurchased = await getTicketPurchaseByEventIdDb(event.eventid);
-        // sort from query easier
-        //eventTicketsPurchased.sort((a,b) => new Date(a.ticketpurchasetime) - new Date(b.ticketpurchasetime));
 
+        // Loops through dates to collect data against time
         let ticketPurchases = [];
         let ticketRevenue = [];
         let pageViews = [];
@@ -943,7 +954,7 @@ export const getEventDataService = async(req, res) => {
             totalConversion = totalTicketPurchaseEvents / totalPageViews;
         }
 
-        // Milestones:
+        // Milestones
         const goals = await getEventGoalMetricsDb(event.eventid);
         let milestones = []
 
@@ -970,6 +981,7 @@ export const getEventDataService = async(req, res) => {
     }
 }
 
+// Gets a to-do list for an event
 export const getEventTodoService = async(req, res) => {
     try {
         const todo = await getEventTaskByEventIDDb(req.params.eventID)
@@ -992,6 +1004,7 @@ export const getEventTodoService = async(req, res) => {
     }
 }
 
+// Adds a task to the to-do list for an event
 export const addEventTodoService = async(req, res) => {
     try {
         const todoList = await getEventTaskByEventIDDb(req.params.eventID)
@@ -1008,6 +1021,7 @@ export const addEventTodoService = async(req, res) => {
     }
 }
 
+// Updates a task on the to-do list for an event
 export const updateEventTodoService = async(req, res) => {
     try {
         const task = await getEventTaskByTaskIDDb(req.params.taskID)
@@ -1024,6 +1038,7 @@ export const updateEventTodoService = async(req, res) => {
     }
 }
 
+// Deletes a task on the to-do list for an event
 export const deleteEventTodoService = async(req, res) => {
     try {
         const task = await getEventTaskByTaskIDDb(req.params.taskID)
